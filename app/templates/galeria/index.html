@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Galería - Club de Robótica{% endblock %}
+
+{% block content %}
+<!-- Cabecera de Galería -->
+<section class="relative bg-dark-900 pt-32 pb-20 border-b-4 border-brand-500 overflow-hidden">
+    <!-- Abstract Background -->
+    <div class="absolute inset-0 w-full h-full opacity-10">
+        <svg class="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="grid-gal" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <rect width="40" height="40" fill="none" class="stroke-brand-500" stroke-width="0.5"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid-gal)"/>
+        </svg>
+    </div>
+    
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center" data-aos="fade-up">
+        <h1 class="text-4xl md:text-5xl font-display font-bold text-white mb-4">Nuestra Galería</h1>
+        <p class="text-xl text-gray-400 max-w-2xl mx-auto font-light">
+            Explora los recuerdos, torneos y proyectos que marcan la historia de nuestro Club de Robótica.
+        </p>
+    </div>
+</section>
+
+<!-- Content Grid para Álbumes -->
+<section class="py-16 bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for album in albumes %}
+            <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 group flex flex-col transform hover:-translate-y-1" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+                <!-- Imagen de Portada -->
+                <a href="{{ url_for('main.galeria_album', id=album.id) }}" class="block aspect-video bg-gray-100 relative overflow-hidden flex items-center justify-center">
+                    {% set fotos_activas = album.fotos | selectattr('activo', 'equalto', True) | list %}
+                    {% if fotos_activas|length > 0 %}
+                        <!-- Tomamos la primera foto activa como portada -->
+                        <img src="{{ url_for('static', filename='uploads/galeria/' ~ fotos_activas[0].imagen_path|replace('\\', '/')) }}" alt="Portada de {{ album.nombre }}" class="w-full h-full object-cover group-hover:scale-110 group-hover:rotate-1 transition-all duration-700">
+                    {% else %}
+                        <!-- Placeholder si el álbum está vacío -->
+                        <div class="absolute inset-0 bg-brand-900/5 group-hover:bg-brand-900/10 transition-colors z-10"></div>
+                        <svg class="w-16 h-16 text-brand-300 z-0 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    {% endif %}
+                    
+                    <!-- Overlay Overlay de hover -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                        <span class="text-white font-medium flex items-center gap-2">
+                            Ver Álbum Completo <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                        </span>
+                    </div>
+                </a>
+                
+                <!-- Info del Álbum -->
+                <div class="p-6 flex flex-col flex-grow">
+                    <div class="flex justify-between items-start mb-3">
+                        <h2 class="text-2xl font-bold text-gray-900 group-hover:text-brand-600 transition-colors line-clamp-1">
+                            <a href="{{ url_for('main.galeria_album', id=album.id) }}">{{ album.nombre }}</a>
+                        </h2>
+                        <span class="inline-flex items-center justify-center px-3 py-1 bg-brand-50 text-brand-600 text-xs font-bold rounded-full whitespace-nowrap ml-2">
+                            {{ fotos_activas|length }} Fotos
+                        </span>
+                    </div>
+                    
+                    <p class="text-gray-500 text-sm mb-4 line-clamp-2">{{ album.descripcion or 'Sin descripción disponible.' }}</p>
+                    
+                    <div class="mt-auto pt-4 border-t border-gray-100 flex items-center text-xs text-gray-400 font-medium uppercase tracking-wider">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        Publicado: {{ album.fecha_creacion.strftime('%d %b, %Y') }}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <!-- Estado Vacío General -->
+            <div class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-20 bg-white rounded-3xl border border-gray-200 border-dashed">
+                <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-10 h-10 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Aún no hay álbumes publicados</h3>
+                <p class="text-gray-500 max-w-md mx-auto">Nuestro equipo de fotografía está procesando los recuerdos. ¡Vuelve pronto!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -72,7 +72,7 @@
                     <a href="{{ url_for('main.horarios') }}" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Horarios</a>
                     <a href="{{ url_for('main.wro') }}" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">WRO</a>
                     <a href="{{ url_for('main.noticias') }}" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Noticias</a>
-                    <a href="{{ url_for('main.index') }}#galeria" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Galería</a>
+                    <a href="{{ url_for('main.galeria') }}" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Galería</a>
                 </nav>
 
                 <!-- Action Button -->
@@ -101,7 +101,7 @@
                 <a href="{{ url_for('main.horarios') }}" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Horarios</a>
                 <a href="{{ url_for('main.wro') }}" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">WRO</a>
                 <a href="{{ url_for('main.noticias') }}" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Noticias</a>
-                <a href="{{ url_for('main.index') }}#galeria" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Galería</a>
+                <a href="{{ url_for('main.galeria') }}" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Galería</a>
                 {% if current_user.is_authenticated and current_user.rol == 'admin' %}
                     <a href="/admin" class="block w-full text-center px-4 py-3 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl transition-colors shadow-lg">Panel Admin</a>
                     <a href="{{ url_for('main.admin_logout') }}" class="block w-full text-center px-4 py-3 border border-gray-600 hover:bg-gray-800 text-white font-semibold rounded-xl transition-colors mt-2">Cerrar Sesión</a>
@@ -154,7 +154,7 @@
                         <li><a href="{{ url_for('main.about') }}" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Sobre nosotros</a></li>
                         <li><a href="{{ url_for('main.noticias') }}" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Noticias del Club</a></li>
                         <li><a href="{{ url_for('main.index') }}#proyectos" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Nuestros Proyectos</a></li>
-                        <li><a href="{{ url_for('main.index') }}#galeria" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Galería visual</a></li>
+                        <li><a href="{{ url_for('main.galeria') }}" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Galería visual</a></li>
                     </ul>
                 </div>
 

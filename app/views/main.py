@@ -9,6 +9,8 @@ import sys
 from app.forms import RegistrationForm, AdminLoginForm
 from app.models import User
 from app.models.noticia import Noticia
+from app.models.album import Album
+from app.models.foto import Foto
 from app.extensions import db, mail
 from flask_login import login_user, logout_user, login_required, current_user
 
@@ -67,6 +69,19 @@ def noticias():
 def noticia_detalle(id):
     noticia = Noticia.query.filter_by(id=id, activo=True).first_or_404()
     return render_template('noticias/detalle.html', noticia=noticia)
+
+@main_bp.route('/galeria')
+def galeria():
+    # Obtener todos los Álbumes activos, ordenados por fecha de creación desc
+    albumes = Album.query.filter_by(activo=True).order_by(Album.fecha_creacion.desc()).all()
+    return render_template('galeria/index.html', albumes=albumes)
+
+@main_bp.route('/galeria/<int:id>')
+def galeria_album(id):
+    album = Album.query.filter_by(id=id, activo=True).first_or_404()
+    # Las fotos se pueden iterar desde `album.fotos` en Jinja, pero validaremos solo foto.activo
+    fotos_activas = [foto for foto in album.fotos if foto.activo]
+    return render_template('galeria/album.html', album=album, fotos=fotos_activas)
 
 @main_bp.route('/horarios')
 def horarios():

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}{{ album.nombre }} - Galería{% endblock %}
+
+{% block extra_css %}
+<!-- GLightbox CSS CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
+<style>
+    /* Ajustes sutiles para que el Lightbox herede identidad visual */
+    .goverlay { background: rgba(15, 23, 42, 0.95); } /* Slate 900 de Tailwind */
+    .gslide-desc {
+        background: rgba(15, 23, 42, 0.9) !important;
+        color: white !important;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Back Link -->
+<div class="bg-white border-b border-gray-100 pt-24 pb-4">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <a href="{{ url_for('main.galeria') }}" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-brand-600 transition-colors">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Volver a Álbumes
+        </a>
+    </div>
+</div>
+
+<article class="bg-gray-50 min-h-screen pb-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 text-center" data-aos="fade-down">
+        <!-- Título del Álbum -->
+        <h1 class="text-4xl md:text-5xl font-display font-extrabold text-gray-900 mb-4">{{ album.nombre }}</h1>
+        <p class="text-lg text-gray-500 max-w-3xl mx-auto mb-8">{{ album.descripcion or 'Revive los mejores momentos de este evento en nuestra galería oficial.' }}</p>
+        
+        <div class="inline-flex items-center justify-center gap-6 px-6 py-3 bg-white rounded-full shadow-sm text-sm border border-gray-100 mb-16">
+            <span class="flex items-center text-gray-600 font-medium">
+                <svg class="w-5 h-5 mr-2 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                {{ fotos|length }} Fotografías
+            </span>
+            <span class="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
+            <span class="flex items-center text-gray-600 font-medium">
+                <svg class="w-5 h-5 mr-2 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                {{ album.fecha_creacion.strftime('%d %b, %Y') }}
+            </span>
+        </div>
+
+        <!-- Mampostería / Cuadrícula de Fotos -->
+        <!-- Usamos CSS columns para crear un efecto Masonry real si se desea, o CSS Grid. Usaremos Grid cuadrado estándar super equilibrado. -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {% for foto in fotos %}
+                <!-- GLightbox Anchor -->
+                <!-- Todo envuelto en <a> con clase "glightbox" para detonar el modal interactivo -->
+                {% set img_url = url_for('static', filename='uploads/galeria/' ~ foto.imagen_path|replace('\\', '/')) %}
+                
+                <a href="{{ img_url }}" 
+                   class="glightbox block relative group rounded-2xl overflow-hidden aspect-square bg-white shadow-sm hover:shadow-xl transition-shadow duration-300"
+                   data-gallery="album-{{ album.id }}"
+                   data-title="{{ foto.titulo }}"
+                   data-description="Agregado el {{ foto.fecha_subida.strftime('%d de %B, %Y') }}"
+                   data-aos="zoom-in" 
+                   data-aos-delay="{{ loop.index0 % 10 * 50 }}">
+                    
+                    <img src="{{ img_url }}" alt="{{ foto.titulo }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    
+                    <!-- Hover Lente de Zoom -->
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transform scale-50 group-hover:scale-100 transition-transform duration-300">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+                        </div>
+                    </div>
+                </a>
+            {% else %}
+                <div class="col-span-full py-20 text-center text-gray-500 bg-white rounded-3xl border border-gray-200 border-dashed">
+                    <p class="text-xl font-medium">Álbum en construcción</p>
+                    <p class="mt-2">Las fotografías están siendo procesadas por el Administrador.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</article>
+{% endblock %}
+
+{% block extra_js %}
+<!-- GLightbox JS CDN e Inicialización -->
+<script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const lightbox = GLightbox({
+            selector: '.glightbox',
+            touchNavigation: true,
+            loop: true,
+            zoomable: true,
+            descPosition: 'bottom',
+        });
+    });
+</script>
+{% endblock %}
