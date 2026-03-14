@@ -194,9 +194,9 @@
                 <div class="space-y-4">
                     <h3 class="text-white font-display font-semibold tracking-wide uppercase text-sm">Legal</h3>
                     <ul class="space-y-3">
-                        <li><a href="#" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Términos y Condiciones</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Política de Privacidad</a></li>
-                        <li><a href="#registro" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Contacto</a></li>
+                        <li><a href="{{ url_for('main.terminos') }}" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Términos y Condiciones</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-brand-500 text-sm transition-colors opacity-50 cursor-not-allowed" title="Próximamente">Política de Privacidad</a></li>
+                        <li><a href="{{ url_for('main.index') }}#registro" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Contacto</a></li>
                     </ul>
                 </div>
             </div>

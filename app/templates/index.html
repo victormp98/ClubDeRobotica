@@ -253,7 +253,7 @@
                 <h2 class="text-base text-brand-600 font-semibold tracking-wide uppercase mb-2">Momentos</h2>
                 <h3 class="text-3xl md:text-4xl font-display font-bold text-gray-900">Galería del Club</h3>
             </div>
-            <a href="#" class="hidden sm:inline-flex items-center gap-1 text-brand-600 font-medium hover:text-dark-900 transition-colors">
+            <a href="{{ url_for('main.galeria') }}" class="hidden sm:inline-flex items-center gap-1 text-brand-600 font-medium hover:text-dark-900 transition-colors">
                 Ver Todo <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
             </a>
         </div>
@@ -283,7 +283,7 @@
         </div>
         
         <div class="mt-8 text-center sm:hidden">
-            <a href="#" class="inline-flex items-center justify-center w-full px-6 py-3 border border-gray-300 text-base font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50">
+            <a href="{{ url_for('main.galeria') }}" class="inline-flex items-center justify-center w-full px-6 py-3 border border-gray-300 text-base font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50">
                 Ver Toda la Galería
             </a>
         </div>
