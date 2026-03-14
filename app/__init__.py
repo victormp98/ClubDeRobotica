@@ -9,6 +9,9 @@ def create_app(config_class=Config):
     # Initialize Flask extensions here
     db.init_app(app)
     migrate.init_app(app, db)
+    
+    from .extensions import mail
+    mail.init_app(app)
 
     # Register blueprints here
     from app.views.main import main_bp
