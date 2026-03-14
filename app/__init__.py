@@ -14,4 +14,7 @@ def create_app(config_class=Config):
     from app.views.main import main_bp
     app.register_blueprint(main_bp)
 
+    # Ensure all models are imported so Alembic can detect them
+    from app import models
+
     return app
