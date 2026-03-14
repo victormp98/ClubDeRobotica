@@ -11,6 +11,7 @@ from app.models import User
 from app.models.noticia import Noticia
 from app.models.album import Album
 from app.models.foto import Foto
+from app.models.horario import Horario
 from app.extensions import db, mail
 from flask_login import login_user, logout_user, login_required, current_user
 
@@ -85,7 +86,23 @@ def galeria_album(id):
 
 @main_bp.route('/horarios')
 def horarios():
-    return render_template('horarios.html')
+    horarios_activos = Horario.query.filter_by(activo=True).all()
+    
+    # Custom sort by day of the week, then by start time
+    dias_orden = {
+        'Lunes': 1, 'Martes': 2, 'Miércoles': 3, 
+        'Jueves': 4, 'Viernes': 5, 'Sábado': 6, 'Domingo': 7
+    }
+    
+    def sort_horarios(h):
+        peso_dia = dias_orden.get(h.dia_semana, 99)
+        # Handle time safely if present
+        peso_hora = h.hora_inicio.strftime('%H:%M:%S') if h.hora_inicio else '00:00:00'
+        return (peso_dia, peso_hora)
+        
+    horarios_ordenados = sorted(horarios_activos, key=sort_horarios)
+
+    return render_template('horarios.html', horarios=horarios_ordenados)
 
 @main_bp.route('/wro')
 def wro():

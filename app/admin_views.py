@@ -1,10 +1,14 @@
 from flask_admin import AdminIndexView, expose
+from flask_admin.model import typefmt
+from markupsafe import Markup
+from wtforms.validators import DataRequired
+from wtforms import fields, validators, SelectField
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.actions import action
 from flask_admin import form
+import sys
 from flask_login import current_user
 from flask import redirect, url_for, flash, current_app
-from markupsafe import Markup
 from flask_mail import Message
 from app.models.user import User
 from app.models.noticia import Noticia
@@ -232,5 +236,37 @@ class FotoAdmin(SecureModelView):
             max_size=(1200, 1200, False), 
             thumbnail_size=(250, 250, True),
         )
+    }
+
+class HorarioAdmin(SecureModelView):
+    column_list = ('dia_semana', 'hora_inicio', 'hora_fin', 'descripcion', 'activo')
+    form_columns = ('dia_semana', 'hora_inicio', 'hora_fin', 'descripcion', 'activo')
+    column_filters = ('dia_semana', 'activo')
+    
+    column_labels = {
+        'dia_semana': 'Día de la Semana',
+        'hora_inicio': 'Hora de Inicio',
+        'hora_fin': 'Hora de Fin',
+        'descripcion': 'Descripción / Nivel',
+        'activo': 'Visible al Público'
+    }
+
+    form_overrides = {
+        'dia_semana': SelectField
+    }
+    
+    form_args = {
+        'dia_semana': {
+            'choices': [
+                ('Lunes', 'Lunes'),
+                ('Martes', 'Martes'),
+                ('Miércoles', 'Miércoles'),
+                ('Jueves', 'Jueves'),
+                ('Viernes', 'Viernes'),
+                ('Sábado', 'Sábado'),
+                ('Domingo', 'Domingo')
+            ],
+            'validators': [DataRequired()]
+        }
     }
 
