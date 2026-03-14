@@ -76,7 +76,7 @@
 
                 <!-- Action Button -->
                 <div class="hidden md:flex items-center">
-                    <a href="{{ url_for('main.index') }}#registro" class="inline-flex items-center justify-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-full text-white bg-brand-500 hover:bg-brand-600 shadow-lg shadow-brand-500/30 transition-all duration-300 hover:-translate-y-0.5">
+                    <a href="{{ url_for('main.registro') }}" class="inline-flex items-center justify-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-full text-white bg-brand-500 hover:bg-brand-600 shadow-lg shadow-brand-500/30 transition-all duration-300 hover:-translate-y-0.5">
                         Únete Ahora
                     </a>
                 </div>
@@ -100,15 +100,29 @@
                 <a href="{{ url_for('main.horarios') }}" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Horarios</a>
                 <a href="{{ url_for('main.wro') }}" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">WRO</a>
                 <a href="{{ url_for('main.index') }}#galeria" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Galería</a>
-                <a href="{{ url_for('main.index') }}#registro" class="mt-4 block w-full text-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-brand-500 hover:bg-brand-600 shadow-md">
+                <a href="{{ url_for('main.registro') }}" class="mt-4 block w-full text-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-brand-500 hover:bg-brand-600 shadow-md">
                     Únete Ahora
                 </a>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="pt-20">
+    <!-- Main Content y Flash Globales (si no se manejan en hijo) -->
+    <main class="flex-grow">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages and not request.endpoint == 'main.registro' %}
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+                    {% for category, message in messages %}
+                        {% if category == 'success' %}
+                        <div class="flex items-start gap-3 p-4 mb-4 bg-emerald-50 border border-emerald-200 rounded-xl shadow-sm" data-aos="fade-down">
+                            <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <p class="text-emerald-700 text-sm font-medium">{{ message }}</p>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
         {% block content %}{% endblock %}
     </main>
 
