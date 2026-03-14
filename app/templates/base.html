@@ -67,19 +67,33 @@
                 </div>
 
                 <!-- Desktop Navigation -->
-                <nav class="hidden md:flex space-x-8">
+                <nav class="hidden md:flex space-x-8 items-center">
                     <a href="{{ url_for('main.about') }}" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Sobre el Club</a>
                     <a href="{{ url_for('main.horarios') }}" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Horarios</a>
                     <a href="{{ url_for('main.wro') }}" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">WRO</a>
                     <a href="{{ url_for('main.noticias') }}" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Noticias</a>
                     <a href="{{ url_for('main.galeria') }}" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Galería</a>
+                    {% if current_user.is_authenticated and (current_user.rol == 'admin' or current_user.aprobado) %}
+                    <a href="{{ url_for('main.miembros_index') }}" class="text-sm font-semibold text-brand-600 hover:text-brand-700 border border-brand-200 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-full transition-colors">★ Zona Miembros</a>
+                    {% endif %}
                 </nav>
 
                 <!-- Action Button -->
-                <div class="hidden md:flex items-center">
-                    <a href="{{ url_for('main.registro') }}" class="inline-flex items-center justify-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-full text-white bg-brand-500 hover:bg-brand-600 shadow-lg shadow-brand-500/30 transition-all duration-300 hover:-translate-y-0.5">
-                        Únete Ahora
-                    </a>
+                <div class="hidden md:flex items-center gap-3">
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.rol == 'admin' %}
+                        <a href="/admin" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Panel Admin</a>
+                        {% endif %}
+                        <a href="{{ url_for('main.logout') }}" class="inline-flex items-center justify-center px-5 py-2 border border-gray-300 text-sm font-medium rounded-full text-gray-700 hover:bg-gray-100 transition-all duration-200">
+                            <svg class="w-4 h-4 mr-1.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                            Cerrar Sesión
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('main.login') }}" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Ingresar</a>
+                        <a href="{{ url_for('main.registro') }}" class="inline-flex items-center justify-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-full text-white bg-brand-500 hover:bg-brand-600 shadow-lg shadow-brand-500/30 transition-all duration-300 hover:-translate-y-0.5">
+                            Únete Ahora
+                        </a>
+                    {% endif %}
                 </div>
 
                 <!-- Mobile menu button -->
@@ -92,9 +106,7 @@
                     </button>
                 </div>
             </div>
-        </div>
-
-        <!-- Mobile Navigation Menu -->
+             <!-- Mobile Navigation Menu -->
         <div class="md:hidden hidden bg-white border-t border-gray-100" id="mobile-menu">
             <div class="px-4 pt-2 pb-6 space-y-1 shadow-xl">
                 <a href="{{ url_for('main.about') }}" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Sobre el Club</a>
@@ -102,28 +114,49 @@
                 <a href="{{ url_for('main.wro') }}" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">WRO</a>
                 <a href="{{ url_for('main.noticias') }}" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Noticias</a>
                 <a href="{{ url_for('main.galeria') }}" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Galería</a>
-                {% if current_user.is_authenticated and current_user.rol == 'admin' %}
+                {% if current_user.is_authenticated %}
+                    {% if current_user.aprobado or current_user.rol == 'admin' %}
+                    <a href="{{ url_for('main.miembros_index') }}" class="block px-3 py-3 rounded-md text-base font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 transition-colors">★ Zona Miembros</a>
+                    {% endif %}
+                    {% if current_user.rol == 'admin' %}
                     <a href="/admin" class="block w-full text-center px-4 py-3 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl transition-colors shadow-lg">Panel Admin</a>
-                    <a href="{{ url_for('main.admin_logout') }}" class="block w-full text-center px-4 py-3 border border-gray-600 hover:bg-gray-800 text-white font-semibold rounded-xl transition-colors mt-2">Cerrar Sesión</a>
+                    {% endif %}
+                    <a href="{{ url_for('main.logout') }}" class="block w-full text-center px-4 py-3 border border-gray-300 hover:bg-gray-100 text-gray-700 font-semibold rounded-xl transition-colors mt-2">Cerrar Sesión</a>
                 {% else %}
-                    <a href="{{ url_for('main.registro') }}" class="mt-4 block w-full text-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-brand-500 hover:bg-brand-600 shadow-md">
-                        Únete Ahora
+                    <a href="{{ url_for('main.login') }}" class="mt-4 block w-full text-center px-6 py-3 border border-brand-500 text-brand-600 text-base font-medium rounded-xl hover:bg-brand-50">Iniciar Sesión</a>
+                    <a href="{{ url_for('main.registro') }}" class="mt-2 block w-full text-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-brand-500 hover:bg-brand-600 shadow-md">
+                        Únjete Ahora
                     </a>
                 {% endif %}
             </div>
-        </div>
+        </div>        </div>
     </header>
 
-    <!-- Main Content y Flash Globales (si no se manejan en hijo) -->
+    <!-- Main Content y Flash Globales -->
     <main class="flex-grow">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages and not request.endpoint == 'main.registro' %}
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-24">
                     {% for category, message in messages %}
                         {% if category == 'success' %}
                         <div class="flex items-start gap-3 p-4 mb-4 bg-emerald-50 border border-emerald-200 rounded-xl shadow-sm" data-aos="fade-down">
                             <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             <p class="text-emerald-700 text-sm font-medium">{{ message }}</p>
+                        </div>
+                        {% elif category == 'warning' %}
+                        <div class="flex items-start gap-3 p-4 mb-4 bg-amber-50 border border-amber-200 rounded-xl shadow-sm" data-aos="fade-down">
+                            <svg class="w-5 h-5 text-amber-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            <p class="text-amber-700 text-sm font-medium">{{ message }}</p>
+                        </div>
+                        {% elif category == 'error' %}
+                        <div class="flex items-start gap-3 p-4 mb-4 bg-red-50 border border-red-200 rounded-xl shadow-sm" data-aos="fade-down">
+                            <svg class="w-5 h-5 text-red-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <p class="text-red-700 text-sm font-medium">{{ message }}</p>
+                        </div>
+                        {% elif category == 'info' %}
+                        <div class="flex items-start gap-3 p-4 mb-4 bg-blue-50 border border-blue-200 rounded-xl shadow-sm" data-aos="fade-down">
+                            <svg class="w-5 h-5 text-blue-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <p class="text-blue-700 text-sm font-medium">{{ message }}</p>
                         </div>
                         {% endif %}
                     {% endfor %}
