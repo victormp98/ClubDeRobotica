@@ -1,8 +1,23 @@
 from flask_admin import AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
+from flask_admin.actions import action
 from flask_login import current_user
-from flask import redirect, url_for, flash
+from flask import redirect, url_for, flash, current_app
+from flask_mail import Message
 from app.models.user import User
+from app.extensions import mail
+import threading
+import sys
+import traceback
+
+def send_async_email(app, msg):
+    with app.app_context():
+        try:
+            mail.send(msg)
+            print(f"[MAIL_SUCCESS] Correo enviado a {msg.recipients}")
+        except Exception as e:
+            print(f"[MAIL_ERROR] No se pudo enviar el correo a {msg.recipients}. Credenciales dummy.")
+            print(traceback.format_exc(), file=sys.stderr)
 
 class MyAdminIndexView(AdminIndexView):
     def is_accessible(self):
@@ -65,7 +80,43 @@ class UserAdmin(SecureModelView):
             self.session.rollback()
             return False
 
-    # (Opcional) Logica POST-Edicion: si cambia `aprobado` a True de repente, ideal mandar email de bienvenida.
+    # Custom batch action para Aprobar usuarios masivamente y mandar email
+    @action('approve', 'Aprobar Seleccionados', '¿Estás seguro de que quieres aprobar a los usuarios seleccionados y enviarles un correo de bienvenida?')
+    def action_approve(self, ids):
+        try:
+            query = User.query.filter(User.id.in_(ids))
+            count = 0
+            
+            # Obtener el proxy de la app real para pasarla a los hilos
+            app = current_app._get_current_object()
+            
+            for user in query.all():
+                if not user.aprobado:
+                    user.aprobado = True
+                    count += 1
+                    
+                    # Preparar correo de bienvenida
+                    msg = Message(
+                        subject="¡Bienvenido al Club de Robótica!",
+                        sender=app.config.get('MAIL_DEFAULT_SENDER', 'noreply@clubrobotica.unach.mx'),
+                        recipients=[user.email]
+                    )
+                    msg.body = f"Hola {user.nombre},\n\nTu solicitud de ingreso ha sido aprobada por un administrador del Club de Robótica.\n\nYa eres oficialmente un miembro activo. ¡Bienvenido al equipo!\n\nSaludos."
+                    
+                    # Mandar correo en hilo de fondo
+                    thread = threading.Thread(target=send_async_email, args=(app, msg))
+                    thread.start()
+
+            self.session.commit()
+            if count > 0:
+                flash(f'{count} usuarios fueron aprobados con éxito y se les envió un correo.', 'success')
+            else:
+                flash('Ningún usuario nuevo fue aprobado (quizás ya estaban aprobados).', 'info')
+        except Exception as ex:
+            if not self.handle_view_exception(ex):
+                flash(f'Hubo un error aprobando usuarios: {str(ex)}', 'error')
+            self.session.rollback()
+
+    # (Opcional) Logica POST-Edicion
     def on_model_change(self, form, model, is_created):
-        # Cuando se actualiza un usuario y se aprueba por primera vez
-        pass # Por ahora no lo conectaré a Mailer para no complicar dependencias cruzadas en admin_views
+        pass
