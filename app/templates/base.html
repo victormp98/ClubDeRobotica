@@ -68,10 +68,10 @@
 
                 <!-- Desktop Navigation -->
                 <nav class="hidden md:flex space-x-8">
-                    <a href="#about" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Sobre el Club</a>
-                    <a href="#proyectos" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Proyectos</a>
-                    <a href="#wro" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">WRO</a>
-                    <a href="#galeria" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Galería</a>
+                    <a href="{{ url_for('main.about') }}" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Sobre el Club</a>
+                    <a href="{{ url_for('main.index') }}#proyectos" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Proyectos</a>
+                    <a href="{{ url_for('main.index') }}#wro" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">WRO</a>
+                    <a href="{{ url_for('main.index') }}#galeria" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Galería</a>
                 </nav>
 
                 <!-- Action Button -->
@@ -96,11 +96,11 @@
         <!-- Mobile Navigation Menu -->
         <div class="md:hidden hidden bg-white border-t border-gray-100" id="mobile-menu">
             <div class="px-4 pt-2 pb-6 space-y-1 shadow-xl">
-                <a href="#about" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Sobre el Club</a>
-                <a href="#proyectos" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Proyectos</a>
-                <a href="#wro" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">WRO</a>
-                <a href="#galeria" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Galería</a>
-                <a href="#registro" class="mt-4 block w-full text-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-brand-500 hover:bg-brand-600 shadow-md">
+                <a href="{{ url_for('main.about') }}" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Sobre el Club</a>
+                <a href="{{ url_for('main.index') }}#proyectos" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Proyectos</a>
+                <a href="{{ url_for('main.index') }}#wro" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">WRO</a>
+                <a href="{{ url_for('main.index') }}#galeria" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Galería</a>
+                <a href="{{ url_for('main.index') }}#registro" class="mt-4 block w-full text-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-brand-500 hover:bg-brand-600 shadow-md">
                     Únete Ahora
                 </a>
             </div>
@@ -130,9 +130,9 @@
                 <div class="space-y-4">
                     <h3 class="text-white font-display font-semibold tracking-wide uppercase text-sm">Explora</h3>
                     <ul class="space-y-3">
-                        <li><a href="#about" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Sobre nosotros</a></li>
-                        <li><a href="#proyectos" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Nuestros Proyectos</a></li>
-                        <li><a href="#galeria" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Galería visual</a></li>
+                        <li><a href="{{ url_for('main.about') }}" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Sobre nosotros</a></li>
+                        <li><a href="{{ url_for('main.index') }}#proyectos" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Nuestros Proyectos</a></li>
+                        <li><a href="{{ url_for('main.index') }}#galeria" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Galería visual</a></li>
                     </ul>
                 </div>
 
