@@ -39,8 +39,8 @@ class MyAdminIndexView(AdminIndexView):
         return current_user.is_authenticated and current_user.rol == 'admin'
 
     def inaccessible_callback(self, name, **kwargs):
-        flash('Debes iniciar sesión para acceder al panel de control.', 'error')
-        return redirect(url_for('main.admin_login'))
+        flash('Debes iniciar sesión con rol Administrador para acceder al panel de control.', 'error')
+        return redirect(url_for('main.login'))
 
     @expose('/')
     def index(self):
@@ -53,8 +53,8 @@ class SecureModelView(ModelView):
         return current_user.is_authenticated and current_user.rol == 'admin'
 
     def inaccessible_callback(self, name, **kwargs):
-        flash('Debes iniciar sesión como administrador para acceder a esta página.', 'error')
-        return redirect(url_for('main.admin_login'))
+        flash('Debes iniciar sesión como administrador para acceder a esta tabla de datos.', 'error')
+        return redirect(url_for('main.login'))
 
 class UserAdmin(SecureModelView):
     # Columnas visibles en la lista
@@ -130,6 +130,21 @@ class UserAdmin(SecureModelView):
         except Exception as ex:
             if not self.handle_view_exception(ex):
                 flash(f'Hubo un error aprobando usuarios: {str(ex)}', 'error')
+            self.session.rollback()
+
+    @action('reset_password', 'Resetear Contraseña', '¿Estás seguro de que quieres sobreescribir la contraseña de los alumnos seleccionados al valor por defecto "robotica2026"?')
+    def action_reset_password(self, ids):
+        try:
+            query = User.query.filter(User.id.in_(ids))
+            count = 0
+            for user in query.all():
+                user.set_password("robotica2026")
+                count += 1
+            self.session.commit()
+            flash(f'Contraseña reseteada a "robotica2026" para {count} usuarios exitosamente.', 'success')
+        except Exception as ex:
+            if not self.handle_view_exception(ex):
+                flash(f'Hubo un fatal error reseteando contraseñas: {str(ex)}', 'error')
             self.session.rollback()
 
     # (Opcional) Logica POST-Edicion

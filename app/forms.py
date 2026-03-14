@@ -1,6 +1,12 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SelectField, SubmitField
+from wtforms import StringField, PasswordField, SelectField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
+
+class LoginForm(FlaskForm):
+    email = StringField('Correo Electrónico', validators=[DataRequired(), Email(message='Correo electrónico inválido')])
+    password = PasswordField('Contraseña', validators=[DataRequired()])
+    remember_me = BooleanField('Mantener sesión iniciada')
+    submit = SubmitField('Ingresar')
 
 class RegistrationForm(FlaskForm):
     nombre = StringField('Nombre Completo', validators=[
@@ -42,3 +48,8 @@ class AdminLoginForm(FlaskForm):
     email = StringField('Correo Electrónico', validators=[DataRequired(), Email()])
     password = PasswordField('Contraseña', validators=[DataRequired()])
     submit = SubmitField('Iniciar Sesión')
+
+class NoticiaForm(FlaskForm):
+    titulo = StringField('Título', validators=[DataRequired(), Length(max=200)])
+    contenido = StringField('Contenido HTML', validators=[DataRequired()])
+    submit = SubmitField('Publicar')

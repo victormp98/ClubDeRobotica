@@ -6,14 +6,23 @@ import threading
 import traceback
 import sys
 
-from app.forms import RegistrationForm, AdminLoginForm
-from app.models import User
-from app.models.noticia import Noticia
-from app.models.album import Album
-from app.models.foto import Foto
-from app.models.horario import Horario
+from app.forms import RegistrationForm, AdminLoginForm, NoticiaForm, LoginForm
+from app.models import Noticia, Album, Foto, Horario, User
+from functools import wraps
 from app.extensions import db, mail
-from flask_login import login_user, logout_user, login_required, current_user
+from flask_login import login_user, logout_user, current_user, login_required
+
+def miembro_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated:
+            flash('Debes iniciar sesión para ver este contenido.', 'warning')
+            return redirect(url_for('main.login', next=request.url))
+        if current_user.rol != 'admin' and not current_user.aprobado:
+            flash('Tu cuenta aún no ha sido aprobada por un administrador.', 'error')
+            return redirect(url_for('main.index'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 main_bp = Blueprint('main', __name__)
 
@@ -103,6 +112,44 @@ def horarios():
     horarios_ordenados = sorted(horarios_activos, key=sort_horarios)
 
     return render_template('horarios.html', horarios=horarios_ordenados)
+
+@main_bp.route('/terminos')
+def terminos():
+    return render_template('terminos.html')
+
+@main_bp.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and user.check_password(form.password.data):
+            login_user(user, remember=form.remember_me.data)
+            next_page = request.args.get('next')
+            # Seguridad: garantizar que la página de redirección sea local
+            from werkzeug.urls import url_parse
+            if not next_page or url_parse(next_page).netloc != '':
+                if current_user.rol == 'admin':
+                    next_page = url_for('admin.index')
+                else:
+                    next_page = url_for('main.index')
+            return redirect(next_page)
+        else:
+            flash('Usuario o contraseña incorrectos', 'error')
+    return render_template('login.html', form=form)
+
+@main_bp.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Has cerrado sesión exitosamente', 'success')
+    return redirect(url_for('main.index'))
+
+@main_bp.route('/miembros')
+@miembro_required
+def miembros_index():
+    return render_template('miembros/index.html')
 
 @main_bp.route('/wro')
 def wro():
