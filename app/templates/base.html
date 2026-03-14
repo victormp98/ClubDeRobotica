@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Club de Robótica{% endblock %}</title>
+    
+    <!-- Meta Descriptions -->
+    <meta name="description" content="Bienvenido al Club de Robótica. Descubre nuestros proyectos, talleres y únete a nuestra comunidad apasionada por la tecnología.">
+
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Tailwind Configuration for Brand Colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6', // Teal vibrant
+                            600: '#0d9488',
+                            900: '#134e4a',
+                        },
+                        dark: {
+                            800: '#1e293b',
+                            900: '#0f172a'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- AOS CSS (CDN) -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50 text-dark-800 font-sans antialiased overflow-x-hidden">
+
+    <!-- Sticky Navbar -->
+    <header class="fixed w-full top-0 z-50 transition-all duration-300 backdrop-blur-md bg-white/80 border-b border-gray-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="{{ url_for('main.index') }}" class="flex items-center gap-2 group">
+                        <div class="w-10 h-10 rounded-xl bg-brand-500 flex items-center justify-center text-white font-display font-bold text-xl group-hover:bg-brand-600 transition-colors shadow-lg shadow-brand-500/30">
+                            CR
+                        </div>
+                        <span class="font-display font-bold text-xl tracking-tight text-dark-900">
+                            Club de Robótica
+                        </span>
+                    </a>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#about" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Sobre el Club</a>
+                    <a href="#proyectos" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Proyectos</a>
+                    <a href="#wro" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">WRO</a>
+                    <a href="#galeria" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Galería</a>
+                </nav>
+
+                <!-- Action Button -->
+                <div class="hidden md:flex items-center">
+                    <a href="#registro" class="inline-flex items-center justify-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-full text-white bg-brand-500 hover:bg-brand-600 shadow-lg shadow-brand-500/30 transition-all duration-300 hover:-translate-y-0.5">
+                        Únete Ahora
+                    </a>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-button" type="button" class="text-gray-500 hover:text-brand-600 focus:outline-none p-2" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Abrir menú principal</span>
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div class="md:hidden hidden bg-white border-t border-gray-100" id="mobile-menu">
+            <div class="px-4 pt-2 pb-6 space-y-1 shadow-xl">
+                <a href="#about" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Sobre el Club</a>
+                <a href="#proyectos" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Proyectos</a>
+                <a href="#wro" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">WRO</a>
+                <a href="#galeria" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Galería</a>
+                <a href="#registro" class="mt-4 block w-full text-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-brand-500 hover:bg-brand-600 shadow-md">
+                    Únete Ahora
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-20">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark-900 border-t border-dark-800 pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12 text-center md:text-left">
+                
+                <div class="space-y-4 flex flex-col items-center md:items-start">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center text-white font-display font-bold text-sm">CR</div>
+                        <span class="font-display font-bold text-lg tracking-tight text-white">Club de Robótica</span>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed max-w-xs">
+                        Impulsando la innovación tecnológica, el trabajo en equipo y el desarrollo de habilidades en robótica para el futuro.
+                    </p>
+                </div>
+
+                <div class="space-y-4">
+                    <h3 class="text-white font-display font-semibold tracking-wide uppercase text-sm">Explora</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#about" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Sobre nosotros</a></li>
+                        <li><a href="#proyectos" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Nuestros Proyectos</a></li>
+                        <li><a href="#galeria" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Galería visual</a></li>
+                    </ul>
+                </div>
+
+                <div class="space-y-4">
+                    <h3 class="text-white font-display font-semibold tracking-wide uppercase text-sm">Legal</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Términos y Condiciones</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Política de Privacidad</a></li>
+                        <li><a href="#registro" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Contacto</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="pt-8 border-t border-dark-800 text-center">
+                <p class="text-gray-500 text-sm">
+                    &copy; <script>document.write(new Date().getFullYear())</script> Club de Robótica. Todos los derechos reservados.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- AOS JS (CDN) -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS animations
+        document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({
+                duration: 800,
+                easing: 'ease-out-cubic',
+                once: true,
+                offset: 50,
+            });
+
+            // Mobile menu toggle
+            const btn = document.getElementById('mobile-menu-button');
+            const menu = document.getElementById('mobile-menu');
+            
+            if(btn && menu) {
+                btn.addEventListener('click', () => {
+                    menu.classList.toggle('hidden');
+                });
+            }
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
