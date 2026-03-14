@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+
+{% block title %}WRO México 2026 – Club de Robótica{% endblock %}
+
+{% block content %}
+
+<!-- PAGE HERO -->
+<section class="relative bg-dark-900 py-28 overflow-hidden">
+    <div class="absolute inset-0 opacity-20">
+        <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M0 40L40 0H20L0 20M40 40V20L20 40" stroke="currentColor" stroke-width="0.5" class="text-brand-500 fill-none"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)"/>
+        </svg>
+    </div>
+    <div class="absolute top-1/3 right-1/4 w-80 h-80 bg-indigo-600/20 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 left-1/4 w-60 h-60 bg-brand-500/15 rounded-full blur-3xl"></div>
+
+    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center" data-aos="fade-up">
+        <span class="inline-block py-1 px-3 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-sm font-semibold tracking-wider mb-6">
+            COMPETENCIA INTERNACIONAL
+        </span>
+        <h1 class="text-4xl md:text-6xl font-display font-extrabold text-white tracking-tight mb-6 leading-tight">
+            World Robot Olympiad<br class="hidden md:block"/>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-indigo-400">México 2026</span>
+        </h1>
+        <p class="text-xl text-gray-300 font-light leading-relaxed max-w-2xl mx-auto mb-8">
+            La WRO es la mayor olimpiada de robótica del mundo. Este es tu reto, tu oportunidad y tu momento de brillar representando al club.
+        </p>
+        <a href="https://wro-association.org/" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-brand-400 hover:text-white text-sm font-semibold transition-colors">
+            Visitar sitio oficial WRO
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        </a>
+    </div>
+</section>
+
+<!-- FECHAS CLAVE -->
+<section class="py-16 bg-white border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12" data-aos="fade-up">
+            <h2 class="text-base text-brand-600 font-semibold tracking-wide uppercase mb-2">Calendario</h2>
+            <h3 class="text-3xl md:text-4xl font-display font-bold text-gray-900">Fechas Clave 2026</h3>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% set fechas = [
+                ("Ene – Mar", "Formación de equipos e inscripción interna en el club.", "bg-brand-500"),
+                ("Abril", "Registro oficial en la plataforma WRO México.", "bg-indigo-600"),
+                ("May – Jul", "Fase de clasificación regional / estatal.", "bg-pink-600"),
+                ("Ago – Oct", "Final Nacional & posible World Final.", "bg-orange-500"),
+            ] %}
+            {% for periodo, desc, color in fechas %}
+            <div class="relative rounded-2xl bg-gray-50 border border-gray-100 p-6 hover:shadow-lg transition-all" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                <div class="inline-block rounded-xl {{ color }} px-3 py-1 text-white text-xs font-bold tracking-wider mb-4">{{ periodo }}</div>
+                <p class="text-gray-700 text-sm leading-relaxed">{{ desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <p class="text-center text-gray-400 text-xs mt-6">
+            * Fechas tentativas basadas en calendarios anteriores. Consulta siempre el calendario oficial en <a href="https://wro-association.org/" target="_blank" class="underline hover:text-brand-500">wro-association.org</a>.
+        </p>
+    </div>
+</section>
+
+<!-- CATEGORÍAS -->
+<section class="py-24 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-14" data-aos="fade-up">
+            <h2 class="text-base text-brand-600 font-semibold tracking-wide uppercase mb-2">Modalidades</h2>
+            <h3 class="text-3xl md:text-4xl font-display font-bold text-gray-900">Categorías de Competencia</h3>
+            <p class="mt-3 text-gray-600 max-w-xl mx-auto">Cada categoría tiene sus propias reglas y desafíos. Encuentra la que mejor se adapte a tus habilidades.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+            <!-- RoboMission -->
+            <div class="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 group" data-aos="fade-up" data-aos-delay="100">
+                <div class="h-2 bg-gradient-to-r from-brand-500 to-teal-400"></div>
+                <div class="p-8">
+                    <div class="w-14 h-14 rounded-2xl bg-brand-50 flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-2xl font-display font-bold text-gray-900 mb-3">RoboMission</h4>
+                    <p class="text-gray-600 mb-6 leading-relaxed text-sm">Los equipos programan un robot LEGO para completar misiones en una tabla de juego temática. Cada año el tema cambia. Se evalúa creatividad, design y comprensión del código.</p>
+                    <div class="space-y-2">
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-brand-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <span class="text-sm text-gray-600">Sub-Junior, Junior, Senior</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-brand-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <span class="text-sm text-gray-600">2 – 3 integrantes por equipo</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-brand-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <span class="text-sm text-gray-600">Robot autónomo con LEGO Mindstorms / SPIKE</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-8 pb-8">
+                    <a href="https://wro-association.org/competition/robomission/" target="_blank" class="inline-flex items-center text-brand-600 font-semibold text-sm hover:text-brand-700 transition-colors gap-1">
+                        Saber más <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Future Innovators -->
+            <div class="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 group md:-translate-y-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="h-2 bg-gradient-to-r from-indigo-600 to-purple-600"></div>
+                <div class="p-8">
+                    <div class="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                        </svg>
+                    </div>
+                    <span class="inline-block bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full mb-4">Recomendada para el Club</span>
+                    <h4 class="text-2xl font-display font-bold text-gray-900 mb-3">Future Innovators</h4>
+                    <p class="text-gray-600 mb-6 leading-relaxed text-sm">Los equipos diseñan y construyen una solución robótica innovadora a un problema real relacionado con el tema anual de la WRO. Se presenta un proyecto completo con investigación, construcción y exposición.</p>
+                    <div class="space-y-2">
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-indigo-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <span class="text-sm text-gray-600">Categoría Open (cualquier plataforma)</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-indigo-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <span class="text-sm text-gray-600">2 – 3 integrantes + coach</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-indigo-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <span class="text-sm text-gray-600">Requiere video de 3 min + documentación técnica</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-8 pb-8">
+                    <a href="https://wro-association.org/competition/future-innovators/" target="_blank" class="inline-flex items-center text-indigo-600 font-semibold text-sm hover:text-indigo-700 transition-colors gap-1">
+                        Saber más <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- RoboSports -->
+            <div class="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 group" data-aos="fade-up" data-aos-delay="300">
+                <div class="h-2 bg-gradient-to-r from-pink-600 to-orange-500"></div>
+                <div class="p-8">
+                    <div class="w-14 h-14 rounded-2xl bg-pink-50 flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-2xl font-display font-bold text-gray-900 mb-3">RoboSports</h4>
+                    <p class="text-gray-600 mb-6 leading-relaxed text-sm">Competencia dinámica donde robots autónomos se enfrentan en diversas disciplinas deportivas como fútbol, sumo o tiro al arco robótico. Alta carga de programación y mecánica ágil.</p>
+                    <div class="space-y-2">
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-pink-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <span class="text-sm text-gray-600">Formato de eliminatorias directas</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-pink-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <span class="text-sm text-gray-600">2 – 3 integrantes por equipo</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-pink-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <span class="text-sm text-gray-600">Robot completamente autónomo sin control remoto</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-8 pb-8">
+                    <a href="https://wro-association.org/competition/robosports/" target="_blank" class="inline-flex items-center text-pink-600 font-semibold text-sm hover:text-pink-700 transition-colors gap-1">
+                        Saber más <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- REQUISITOS Y BENEFICIOS -->
+<section class="py-24 bg-dark-900 relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl"></div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+
+            <!-- Requisitos -->
+            <div data-aos="fade-right">
+                <h2 class="text-base text-brand-400 font-semibold tracking-wide uppercase mb-2">Lo que necesitas</h2>
+                <h3 class="text-3xl font-display font-bold text-white mb-8">Requisitos para Participar</h3>
+                <div class="space-y-4">
+                    {% set requisitos = [
+                        ("Equipo de 2 a 3 integrantes estudiantes activos.", "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"),
+                        ("Un coach adulto (maestro, coordinador o asesor del club).", "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"),
+                        ("Inscripción activa como miembro del club.", "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"),
+                        ("Asistencia obligatoria a sesiones de entrenamiento.", "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"),
+                        ("Compromisos sujetos a la categoría seleccionada.", "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"),
+                    ] %}
+                    {% for texto, icon in requisitos %}
+                    <div class="flex items-start gap-4 p-4 bg-white/5 border border-white/10 rounded-xl">
+                        <div class="w-10 h-10 rounded-lg bg-brand-500/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ icon }}"/>
+                            </svg>
+                        </div>
+                        <p class="text-gray-300 text-sm leading-relaxed pt-1.5">{{ texto }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Beneficios -->
+            <div data-aos="fade-left">
+                <h2 class="text-base text-brand-400 font-semibold tracking-wide uppercase mb-2">Por qué participar</h2>
+                <h3 class="text-3xl font-display font-bold text-white mb-8">Beneficios de Competir</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {% set beneficios = [
+                        ("Representar al club a nivel nacional", "🏆"),
+                        ("Desarrollar habilidades de trabajo en equipo", "🤝"),
+                        ("Aprender programación y diseño avanzado", "💻"),
+                        ("Obtener reconocimientos y premios", "🎖️"),
+                        ("Conectar con equipos de todo México", "🌎"),
+                        ("Prep. para World Final internacional", "✈️"),
+                    ] %}
+                    {% for texto, emoji in beneficios %}
+                    <div class="flex items-start gap-3 p-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors">
+                        <span class="text-2xl leading-none">{{ emoji }}</span>
+                        <p class="text-gray-300 text-sm leading-relaxed">{{ texto }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="py-24 bg-gradient-to-br from-brand-500 via-teal-500 to-indigo-600 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10">
+        <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="grid2" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M0 40L40 0H20L0 20M40 40V20L20 40" stroke="white" stroke-width="0.5" fill="none"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid2)"/>
+        </svg>
+    </div>
+    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center" data-aos="zoom-in">
+        <h2 class="text-4xl md:text-5xl font-display font-extrabold text-white mb-6">
+            ¿Listo para representar<br class="hidden md:block"/> al Club en la WRO?
+        </h2>
+        <p class="text-xl text-white/80 mb-10 max-w-xl mx-auto font-light">
+            El primer paso es unirte al club. Inscríbete ahora y empieza a entrenar con nuestro equipo de campeones.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{{ url_for('main.index') }}#registro" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-full text-brand-600 bg-white shadow-xl hover:bg-gray-50 transition-all duration-300 hover:-translate-y-1">
+                Registrarse en el club
+            </a>
+            <a href="https://wro-association.org/" target="_blank" rel="noopener" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-full text-white border-2 border-white/50 hover:border-white hover:bg-white/10 transition-all duration-300">
+                Sitio Oficial WRO
+                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

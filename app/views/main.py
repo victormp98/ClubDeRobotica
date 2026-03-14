@@ -13,3 +13,7 @@ def about():
 @main_bp.route('/horarios')
 def horarios():
     return render_template('horarios.html')
+
+@main_bp.route('/wro')
+def wro():
+    return render_template('wro.html')

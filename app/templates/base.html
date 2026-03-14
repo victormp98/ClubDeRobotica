@@ -70,13 +70,13 @@
                 <nav class="hidden md:flex space-x-8">
                     <a href="{{ url_for('main.about') }}" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Sobre el Club</a>
                     <a href="{{ url_for('main.horarios') }}" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Horarios</a>
-                    <a href="{{ url_for('main.index') }}#proyectos" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Proyectos</a>
+                    <a href="{{ url_for('main.wro') }}" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">WRO</a>
                     <a href="{{ url_for('main.index') }}#galeria" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Galería</a>
                 </nav>
 
                 <!-- Action Button -->
                 <div class="hidden md:flex items-center">
-                    <a href="#registro" class="inline-flex items-center justify-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-full text-white bg-brand-500 hover:bg-brand-600 shadow-lg shadow-brand-500/30 transition-all duration-300 hover:-translate-y-0.5">
+                    <a href="{{ url_for('main.index') }}#registro" class="inline-flex items-center justify-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-full text-white bg-brand-500 hover:bg-brand-600 shadow-lg shadow-brand-500/30 transition-all duration-300 hover:-translate-y-0.5">
                         Únete Ahora
                     </a>
                 </div>
@@ -98,7 +98,7 @@
             <div class="px-4 pt-2 pb-6 space-y-1 shadow-xl">
                 <a href="{{ url_for('main.about') }}" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Sobre el Club</a>
                 <a href="{{ url_for('main.horarios') }}" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Horarios</a>
-                <a href="{{ url_for('main.index') }}#proyectos" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Proyectos</a>
+                <a href="{{ url_for('main.wro') }}" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">WRO</a>
                 <a href="{{ url_for('main.index') }}#galeria" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Galería</a>
                 <a href="{{ url_for('main.index') }}#registro" class="mt-4 block w-full text-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-brand-500 hover:bg-brand-600 shadow-md">
                     Únete Ahora
