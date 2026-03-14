@@ -1,0 +1,31 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+<div class="p-4">
+    <h1 class="mb-4">Dashboard - Club de Robótica</h1>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-header">Solicitudes Pendientes</div>
+                <div class="card-body py-4 text-center">
+                    <h2 class="card-title display-4 font-weight-bold">{{ pendientes_count }}</h2>
+                    <p class="card-text">Alumnos esperando aprobación.</p>
+                    <a href="{{ url_for('users.index_view') }}?flt1_aprobado_equals=0" class="btn btn-light mt-2">Revisar Solicitudes</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Usuarios Activos</div>
+                <div class="card-body py-4 text-center">
+                    <h2 class="card-title display-4 font-weight-bold">{{ activos_count }}</h2>
+                    <p class="card-text">Miembros aprobados del club.</p>
+                    <a href="{{ url_for('users.index_view') }}?flt1_aprobado_equals=1" class="btn btn-light mt-2">Ver Activos</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

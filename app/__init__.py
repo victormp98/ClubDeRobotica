@@ -10,8 +10,9 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     
-    from .extensions import mail
+    from .extensions import mail, login_manager
     mail.init_app(app)
+    login_manager.init_app(app)
 
     # Register blueprints here
     from app.views.main import main_bp
@@ -19,5 +20,12 @@ def create_app(config_class=Config):
 
     # Ensure all models are imported so Alembic can detect them
     from app import models
+    from app.models.user import User
+    from app.admin_views import UserAdmin, MyAdminIndexView
+    
+    # Initialize Flask-Admin here (to avoid circular imports with models)
+    from flask_admin import Admin
+    admin = Admin(app, name='Admin - Club de Robótica', url='/admin', index_view=MyAdminIndexView())
+    admin.add_view(UserAdmin(User, db.session, name='Usuarios', endpoint='users'))
 
     return app

@@ -6,9 +6,10 @@ import threading
 import traceback
 import sys
 
-from app.forms import RegistrationForm
+from app.forms import RegistrationForm, AdminLoginForm
 from app.models import User
 from app.extensions import db, mail
+from flask_login import login_user, logout_user, login_required, current_user
 
 main_bp = Blueprint('main', __name__)
 
@@ -61,6 +62,30 @@ def horarios():
 @main_bp.route('/wro')
 def wro():
     return render_template('wro.html')
+
+@main_bp.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if current_user.is_authenticated and current_user.rol == 'admin':
+        return redirect('/admin') # Ruta por defecto de Flask-Admin
+        
+    form = AdminLoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and user.check_password(form.password.data) and user.rol == 'admin':
+            login_user(user)
+            flash('Sesión iniciada correctamente.', 'success')
+            return redirect('/admin')
+        else:
+            flash('Credenciales incorrectas o no tienes permisos de administrador.', 'error')
+            
+    return render_template('admin_login.html', form=form)
+
+@main_bp.route('/admin/logout')
+@login_required
+def admin_logout():
+    logout_user()
+    flash('Sesión cerrada correctamente.', 'success')
+    return redirect(url_for('main.index'))
 
 @main_bp.route('/registro', methods=['GET', 'POST'])
 def registro():

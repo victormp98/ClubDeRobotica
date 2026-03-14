@@ -100,9 +100,14 @@
                 <a href="{{ url_for('main.horarios') }}" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Horarios</a>
                 <a href="{{ url_for('main.wro') }}" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">WRO</a>
                 <a href="{{ url_for('main.index') }}#galeria" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Galería</a>
-                <a href="{{ url_for('main.registro') }}" class="mt-4 block w-full text-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-brand-500 hover:bg-brand-600 shadow-md">
-                    Únete Ahora
-                </a>
+                {% if current_user.is_authenticated and current_user.rol == 'admin' %}
+                    <a href="/admin" class="block w-full text-center px-4 py-3 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl transition-colors shadow-lg">Panel Admin</a>
+                    <a href="{{ url_for('main.admin_logout') }}" class="block w-full text-center px-4 py-3 border border-gray-600 hover:bg-gray-800 text-white font-semibold rounded-xl transition-colors mt-2">Cerrar Sesión</a>
+                {% else %}
+                    <a href="{{ url_for('main.registro') }}" class="mt-4 block w-full text-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-brand-500 hover:bg-brand-600 shadow-md">
+                        Únete Ahora
+                    </a>
+                {% endif %}
             </div>
         </div>
     </header>
