@@ -8,6 +8,8 @@ from markupsafe import Markup
 from flask_mail import Message
 from app.models.user import User
 from app.models.noticia import Noticia
+from app.models.album import Album
+from app.models.foto import Foto
 from app.extensions import mail
 import threading
 import sys
@@ -181,4 +183,54 @@ class NoticiaAdmin(SecureModelView):
     def on_model_change(self, form, model, is_created):
         if is_created and not model.autor_id:
             model.autor_id = current_user.id
+
+class AlbumAdmin(SecureModelView):
+    column_list = ('nombre', 'descripcion', 'fecha_creacion', 'activo')
+    column_searchable_list = ('nombre', 'descripcion')
+    form_columns = ('nombre', 'descripcion', 'activo')
+    column_labels = {
+        'nombre': 'Nombre del Álbum',
+        'descripcion': 'Descripción',
+        'fecha_creacion': 'Fecha de Creación',
+        'activo': 'Activo'
+    }
+
+class FotoAdmin(SecureModelView):
+    column_list = ('album', 'miniatura_preview', 'titulo', 'fecha_subida', 'activo')
+    form_columns = ('album', 'titulo', 'imagen_path', 'activo')
+    column_filters = ('album.nombre', 'activo')
+
+    column_labels = {
+        'album': 'Álbum',
+        'titulo': 'Título de la Foto',
+        'miniatura_preview': 'Vista Previa',
+        'fecha_subida': 'Fecha de Subida',
+        'imagen_path': 'Subir Fotografía (Máx 1200px)',
+        'activo': 'Activo'
+    }
+
+    def _list_thumbnail(view, context, model, name):
+        if not model.imagen_path:
+            return ''
+        url = url_for('static', filename=os.path.join('uploads/galeria/', model.imagen_path).replace('\\', '/'))
+        return Markup(f'<img src="{url}" style="width: 150px; height: auto; border-radius: 8px;">')
+
+    column_formatters = {
+        'miniatura_preview': _list_thumbnail
+    }
+
+    base_path_galeria = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads', 'galeria')
+
+    form_extra_fields = {
+        'imagen_path': form.ImageUploadField(
+            'Subir Fotografía (Auto-Comprimida)',
+            base_path=base_path_galeria,
+            url_relative_path='uploads/galeria/',
+            namegen=prefix_name,
+            allowed_extensions=['jpg', 'jpeg', 'png', 'webp'],
+            # Pillow constraint intercept: Resize up to 1200x1200 retaining aspect ratio 
+            max_size=(1200, 1200, False), 
+            thumbnail_size=(250, 250, True),
+        )
+    }
 

@@ -22,12 +22,17 @@ def create_app(config_class=Config):
     from app import models
     from app.models.user import User
     from app.models.noticia import Noticia
-    from app.admin_views import UserAdmin, MyAdminIndexView, NoticiaAdmin
+    from app.models.album import Album
+    from app.models.foto import Foto
+    from app.admin_views import UserAdmin, MyAdminIndexView, NoticiaAdmin, AlbumAdmin, FotoAdmin
     
     # Initialize Flask-Admin here (to avoid circular imports with models)
     from flask_admin import Admin
     admin = Admin(app, name='Admin - Club de Robótica', url='/admin', index_view=MyAdminIndexView())
     admin.add_view(UserAdmin(User, db.session, name='Usuarios', endpoint='users'))
     admin.add_view(NoticiaAdmin(Noticia, db.session, name='Noticias', endpoint='noticias'))
+    
+    admin.add_view(AlbumAdmin(Album, db.session, name='Álbumes', category='Galería', endpoint='albumes'))
+    admin.add_view(FotoAdmin(Foto, db.session, name='Fotos', category='Galería', endpoint='fotos'))
 
     return app
