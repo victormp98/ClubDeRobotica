@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}Horarios – Club de Robótica{% endblock %}
+
+{% block content %}
+
+<!-- PAGE HERO -->
+<section class="relative bg-dark-900 py-28 overflow-hidden">
+    <div class="absolute inset-0 opacity-20">
+        <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M0 40L40 0H20L0 20M40 40V20L20 40" stroke="currentColor" stroke-width="0.5" class="text-brand-500 fill-none"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)"/>
+        </svg>
+    </div>
+    <div class="absolute bottom-0 left-1/4 w-80 h-80 bg-brand-500/20 rounded-full blur-3xl"></div>
+
+    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center" data-aos="fade-up">
+        <span class="inline-block py-1 px-3 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-sm font-semibold tracking-wider mb-6">
+            ORGANIZACIÓN
+        </span>
+        <h1 class="text-4xl md:text-6xl font-display font-extrabold text-white tracking-tight mb-6">
+            Horarios del Club
+        </h1>
+        <p class="text-xl text-gray-300 font-light leading-relaxed max-w-2xl mx-auto">
+            Consulta cuándo nos reunimos y planifica tu participación semanal con el equipo.
+        </p>
+    </div>
+</section>
+
+<!-- NOTICE BANNER -->
+<div class="bg-amber-50 border-b border-amber-200" data-aos="fade-down">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div class="flex items-start gap-3">
+            <div class="flex-shrink-0 mt-0.5">
+                <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <p class="text-amber-800 text-sm leading-relaxed">
+                <span class="font-semibold">Nota importante:</span> Los horarios mostrados son los establecidos para este semestre y pueden estar sujetos a cambios según el calendario académico o disponibilidad de espacios. Cualquier modificación será anunciada con anticipación a todos los miembros.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- SCHEDULE CARDS -->
+<section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <div class="text-center mb-14" data-aos="fade-up">
+            <h2 class="text-base text-brand-600 font-semibold tracking-wide uppercase mb-2">Semana actual</h2>
+            <h3 class="text-3xl md:text-4xl font-display font-bold text-gray-900">Sesiones Semanales</h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+            <!-- LUNES -->
+            <div class="rounded-3xl border border-gray-200 bg-gray-50 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group" data-aos="fade-up" data-aos-delay="100">
+                <!-- Header day -->
+                <div class="bg-brand-500 px-8 py-6 text-center">
+                    <p class="text-white/70 text-xs font-bold tracking-widest uppercase mb-1">Inicio de semana</p>
+                    <h4 class="text-3xl font-display font-extrabold text-white">Lunes</h4>
+                </div>
+                <!-- Time slots -->
+                <div class="p-8 space-y-4">
+                    <div class="flex items-center gap-4 p-4 bg-white rounded-2xl border border-gray-100 shadow-xs group-hover:border-brand-100 transition-colors">
+                        <div class="w-12 h-12 rounded-xl bg-brand-50 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-6 h-6 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-display font-bold text-gray-900">10:00 – 11:00</p>
+                            <p class="text-sm text-gray-500 mt-0.5">Sesión matutina</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 p-4 bg-white rounded-2xl border border-gray-100 shadow-xs group-hover:border-brand-100 transition-colors">
+                        <div class="w-12 h-12 rounded-xl bg-brand-50 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-6 h-6 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-display font-bold text-gray-900">14:00 – 15:00</p>
+                            <p class="text-sm text-gray-500 mt-0.5">Sesión vespertina</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MIÉRCOLES -->
+            <div class="rounded-3xl border border-gray-200 bg-gray-50 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group md:-translate-y-4" data-aos="fade-up" data-aos-delay="200">
+                <!-- Header day -->
+                <div class="bg-indigo-600 px-8 py-6 text-center">
+                    <p class="text-white/70 text-xs font-bold tracking-widest uppercase mb-1">Mitad de semana</p>
+                    <h4 class="text-3xl font-display font-extrabold text-white">Miércoles</h4>
+                </div>
+                <!-- Time slots -->
+                <div class="p-8 space-y-4">
+                    <div class="flex items-center gap-4 p-4 bg-white rounded-2xl border border-gray-100 shadow-xs group-hover:border-indigo-100 transition-colors">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-display font-bold text-gray-900">10:00 – 11:00</p>
+                            <p class="text-sm text-gray-500 mt-0.5">Sesión matutina</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 p-4 bg-white rounded-2xl border border-gray-100 shadow-xs group-hover:border-indigo-100 transition-colors">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-display font-bold text-gray-900">14:00 – 15:00</p>
+                            <p class="text-sm text-gray-500 mt-0.5">Sesión vespertina</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIERNES -->
+            <div class="rounded-3xl border border-gray-200 bg-gray-50 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group" data-aos="fade-up" data-aos-delay="300">
+                <!-- Header day -->
+                <div class="bg-pink-600 px-8 py-6 text-center">
+                    <p class="text-white/70 text-xs font-bold tracking-widest uppercase mb-1">Fin de semana</p>
+                    <h4 class="text-3xl font-display font-extrabold text-white">Viernes</h4>
+                </div>
+                <!-- Time slots -->
+                <div class="p-8 space-y-4">
+                    <div class="flex items-center gap-4 p-4 bg-white rounded-2xl border border-gray-100 shadow-xs group-hover:border-pink-100 transition-colors">
+                        <div class="w-12 h-12 rounded-xl bg-pink-50 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-6 h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-display font-bold text-gray-900">13:00 – 15:00</p>
+                            <p class="text-sm text-gray-500 mt-0.5">Sesión extendida</p>
+                        </div>
+                    </div>
+                    <!-- Info badge for extended session -->
+                    <div class="p-4 bg-pink-50 rounded-2xl border border-pink-100 text-center">
+                        <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-pink-600">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Sesión de 2 horas para proyectos y revisión de avances
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly summary table -->
+        <div class="mt-16" data-aos="fade-up">
+            <h3 class="text-xl font-display font-bold text-gray-900 mb-6 text-center">Resumen semanal</h3>
+            <div class="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-gray-900 text-white">
+                            <th class="px-6 py-4 text-left font-display font-semibold tracking-wide">Día</th>
+                            <th class="px-6 py-4 text-left font-display font-semibold tracking-wide">Horario 1</th>
+                            <th class="px-6 py-4 text-left font-display font-semibold tracking-wide">Horario 2</th>
+                            <th class="px-6 py-4 text-left font-display font-semibold tracking-wide">Total horas</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 bg-white">
+                        <tr class="hover:bg-brand-50 transition-colors">
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-brand-500"></span>
+                                    <span class="font-semibold text-gray-900">Lunes</span>
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600 font-medium">10:00 – 11:00</td>
+                            <td class="px-6 py-4 text-gray-600 font-medium">14:00 – 15:00</td>
+                            <td class="px-6 py-4">
+                                <span class="inline-block bg-brand-100 text-brand-700 text-xs font-bold px-3 py-1 rounded-full">2 horas</span>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-indigo-50 transition-colors">
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-indigo-500"></span>
+                                    <span class="font-semibold text-gray-900">Miércoles</span>
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600 font-medium">10:00 – 11:00</td>
+                            <td class="px-6 py-4 text-gray-600 font-medium">14:00 – 15:00</td>
+                            <td class="px-6 py-4">
+                                <span class="inline-block bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full">2 horas</span>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-pink-50 transition-colors">
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-pink-500"></span>
+                                    <span class="font-semibold text-gray-900">Viernes</span>
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600 font-medium">13:00 – 15:00</td>
+                            <td class="px-6 py-4 text-gray-400 italic text-xs">—</td>
+                            <td class="px-6 py-4">
+                                <span class="inline-block bg-pink-100 text-pink-700 text-xs font-bold px-3 py-1 rounded-full">2 horas</span>
+                            </td>
+                        </tr>
+                        <tr class="bg-gray-50 font-semibold">
+                            <td class="px-6 py-4 text-gray-900" colspan="3">Total semanal</td>
+                            <td class="px-6 py-4">
+                                <span class="inline-block bg-gray-900 text-white text-xs font-bold px-3 py-1 rounded-full">6 horas</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- LOCATION INFO -->
+<section class="py-16 bg-gray-50 border-t border-gray-200">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center" data-aos="fade-up">
+        <div class="inline-flex items-center gap-2 mb-4 text-brand-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <span class="font-semibold text-base uppercase tracking-wide">Lugar de reunión</span>
+        </div>
+        <p class="text-gray-600 text-lg mb-8">
+            Nos reunimos en el <strong class="text-gray-900">Laboratorio de Robótica</strong>. Si no conoces la ubicación exacta, contacta a algún miembro del club o escríbenos.
+        </p>
+        <a href="{{ url_for('main.index') }}#registro" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-full text-white bg-brand-500 hover:bg-brand-600 shadow-lg shadow-brand-500/30 transition-all duration-300 hover:-translate-y-1">
+            Contáctanos para más info
+        </a>
+    </div>
+</section>
+
+{% endblock %}
