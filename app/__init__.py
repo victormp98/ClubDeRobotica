@@ -21,11 +21,13 @@ def create_app(config_class=Config):
     # Ensure all models are imported so Alembic can detect them
     from app import models
     from app.models.user import User
-    from app.admin_views import UserAdmin, MyAdminIndexView
+    from app.models.noticia import Noticia
+    from app.admin_views import UserAdmin, MyAdminIndexView, NoticiaAdmin
     
     # Initialize Flask-Admin here (to avoid circular imports with models)
     from flask_admin import Admin
     admin = Admin(app, name='Admin - Club de Robótica', url='/admin', index_view=MyAdminIndexView())
     admin.add_view(UserAdmin(User, db.session, name='Usuarios', endpoint='users'))
+    admin.add_view(NoticiaAdmin(Noticia, db.session, name='Noticias', endpoint='noticias'))
 
     return app

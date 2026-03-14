@@ -1,10 +1,19 @@
 from flask_admin import AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.actions import action
+from flask_admin import form
 from flask_login import current_user
 from flask import redirect, url_for, flash, current_app
+from markupsafe import Markup
 from flask_mail import Message
 from app.models.user import User
+from app.models.noticia import Noticia
+from app.extensions import mail
+import threading
+import sys
+import traceback
+import os
+import uuid
 from app.extensions import mail
 import threading
 import sys
@@ -120,3 +129,56 @@ class UserAdmin(SecureModelView):
     # (Opcional) Logica POST-Edicion
     def on_model_change(self, form, model, is_created):
         pass
+
+# Definición para formatear nombres de imagenes asegurando UUID
+def prefix_name(obj, file_data):
+    parts = os.path.splitext(file_data.filename)
+    return f"{uuid.uuid4().hex}{parts[1]}"
+
+class NoticiaAdmin(SecureModelView):
+    column_list = ('titulo', 'imagen_preview', 'fecha_publicacion', 'activo')
+    column_searchable_list = ('titulo', 'contenido')
+    column_filters = ('activo',)
+    column_default_sort = ('fecha_publicacion', True)
+
+    column_labels = {
+        'titulo': 'Título',
+        'imagen_preview': 'Imagen',
+        'fecha_publicacion': 'Fecha de Publicación',
+        'activo': 'Activo',
+        'contenido': 'Contenido HTML / Texto',
+        'autor': 'Autor',
+        'imagen': 'Subir Imagen'
+    }
+
+    # Custom formatter para mostrar la miniatura en la lista
+    def _list_thumbnail(view, context, model, name):
+        if not model.imagen:
+            return ''
+        url = url_for('static', filename=os.path.join('uploads/noticias/', model.imagen).replace('\\', '/'))
+        return Markup(f'<img src="{url}" style="width: 100px; height: auto; border-radius: 5px;">')
+
+    column_formatters = {
+        'imagen_preview': _list_thumbnail
+    }
+
+    # Definir el path base absoluto hacia static/uploads/noticias
+    base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads', 'noticias')
+
+    form_extra_fields = {
+        'imagen': form.ImageUploadField(
+            'Imagen de Portada',
+            base_path=base_path,
+            url_relative_path='uploads/noticias/',
+            namegen=prefix_name,
+            allowed_extensions=['jpg', 'jpeg', 'png', 'webp', 'gif'],
+            max_size=(1920, 1080, True),
+            thumbnail_size=(200, 200, True),
+        )
+    }
+
+    # Forzar al usuario autologueado como autor si se crea desde panel (opcional, aunque ModelView permite seleccionarlo)
+    def on_model_change(self, form, model, is_created):
+        if is_created and not model.autor_id:
+            model.autor_id = current_user.id
+
