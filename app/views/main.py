@@ -8,6 +8,7 @@ import sys
 
 from app.forms import RegistrationForm, AdminLoginForm, NoticiaForm, LoginForm
 from app.models import Noticia, Album, Foto, Horario, User
+from app.models.page import Page
 from functools import wraps
 from app.extensions import db, mail
 from flask_login import login_user, logout_user, current_user, login_required
@@ -67,7 +68,8 @@ def index():
 
 @main_bp.route('/about')
 def about():
-    return render_template('about.html')
+    page = Page.query.filter_by(slug='about').first_or_404()
+    return render_template('about.html', page=page)
 
 @main_bp.route('/noticias')
 def noticias():
@@ -115,7 +117,8 @@ def horarios():
 
 @main_bp.route('/terminos')
 def terminos():
-    return render_template('terminos.html')
+    page = Page.query.filter_by(slug='terminos').first_or_404()
+    return render_template('terminos.html', page=page)
 
 @main_bp.route('/login', methods=['GET', 'POST'])
 def login():

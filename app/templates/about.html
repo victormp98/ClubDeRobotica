@@ -34,6 +34,15 @@
 <!-- MISIÓN Y VISIÓN -->
 <section class="py-24 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        {% if page and page.contenido %}
+        <!-- DYNAMIC CONTENT FROM ADMIN -->
+        <div class="prose prose-lg max-w-3xl mx-auto mb-16 text-gray-700" data-aos="fade-up">
+            {{ page.contenido | safe }}
+        </div>
+        <hr class="border-gray-200 mb-16">
+        {% endif %}
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
 
             <!-- Misión -->

@@ -285,3 +285,27 @@ class HorarioAdmin(SecureModelView):
         }
     }
 
+
+class PageAdmin(SecureModelView):
+    column_list = ('slug', 'titulo', 'ultima_modificacion')
+    form_columns = ('slug', 'titulo', 'contenido')
+    column_searchable_list = ('slug', 'titulo')
+    column_default_sort = ('slug', False)
+
+    column_labels = {
+        'slug': 'Identificador (slug)',
+        'titulo': 'Título de la Página',
+        'contenido': 'Contenido HTML',
+        'ultima_modificacion': 'Última Modificación'
+    }
+
+    form_widget_args = {
+        'contenido': {
+            'rows': 20,
+            'class': 'form-control',
+            'style': 'font-family: monospace; font-size: 13px;'
+        },
+        'slug': {
+            'readonly': True
+        }
+    }

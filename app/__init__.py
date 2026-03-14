@@ -25,7 +25,8 @@ def create_app(config_class=Config):
     from app.models.album import Album
     from app.models.foto import Foto
     from app.models.horario import Horario
-    from app.admin_views import UserAdmin, MyAdminIndexView, NoticiaAdmin, AlbumAdmin, FotoAdmin, HorarioAdmin
+    from app.models.page import Page
+    from app.admin_views import UserAdmin, MyAdminIndexView, NoticiaAdmin, AlbumAdmin, FotoAdmin, HorarioAdmin, PageAdmin
     
     # Initialize Flask-Admin here (to avoid circular imports with models)
     from flask_admin import Admin
@@ -36,5 +37,6 @@ def create_app(config_class=Config):
     admin.add_view(AlbumAdmin(Album, db.session, name='Álbumes', category='Galería', endpoint='albumes'))
     admin.add_view(FotoAdmin(Foto, db.session, name='Fotos', category='Galería', endpoint='fotos'))
     admin.add_view(HorarioAdmin(Horario, db.session, name='Horarios', endpoint='horarios'))
+    admin.add_view(PageAdmin(Page, db.session, name='Páginas Estáticas', category='Contenido', endpoint='pages'))
 
     return app
