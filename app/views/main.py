@@ -8,6 +8,7 @@ import sys
 
 from app.forms import RegistrationForm, AdminLoginForm
 from app.models import User
+from app.models.noticia import Noticia
 from app.extensions import db, mail
 from flask_login import login_user, logout_user, login_required, current_user
 
@@ -49,11 +50,23 @@ main_bp = Blueprint('main', __name__)
 
 @main_bp.route('/')
 def index():
-    return render_template('index.html')
+    ultimas_noticias = Noticia.query.filter_by(activo=True).order_by(Noticia.fecha_publicacion.desc()).limit(3).all()
+    return render_template('index.html', ultimas_noticias=ultimas_noticias)
 
 @main_bp.route('/about')
 def about():
     return render_template('about.html')
+
+@main_bp.route('/noticias')
+def noticias():
+    page = request.args.get('page', 1, type=int)
+    pagination = Noticia.query.filter_by(activo=True).order_by(Noticia.fecha_publicacion.desc()).paginate(page=page, per_page=9)
+    return render_template('noticias/index.html', pagination=pagination)
+
+@main_bp.route('/noticias/<int:id>')
+def noticia_detalle(id):
+    noticia = Noticia.query.filter_by(id=id, activo=True).first_or_404()
+    return render_template('noticias/detalle.html', noticia=noticia)
 
 @main_bp.route('/horarios')
 def horarios():
