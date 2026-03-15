@@ -53,7 +53,13 @@
                     <div class="lotos-hero-stat-divider"></div>
                     <div class="lotos-hero-stat">
                         <span class="lotos-hero-stat-num">{{ anios_activos }}</span>
-                        <span class="lotos-hero-stat-desc">Años activos</span>
+                        <span class="lotos-hero-stat-desc">
+                            {% if anios_activos == "2026" %}
+                                Año de inauguración
+                            {% else %}
+                                Años activos
+                            {% endif %}
+                        </span>
                     </div>
                     <div class="lotos-hero-stat-divider"></div>
                     <div class="lotos-hero-stat">

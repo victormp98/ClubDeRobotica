@@ -102,9 +102,14 @@ def index():
     total_proyectos = Proyecto.query.filter_by(activo=True).count()
     
     from datetime import datetime
-    # Base: 2023 (Año de fundación del Club según contexto)
-    anios_activos = datetime.now().year - 2023
-    if anios_activos < 1: anios_activos = 1
+    # Base: 2026 (Año de inauguración oficial)
+    anios_activos = datetime.now().year - 2026
+    if anios_activos < 1: 
+        # Si es el primer año, pasamos un valor especial o simplemente 2026
+        anios_activos = "2026"
+    else:
+        # Si pasan los años, mostrará "1", "2", etc.
+        anios_activos = str(anios_activos + 1)
     
     return render_template('index.html', 
                            page=page, 
