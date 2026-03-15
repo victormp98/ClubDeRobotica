@@ -153,7 +153,8 @@ ClubDeRobotica/
 - **Roles**: `admin` (acceso total), `miembro` (panel de miembros), `visitante` (solo público).
 - **Seguridad**: Contraseñas con `werkzeug.security.generate_password_hash` (PBKDF2).
 - **Decorador custom**: `@miembro_required` — verifica sesión activa **y** `aprobado=True`.
-- **Admin Reset**: Acción de lote en `UserAdmin` para resetear contraseña a `"robotica2026"`.
+- **Admin Reset**: Acción de lote en `UserAdmin` para resetear contraseña a valor por defecto (ej. `"robotica2026"`).
+- **Perfil de Usuario**: Ruta `/perfil` que permite a miembros autenticados cambiar su contraseña de manera segura sin depender de correos electrónicos.
 
 ### 5.2 Panel Administrativo (Flask-Admin en `/admin`)
 
@@ -260,7 +261,7 @@ Pasos básicos:
 ## 9. Pendientes / Backlog
 
 - [ ] Editor WYSIWYG (TinyMCE/Quill) para `PageAdmin` y `NoticiaAdmin`.
-- [ ] Gestión de perfil de miembro (cambio de contraseña propio).
+- [x] Gestión de perfil de miembro (cambio de contraseña propio).
 - [ ] Sistema de notificaciones push o email al publicar noticias.
 - [ ] Integración de resultados WRO y torneos.
 

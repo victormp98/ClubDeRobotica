@@ -5,7 +5,7 @@
 {% block content %}
 
 <!-- FORM SECTION -->
-<section class="min-h-screen py-24 bg-gray-50 flex flex-col justify-center relative overflow-hidden">
+<section class="min-h-screen py-24 bg-transparent flex flex-col justify-center relative overflow-hidden">
     <!-- Decorativos de fondo -->
     <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-600/5 rounded-full blur-3xl pointer-events-none"></div>
@@ -33,7 +33,7 @@
             {% endif %}
         {% endwith %}
 
-        <div class="bg-white border border-gray-200 shadow-xl shadow-gray-200/50 rounded-3xl overflow-hidden">
+        <div class="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl rounded-3xl overflow-hidden">
             <!-- Header -->
             <div class="bg-dark-900 p-8 text-center relative overflow-hidden">
                 <div class="absolute inset-0 opacity-20">
@@ -54,10 +54,10 @@
 
                 <!-- Nombre -->
                 <div>
-                    {{ form.nombre.label(class="block text-sm font-semibold text-gray-700 mb-1.5") }}
-                    {{ form.nombre(class="block w-full rounded-xl border-gray-300 bg-gray-50 focus:border-brand-500 focus:bg-white focus:ring-brand-500 transition-colors sm:text-sm py-3 px-4 shadow-sm", placeholder="Ej: Víctor Pérez") }}
+                    {{ form.nombre.label(class="block text-sm font-semibold text-gray-300 mb-1.5") }}
+                    {{ form.nombre(class="block w-full rounded-xl border-white/10 bg-black/20 text-white focus:border-brand-500 focus:bg-black/40 focus:ring-brand-500 transition-colors sm:text-sm py-3 px-4 shadow-sm", placeholder="Ej: Víctor Pérez") }}
                     {% for error in form.nombre.errors %}
-                        <p class="mt-1.5 text-sm text-red-600 flex items-center gap-1">
+                        <p class="mt-1.5 text-sm text-red-500 flex items-center gap-1">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> {{ error }}
                         </p>
                     {% endfor %}
@@ -65,10 +65,10 @@
 
                 <!-- Email -->
                 <div>
-                    {{ form.email.label(class="block text-sm font-semibold text-gray-700 mb-1.5") }}
-                    {{ form.email(class="block w-full rounded-xl border-gray-300 bg-gray-50 focus:border-brand-500 focus:bg-white focus:ring-brand-500 transition-colors sm:text-sm py-3 px-4 shadow-sm", placeholder="ejemplo@correo.com") }}
+                    {{ form.email.label(class="block text-sm font-semibold text-gray-300 mb-1.5") }}
+                    {{ form.email(class="block w-full rounded-xl border-white/10 bg-black/20 text-white focus:border-brand-500 focus:bg-black/40 focus:ring-brand-500 transition-colors sm:text-sm py-3 px-4 shadow-sm", placeholder="ejemplo@correo.com") }}
                     {% for error in form.email.errors %}
-                        <p class="mt-1.5 text-sm text-red-600 flex items-center gap-1">
+                        <p class="mt-1.5 text-sm text-red-500 flex items-center gap-1">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> {{ error }}
                         </p>
                     {% endfor %}
@@ -76,10 +76,10 @@
 
                 <!-- Carrera -->
                 <div>
-                    {{ form.carrera.label(class="block text-sm font-semibold text-gray-700 mb-1.5") }}
-                    {{ form.carrera(class="block w-full rounded-xl border-gray-300 bg-gray-50 focus:border-brand-500 focus:bg-white focus:ring-brand-500 transition-colors sm:text-sm py-3 px-4 shadow-sm", placeholder="Ej: Ingeniería en Sistemas") }}
+                    {{ form.carrera.label(class="block text-sm font-semibold text-gray-300 mb-1.5") }}
+                    {{ form.carrera(class="block w-full rounded-xl border-white/10 bg-black/20 text-white focus:border-brand-500 focus:bg-black/40 focus:ring-brand-500 transition-colors sm:text-sm py-3 px-4 shadow-sm", placeholder="Ej: Ingeniería en Sistemas") }}
                     {% for error in form.carrera.errors %}
-                        <p class="mt-1.5 text-sm text-red-600 flex items-center gap-1">
+                        <p class="mt-1.5 text-sm text-red-500 flex items-center gap-1">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> {{ error }}
                         </p>
                     {% endfor %}
@@ -87,15 +87,15 @@
 
                 <!-- Área Interés -->
                 <div>
-                    {{ form.area_interes.label(class="block text-sm font-semibold text-gray-700 mb-1.5") }}
+                    {{ form.area_interes.label(class="block text-sm font-semibold text-gray-300 mb-1.5") }}
                     <div class="relative">
-                        {{ form.area_interes(class="block w-full appearance-none rounded-xl border-gray-300 bg-gray-50 focus:border-brand-500 focus:bg-white focus:ring-brand-500 transition-colors sm:text-sm py-3 px-4 pr-10 shadow-sm") }}
+                        {{ form.area_interes(class="block w-full appearance-none rounded-xl border-white/10 bg-black/20 text-white focus:border-brand-500 focus:bg-black/40 focus:ring-brand-500 transition-colors sm:text-sm py-3 px-4 pr-10 shadow-sm") }}
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                         </div>
                     </div>
                     {% for error in form.area_interes.errors %}
-                        <p class="mt-1.5 text-sm text-red-600 flex items-center gap-1">
+                        <p class="mt-1.5 text-sm text-red-500 flex items-center gap-1">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> {{ error }}
                         </p>
                     {% endfor %}
@@ -105,10 +105,10 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <!-- Password -->
                     <div>
-                        {{ form.password.label(class="block text-sm font-semibold text-gray-700 mb-1.5") }}
-                        {{ form.password(class="block w-full rounded-xl border-gray-300 bg-gray-50 focus:border-brand-500 focus:bg-white focus:ring-brand-500 transition-colors sm:text-sm py-3 px-4 shadow-sm") }}
+                        {{ form.password.label(class="block text-sm font-semibold text-gray-300 mb-1.5") }}
+                        {{ form.password(class="block w-full rounded-xl border-white/10 bg-black/20 text-white focus:border-brand-500 focus:bg-black/40 focus:ring-brand-500 transition-colors sm:text-sm py-3 px-4 shadow-sm") }}
                         {% for error in form.password.errors %}
-                            <p class="mt-1.5 text-sm text-red-600 flex items-center gap-1">
+                            <p class="mt-1.5 text-sm text-red-500 flex items-center gap-1">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> {{ error }}
                             </p>
                         {% endfor %}
@@ -116,10 +116,10 @@
 
                     <!-- Confirm Password -->
                     <div>
-                        {{ form.confirm_password.label(class="block text-sm font-semibold text-gray-700 mb-1.5") }}
-                        {{ form.confirm_password(class="block w-full rounded-xl border-gray-300 bg-gray-50 focus:border-brand-500 focus:bg-white focus:ring-brand-500 transition-colors sm:text-sm py-3 px-4 shadow-sm") }}
+                        {{ form.confirm_password.label(class="block text-sm font-semibold text-gray-300 mb-1.5") }}
+                        {{ form.confirm_password(class="block w-full rounded-xl border-white/10 bg-black/20 text-white focus:border-brand-500 focus:bg-black/40 focus:ring-brand-500 transition-colors sm:text-sm py-3 px-4 shadow-sm") }}
                         {% for error in form.confirm_password.errors %}
-                            <p class="mt-1.5 text-sm text-red-600 flex items-center gap-1">
+                            <p class="mt-1.5 text-sm text-red-500 flex items-center gap-1">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> {{ error }}
                             </p>
                         {% endfor %}
@@ -131,9 +131,9 @@
                 </div>
             </form>
             
-            <div class="bg-gray-50 border-t border-gray-100 p-6 text-center">
-                <p class="text-sm text-gray-600">
-                    ¿Ya tienes una cuenta? <a href="{{ url_for('main.login') }}" class="font-bold text-brand-600 hover:text-brand-500 hover:underline transition-colors">Iniciar sesión</a>
+            <div class="bg-black/40 border-t border-white/5 p-6 text-center">
+                <p class="text-sm text-gray-300">
+                    ¿Ya tienes una cuenta? <a href="{{ url_for('main.login') }}" class="font-bold text-brand-400 hover:text-brand-300 hover:underline transition-colors">Iniciar sesión</a>
                 </p>
             </div>
         </div>

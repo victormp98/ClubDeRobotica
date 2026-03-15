@@ -2,10 +2,14 @@ from app.extensions import db, login_manager
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from datetime import datetime, timezone
+import jwt
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
+from flask import current_app
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    # ME-04: Query.get() deprecado en SQLAlchemy 2.x -> usar db.session.get()
+    return db.session.get(User, int(user_id))
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -32,6 +36,25 @@ class User(UserMixin, db.Model):
     @property
     def is_active(self):
         return self.activo
+
+    def get_reset_password_token(self, expires_in=3600):
+        return jwt.encode(
+            {'reset_password': self.id, 'exp': datetime.now(timezone.utc).timestamp() + expires_in},
+            current_app.config['SECRET_KEY'], algorithm='HS256'
+        )
+
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            id = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])['reset_password']
+        except ExpiredSignatureError:
+            # ME-01: Token expirado — devolver None sin propagar la excepción
+            return None
+        except InvalidTokenError:
+            # ME-01: Token inválido, manipulado o con formato incorrecto
+            return None
+        # ME-04: Query.get() deprecado en SQLAlchemy 2.x -> usar db.session.get()
+        return db.session.get(User, id)
 
     def __repr__(self):
         return f'<User {self.nombre}>'

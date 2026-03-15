@@ -1,0 +1,117 @@
+{% extends 'admin/base.html' %}
+{% import 'admin/layout.html' as layout with context %}
+
+{% block head_css %}
+    {{ super() }}
+    <!-- LotOS Premium Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- LotOS Signature Scanline -->
+    <div class="lotos-scanline"></div>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#6366f1', // Primary brand purple
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#081424', // Dark brand background
+                        },
+                        dark: {
+                            900: '#081424',
+                            800: '#111827',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Nuestro CSS personalizado Tech encima de Tailwind y Bootstrap -->
+    <link href="/static/css/admin_custom.css" rel="stylesheet">
+    {{ admin_fix | safe if admin_fix }}
+{% endblock %}
+{% block head_tail %}
+    {{ super() }}
+    <style>
+        body { padding-top: 80px !important; }
+        @media (max-width: 768px) { body { padding-top: 70px !important; } }
+    </style>
+{% endblock %}
+
+{% block brand %}
+    <div class="flex items-center justify-between w-full h-16 md:h-20">
+        <!-- Brand Logo -->
+        <div class="flex items-center gap-3">
+            <a href="{{ url_for('main.index') }}" class="flex items-center gap-3 group no-underline transition-all">
+                <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-brand-500 flex items-center justify-center text-white font-display font-bold text-base md:text-lg group-hover:bg-brand-600 shadow-lg shadow-brand-500/40">
+                    CR
+                </div>
+                <span class="hidden sm:block font-display font-bold text-base md:text-lg tracking-tight text-white/90">
+                    Admin Panel
+                </span>
+            </a>
+        </div>
+
+        <!-- Desktop Mid Navigation -->
+        <nav class="hidden lg:flex items-center space-x-4">
+            <a href="{{ admin_view.admin.url }}" class="lotos-nav-link text-[10px] uppercase tracking-widest !font-bold">Dashboard</a>
+            <div class="h-4 w-[1px] bg-white/10 mx-1"></div>
+            <div class="flex items-center">
+                {{ layout.menu_links() }}
+            </div>
+        </nav>
+
+        <!-- Rights Side Actions -->
+        <div class="flex items-center gap-2 md:gap-4">
+            <a href="/" class="lotos-btn-ghost !text-[10px] !px-3 !py-1.5 md:!text-xs md:!px-4 md:!py-2" title="Volver al Sitio">
+                <i class="fa fa-home"></i> <span class="hidden sm:inline">Portal</span>
+            </a>
+            <a href="{{ url_for('main.logout') }}" class="lotos-badge lotos-badge-critical text-[10px] !px-3 !py-1.5" title="Cerrar Sesión">
+                <i class="fa fa-power-off"></i> <span class="hidden sm:inline">Salir</span>
+            </a>
+            
+            <!-- Mobile Toggler -->
+            <button id="admin-mobile-btn" class="lg:hidden text-white/60 p-2 hover:text-white transition-colors">
+                <i class="fa fa-bars text-xl"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Container -->
+    <div id="admin-mobile-menu" class="hidden lg:hidden w-full border-t border-white/5 bg-dark-950/95 backdrop-blur-2xl mt-2 py-4">
+        <div class="px-4 space-y-4">
+            <a href="{{ admin_view.admin.url }}" class="block text-white/90 font-bold hover:text-white text-sm">Dashboard</a>
+            <div class="h-[1px] bg-white/5"></div>
+            <div class="admin-mobile-nav-links flex flex-col gap-1">
+                 {{ layout.menu_links() }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block menu_links %}{% endblock %}
+
+{% block extra_js %}
+    {{ super() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const btn = document.getElementById('admin-mobile-btn');
+            const menu = document.getElementById('admin-mobile-menu');
+            if (btn && menu) {
+                btn.addEventListener('click', () => {
+                    menu.classList.toggle('hidden');
+                });
+            }
+        });
+    </script>
+{% endblock %}

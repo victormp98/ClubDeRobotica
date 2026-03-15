@@ -10,87 +10,144 @@
 
     <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Custom Tailwind Configuration for Brand Colors -->
+
+    <!-- LotOS UI — Tailwind Token Config (Indigo + Teal palette) -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
+                        /* Primary — Indigo (LotOS signature) */
                         brand: {
-                            50: '#f0fdfa',
-                            100: '#ccfbf1',
-                            500: '#14b8a6', // Teal vibrant
-                            600: '#0d9488',
-                            900: '#134e4a',
+                            50:  '#eef2ff',
+                            100: '#e0e7ff',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
                         },
+                        /* Accent — Teal */
+                        accent: {
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                        },
+                        /* Premium — Rose/Pink */
+                        premium: {
+                            400: '#f472b6',
+                            500: '#ec4899',
+                        },
+                        /* Surfaces */
                         dark: {
-                            800: '#1e293b',
-                            900: '#0f172a'
+                            800: '#161b22',
+                            900: '#0d1117',
+                            950: '#070711',
                         }
                     },
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans:    ['Inter', 'sans-serif'],
                         display: ['Outfit', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
-    
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
-    
-    <!-- AOS CSS (CDN) -->
+
+    <!-- AOS CSS -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    
+
+    <!-- LotOS Design System CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lotos.css') }}">
+
+    <!-- LotOS Base Styles -->
+    <style>
+    body {
+        background-color: #070711 !important;
+        background-image:
+            radial-gradient(ellipse at 20% 0%, rgba(99,102,241,.10) 0%, transparent 55%),
+            radial-gradient(ellipse at 80% 0%, rgba(20,184,166,.06) 0%, transparent 45%);
+    }
+    /* Star particles — LotOS indigo/teal tinted */
+    .stars {
+        position: fixed; inset: 0; z-index: -10; pointer-events: none;
+        background:
+            radial-gradient(1px 1px at 15% 25%, rgba(255,255,255,.35) 0%, transparent 100%),
+            radial-gradient(1px 1px at 80% 12%, rgba(255,255,255,.20) 0%, transparent 100%),
+            radial-gradient(1px 1px at 50% 68%, rgba(20,184,166,.30) 0%, transparent 100%),
+            radial-gradient(1px 1px at 10% 82%, rgba(255,255,255,.10) 0%, transparent 100%),
+            radial-gradient(1px 1px at 90% 55%, rgba(99,102,241,.35) 0%, transparent 100%),
+            radial-gradient(2px 2px at 35% 45%, rgba(129,140,248,.15) 0%, transparent 100%),
+            radial-gradient(1px 1px at 65% 18%, rgba(20,184,166,.20) 0%, transparent 100%),
+            radial-gradient(1px 1px at 72% 88%, rgba(255,255,255,.08) 0%, transparent 100%),
+            radial-gradient(1px 1px at 28% 60%, rgba(99,102,241,.20) 0%, transparent 100%),
+            radial-gradient(1px 1px at 55% 35%, rgba(255,255,255,.12) 0%, transparent 100%);
+    }
+    /* Orbital rings — LotOS indigo/teal hues */
+    .hero-ring { position: absolute; border-radius: 50%; border: 1px solid; pointer-events: none; animation: wro-rotate 20s linear infinite; }
+    .ring1 { width:500px; height:500px; border-color:rgba(99,102,241,.12); top:50%; left:50%; transform:translate(-50%,-50%); }
+    .ring2 { width:700px; height:700px; border-color:rgba(20,184,166,.08); top:50%; left:50%; transform:translate(-50%,-50%); animation-direction:reverse; animation-duration:30s; }
+    .ring3 { width:900px; height:900px; border-color:rgba(255,255,255,.03); top:50%; left:50%; transform:translate(-50%,-50%); animation-duration:45s; }
+    @keyframes wro-rotate { to { transform: translate(-50%,-50%) rotate(360deg); } }
+    </style>
+
     {% block extra_css %}{% endblock %}
 </head>
-<body class="bg-gray-50 text-dark-800 font-sans antialiased overflow-x-hidden">
+<body class="text-gray-200 font-sans antialiased overflow-x-hidden">
+    <!-- Star particles fixed background -->
+    <div class="stars"></div>
 
     <!-- Sticky Navbar -->
-    <header class="fixed w-full top-0 z-50 transition-all duration-300 backdrop-blur-md bg-white/80 border-b border-gray-100 shadow-sm">
+    <header class="fixed w-full top-0 z-50 transition-all duration-300 backdrop-blur-xl bg-dark-950/75 border-b border-white/[0.06] shadow-lg shadow-black/30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
                 <!-- Logo -->
                 <div class="flex-shrink-0 flex items-center">
-                    <a href="{{ url_for('main.index') }}" class="flex items-center gap-2 group">
-                        <div class="w-10 h-10 rounded-xl bg-brand-500 flex items-center justify-center text-white font-display font-bold text-xl group-hover:bg-brand-600 transition-colors shadow-lg shadow-brand-500/30">
+                    <a href="{{ url_for('main.index') }}" class="flex items-center gap-3 group">
+                        <div class="w-10 h-10 rounded-xl bg-brand-500 flex items-center justify-center text-white font-display font-bold text-lg group-hover:bg-brand-600 transition-all duration-300 shadow-lg shadow-brand-500/40 group-hover:shadow-brand-500/60">
                             CR
                         </div>
-                        <span class="font-display font-bold text-xl tracking-tight text-dark-900">
+                        <span class="font-display font-bold text-lg tracking-tight text-white">
                             Club de Robótica
                         </span>
                     </a>
                 </div>
 
                 <!-- Desktop Navigation -->
-                <nav class="hidden md:flex space-x-8 items-center">
-                    <a href="{{ url_for('main.about') }}" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Sobre el Club</a>
-                    <a href="{{ url_for('main.horarios') }}" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Horarios</a>
-                    <a href="{{ url_for('main.wro') }}" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">WRO</a>
-                    <a href="{{ url_for('main.noticias') }}" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Noticias</a>
-                    <a href="{{ url_for('main.galeria') }}" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Galería</a>
+                <nav class="hidden md:flex space-x-7 items-center">
+                    <a href="{{ url_for('main.about') }}" class="lotos-nav-link">Sobre el Club</a>
+                    <a href="{{ url_for('main.horarios') }}" class="lotos-nav-link">Horarios</a>
+                    <a href="{{ url_for('main.wro') }}" class="lotos-nav-link">WRO</a>
+                    <a href="{{ url_for('main.noticias') }}" class="lotos-nav-link">Noticias</a>
+                    <a href="{{ url_for('main.galeria') }}" class="lotos-nav-link">Galería</a>
                     {% if current_user.is_authenticated and (current_user.rol == 'admin' or current_user.aprobado) %}
-                    <a href="{{ url_for('main.miembros_index') }}" class="text-sm font-semibold text-brand-600 hover:text-brand-700 border border-brand-200 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-full transition-colors">★ Zona Miembros</a>
+                    <a href="{{ url_for('main.miembros_index') }}" class="lotos-badge lotos-badge-accent text-xs">⬡ Zona Miembros</a>
                     {% endif %}
                 </nav>
 
-                <!-- Action Button -->
+                <!-- Action Buttons -->
                 <div class="hidden md:flex items-center gap-3">
                     {% if current_user.is_authenticated %}
                         {% if current_user.rol == 'admin' %}
-                        <a href="/admin" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Panel Admin</a>
+                        <a href="/admin" class="lotos-badge lotos-badge-primary text-xs">⬡ Admin</a>
                         {% endif %}
-                        <a href="{{ url_for('main.logout') }}" class="inline-flex items-center justify-center px-5 py-2 border border-gray-300 text-sm font-medium rounded-full text-gray-700 hover:bg-gray-100 transition-all duration-200">
-                            <svg class="w-4 h-4 mr-1.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                            Cerrar Sesión
+                        <a href="{{ url_for('main.perfil') }}" class="lotos-btn-ghost" style="padding: 0.5rem 1rem; font-size: 0.8rem;">
+                            <!-- Icono de usuario simple -->
+                            <svg class="w-3.5 h-3.5 mr-1 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            Mi Perfil
+                        </a>
+                        <a href="{{ url_for('main.logout') }}" class="lotos-btn-ghost" style="padding: 0.5rem 1.25rem; font-size: 0.8rem; background: rgba(239, 68, 68, 0.1); color: rgb(248, 113, 113);">
+                            <svg class="w-3.5 h-3.5 mr-1 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                            Salir
                         </a>
                     {% else %}
-                        <a href="{{ url_for('main.login') }}" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Ingresar</a>
-                        <a href="{{ url_for('main.registro') }}" class="inline-flex items-center justify-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-full text-white bg-brand-500 hover:bg-brand-600 shadow-lg shadow-brand-500/30 transition-all duration-300 hover:-translate-y-0.5">
+                        <a href="{{ url_for('main.login') }}" class="lotos-nav-link text-sm">Ingresar</a>
+                        <a href="{{ url_for('main.registro') }}" class="lotos-btn-primary" style="padding: 0.55rem 1.4rem; font-size: 0.825rem;">
                             Únete Ahora
                         </a>
                     {% endif %}
@@ -106,57 +163,63 @@
                     </button>
                 </div>
             </div>
-             <!-- Mobile Navigation Menu -->
-        <div class="md:hidden hidden bg-white border-t border-gray-100" id="mobile-menu">
-            <div class="px-4 pt-2 pb-6 space-y-1 shadow-xl">
-                <a href="{{ url_for('main.about') }}" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Sobre el Club</a>
-                <a href="{{ url_for('main.horarios') }}" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Horarios</a>
-                <a href="{{ url_for('main.wro') }}" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">WRO</a>
-                <a href="{{ url_for('main.noticias') }}" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Noticias</a>
-                <a href="{{ url_for('main.galeria') }}" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-brand-600 hover:bg-brand-50 transition-colors">Galería</a>
+            <!-- Mobile Navigation Menu (LotOS dark glass style) -->
+        <div class="md:hidden hidden border-t border-white/[0.06]" id="mobile-menu"
+             style="background: rgba(7,7,17,0.95); backdrop-filter: blur(20px);">
+            <div class="px-4 pt-3 pb-6 space-y-1">
+                <a href="{{ url_for('main.about') }}" class="block px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/[0.06] transition-all">Sobre el Club</a>
+                <a href="{{ url_for('main.horarios') }}" class="block px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/[0.06] transition-all">Horarios</a>
+                <a href="{{ url_for('main.wro') }}" class="block px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/[0.06] transition-all">WRO</a>
+                <a href="{{ url_for('main.noticias') }}" class="block px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/[0.06] transition-all">Noticias</a>
+                <a href="{{ url_for('main.galeria') }}" class="block px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/[0.06] transition-all">Galería</a>
+                <div class="my-2" style="height:1px; background: linear-gradient(90deg, transparent, rgba(99,102,241,0.3), transparent);"></div>
                 {% if current_user.is_authenticated %}
                     {% if current_user.aprobado or current_user.rol == 'admin' %}
-                    <a href="{{ url_for('main.miembros_index') }}" class="block px-3 py-3 rounded-md text-base font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 transition-colors">★ Zona Miembros</a>
+                    <a href="{{ url_for('main.miembros_index') }}" class="block px-3 py-2.5 rounded-lg text-sm font-semibold text-accent-400 bg-white/[0.04] border border-white/[0.08] hover:border-accent-500/40 transition-all">⬡ Zona Miembros</a>
                     {% endif %}
                     {% if current_user.rol == 'admin' %}
-                    <a href="/admin" class="block w-full text-center px-4 py-3 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl transition-colors shadow-lg">Panel Admin</a>
+                    <a href="/admin" class="block w-full text-center px-4 py-3 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-brand-500/30">Panel Admin</a>
                     {% endif %}
-                    <a href="{{ url_for('main.logout') }}" class="block w-full text-center px-4 py-3 border border-gray-300 hover:bg-gray-100 text-gray-700 font-semibold rounded-xl transition-colors mt-2">Cerrar Sesión</a>
+                    <a href="{{ url_for('main.perfil') }}" class="block w-full text-center px-4 py-3 mt-1 bg-white/[0.04] hover:bg-white/[0.08] text-white/90 font-medium rounded-xl transition-all">Mi Perfil</a>
+                    <a href="{{ url_for('main.logout') }}" class="block w-full text-center px-4 py-3 mt-1 border border-red-500/20 hover:bg-red-500/10 text-red-400 hover:text-red-300 text-sm font-medium rounded-xl transition-all">Cerrar Sesión</a>
                 {% else %}
-                    <a href="{{ url_for('main.login') }}" class="mt-4 block w-full text-center px-6 py-3 border border-brand-500 text-brand-600 text-base font-medium rounded-xl hover:bg-brand-50">Iniciar Sesión</a>
-                    <a href="{{ url_for('main.registro') }}" class="mt-2 block w-full text-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-brand-500 hover:bg-brand-600 shadow-md">
-                        Únjete Ahora
+                    <a href="{{ url_for('main.login') }}" class="mt-3 block w-full text-center px-6 py-3 border border-brand-500/40 text-brand-400 text-sm font-semibold rounded-xl hover:bg-brand-500/10 transition-all">Iniciar Sesión</a>
+                    <a href="{{ url_for('main.registro') }}" class="mt-2 block w-full text-center px-6 py-3 text-sm font-bold rounded-xl text-white bg-brand-500 hover:bg-brand-600 shadow-lg shadow-brand-500/30 transition-all">
+                        Únete Ahora
                     </a>
                 {% endif %}
             </div>
-        </div>        </div>
+        </div>
     </header>
+
+    <!-- LotOS Scanline effect -->
+    <div class="lotos-scanline" aria-hidden="true"></div>
 
     <!-- Main Content y Flash Globales -->
     <main class="flex-grow">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages and not request.endpoint == 'main.registro' %}
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-24">
+                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-24 space-y-2">
                     {% for category, message in messages %}
                         {% if category == 'success' %}
-                        <div class="flex items-start gap-3 p-4 mb-4 bg-emerald-50 border border-emerald-200 rounded-xl shadow-sm" data-aos="fade-down">
-                            <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            <p class="text-emerald-700 text-sm font-medium">{{ message }}</p>
+                        <div class="lotos-alert lotos-alert-success" data-aos="fade-down">
+                            <span class="status-dot dot-success mt-1 flex-shrink-0"></span>
+                            <p>{{ message }}</p>
                         </div>
                         {% elif category == 'warning' %}
-                        <div class="flex items-start gap-3 p-4 mb-4 bg-amber-50 border border-amber-200 rounded-xl shadow-sm" data-aos="fade-down">
-                            <svg class="w-5 h-5 text-amber-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                            <p class="text-amber-700 text-sm font-medium">{{ message }}</p>
+                        <div class="lotos-alert lotos-alert-warning" data-aos="fade-down">
+                            <span class="status-dot dot-warning mt-1 flex-shrink-0"></span>
+                            <p>{{ message }}</p>
                         </div>
                         {% elif category == 'error' %}
-                        <div class="flex items-start gap-3 p-4 mb-4 bg-red-50 border border-red-200 rounded-xl shadow-sm" data-aos="fade-down">
-                            <svg class="w-5 h-5 text-red-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            <p class="text-red-700 text-sm font-medium">{{ message }}</p>
+                        <div class="lotos-alert lotos-alert-error" data-aos="fade-down">
+                            <span class="status-dot dot-critical mt-1 flex-shrink-0"></span>
+                            <p>{{ message }}</p>
                         </div>
                         {% elif category == 'info' %}
-                        <div class="flex items-start gap-3 p-4 mb-4 bg-blue-50 border border-blue-200 rounded-xl shadow-sm" data-aos="fade-down">
-                            <svg class="w-5 h-5 text-blue-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            <p class="text-blue-700 text-sm font-medium">{{ message }}</p>
+                        <div class="lotos-alert lotos-alert-info" data-aos="fade-down">
+                            <span class="status-dot dot-primary mt-1 flex-shrink-0"></span>
+                            <p>{{ message }}</p>
                         </div>
                         {% endif %}
                     {% endfor %}
@@ -166,45 +229,61 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-dark-900 border-t border-dark-800 pt-16 pb-8">
+    <!-- Footer — LotOS Command Surface style -->
+    <footer style="background: var(--lotos-surface); border-top: 1px solid var(--lotos-border);" class="pt-14 pb-8">
+        <!-- Separator glow -->
+        <div class="lotos-sep mb-12"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12 text-center md:text-left">
-                
-                <div class="space-y-4 flex flex-col items-center md:items-start">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12 text-center md:text-left">
+
+                <!-- Brand -->
+                <div class="flex flex-col items-center md:items-start gap-4">
                     <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center text-white font-display font-bold text-sm">CR</div>
-                        <span class="font-display font-bold text-lg tracking-tight text-white">Club de Robótica</span>
+                        <div class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center text-white font-display font-bold text-sm shadow-md shadow-brand-500/30">CR</div>
+                        <span class="font-display font-bold text-base tracking-tight text-white">Club de Robótica</span>
                     </div>
-                    <p class="text-gray-400 text-sm leading-relaxed max-w-xs">
-                        Impulsando la innovación tecnológica, el trabajo en equipo y el desarrollo de habilidades en robótica para el futuro.
+                    <p class="text-white/40 text-sm leading-relaxed max-w-xs">
+                        Impulsando la innovación tecnológica, el trabajo en equipo y el desarrollo de habilidades en robótica.
                     </p>
+                    <!-- Status indicator -->
+                    <div class="flex items-center gap-2">
+                        <span class="status-dot dot-success"></span>
+                        <span class="text-xs text-white/30 font-mono">SISTEMA ACTIVO</span>
+                    </div>
                 </div>
 
+                <!-- Explore -->
                 <div class="space-y-4">
-                    <h3 class="text-white font-display font-semibold tracking-wide uppercase text-sm">Explora</h3>
-                    <ul class="space-y-3">
-                        <li><a href="{{ url_for('main.about') }}" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Sobre nosotros</a></li>
-                        <li><a href="{{ url_for('main.noticias') }}" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Noticias del Club</a></li>
-                        <li><a href="{{ url_for('main.index') }}#proyectos" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Nuestros Proyectos</a></li>
-                        <li><a href="{{ url_for('main.galeria') }}" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Galería visual</a></li>
+                    <p class="lotos-label">Explora</p>
+                    <ul class="space-y-2.5">
+                        <li><a href="{{ url_for('main.about') }}" class="text-white/40 hover:text-white text-sm transition-colors">Sobre nosotros</a></li>
+                        <li><a href="{{ url_for('main.noticias') }}" class="text-white/40 hover:text-white text-sm transition-colors">Noticias del Club</a></li>
+                        <li><a href="{{ url_for('main.index') }}#proyectos" class="text-white/40 hover:text-white text-sm transition-colors">Nuestros Proyectos</a></li>
+                        <li><a href="{{ url_for('main.galeria') }}" class="text-white/40 hover:text-white text-sm transition-colors">Galería visual</a></li>
                     </ul>
                 </div>
 
+                <!-- Legal -->
                 <div class="space-y-4">
-                    <h3 class="text-white font-display font-semibold tracking-wide uppercase text-sm">Legal</h3>
-                    <ul class="space-y-3">
-                        <li><a href="{{ url_for('main.terminos') }}" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Términos y Condiciones</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-brand-500 text-sm transition-colors opacity-50 cursor-not-allowed" title="Próximamente">Política de Privacidad</a></li>
-                        <li><a href="{{ url_for('main.index') }}#registro" class="text-gray-400 hover:text-brand-500 text-sm transition-colors">Contacto</a></li>
+                    <p class="lotos-label">Legal</p>
+                    <ul class="space-y-2.5">
+                        <li><a href="{{ url_for('main.terminos') }}" class="text-white/40 hover:text-white text-sm transition-colors">Términos y Condiciones</a></li>
+                        <li><a href="#" class="text-white/20 text-sm cursor-not-allowed" title="Próximamente">Política de Privacidad</a></li>
+                        <li><a href="{{ url_for('main.index') }}#registro" class="text-white/40 hover:text-white text-sm transition-colors">Contacto</a></li>
                     </ul>
                 </div>
             </div>
-            
-            <div class="pt-8 border-t border-dark-800 text-center">
-                <p class="text-gray-500 text-sm">
-                    &copy; <script>document.write(new Date().getFullYear())</script> Club de Robótica. Todos los derechos reservados.
-                </p>
+
+            <!-- Bottom bar -->
+            <div class="pt-6" style="border-top: 1px solid var(--lotos-border);">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-2">
+                    <p class="text-white/25 text-xs font-mono">
+                        &copy; <script>document.write(new Date().getFullYear())</script> Club de Robótica UNACH · All rights reserved
+                    </p>
+                    <div class="flex items-center gap-1.5">
+                        <span class="lotos-badge lotos-badge-neutral" style="font-size: 0.6rem;">Powered by LotOS UI</span>
+                    </div>
+                </div>
             </div>
         </div>
     </footer>

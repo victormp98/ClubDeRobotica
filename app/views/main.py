@@ -6,9 +6,13 @@ import threading
 import traceback
 import sys
 
-from app.forms import RegistrationForm, AdminLoginForm, NoticiaForm, LoginForm
+from app.forms import RegistrationForm, NoticiaForm, LoginForm, ResetPasswordRequestForm, ResetPasswordForm, ChangePasswordForm
 from app.models import Noticia, Album, Foto, Horario, User
 from app.models.page import Page
+from app.models.configuracion import Configuracion
+from app.models.proyecto import Proyecto
+from app.models.equipo import Equipo
+from app.models.miembro_equipo import MiembroEquipo
 from functools import wraps
 from app.extensions import db, mail
 from flask_login import login_user, logout_user, current_user, login_required
@@ -19,13 +23,15 @@ def miembro_required(f):
         if not current_user.is_authenticated:
             flash('Debes iniciar sesión para ver este contenido.', 'warning')
             return redirect(url_for('main.login', next=request.url))
+        # BA-04: Los admins siempre tienen acceso aunque aprobado=False.
+        # Esto es intencional: permite au admin recién creado entrar sin aprobarse a sí mismo.
         if current_user.rol != 'admin' and not current_user.aprobado:
             flash('Tu cuenta aún no ha sido aprobada por un administrador.', 'error')
             return redirect(url_for('main.index'))
         return f(*args, **kwargs)
     return decorated_function
 
-main_bp = Blueprint('main', __name__)
+main_bp = Blueprint('main', __name__)  # AL-01: única instancia — la segunda (antes en línea 79) fue eliminada
 
 def send_async_email(app, msg):
     with app.app_context():
@@ -34,42 +40,77 @@ def send_async_email(app, msg):
             print(f"[MAIL_SUCCESS] Correo enviado a {msg.recipients}")
         except Exception as e:
             # Capturamos el error silenciosamente (para que no afecte el registro)
-            print(f"[MAIL_ERROR] No se pudo enviar el correo de registro. Esto es esperado si las credenciales son dummy.")
-            print(traceback.format_exc(), file=sys.stderr)
+            print(f"\n[ATENCIÓN DEV] No se pudo enviar el correo a {msg.recipients} porque el servidor SMTP no está configurado.")
+            print(f"[LINK A TUS CORREOS LOCALES]: \n{msg.body}\n")
+            # print(traceback.format_exc(), file=sys.stderr)
 
 def enviar_notificacion_admin(user, app):
     """Envia correo al admin en un hilo separado para no bloquear la request."""
+    # ME-02: Correo del admin leído de config (configurable via .env ADMIN_EMAIL)
+    admin_email = app.config.get('ADMIN_EMAIL', 'admin@clubrobotica.unach.mx')
     msg = Message(
         subject=f"[Club Robótica] Nuevo registro: {user.nombre}",
         sender=app.config.get('MAIL_DEFAULT_SENDER', 'noreply@clubrobotica.com'),
-        recipients=['admin@clubrobotica.unach.mx'] # Reemplazar con correo real admin futuro
+        recipients=[admin_email]
     )
     msg.body = f'''
     Nuevo alumno registrado y pendiente de aprobación:
-    
+
     Nombre: {user.nombre}
     Email: {user.email}
     Carrera: {user.carrera}
     Área de Interés: {user.area_interes}
-    
+
     Por favor inicia sesión en el panel de administrador para aprobar o rechazar esta solicitud.
     '''
-    
+
     # Lanzar hilo en background
     thread = threading.Thread(target=send_async_email, args=(app, msg))
     thread.start()
 
-main_bp = Blueprint('main', __name__)
+def send_password_reset_email(user, app):
+    """Envia correo con el token de recuperacion en un hilo separado."""
+    token = user.get_reset_password_token()
+    msg = Message(
+        subject="[Club Robótica] Restablecer tu contraseña",
+        sender=app.config.get('MAIL_DEFAULT_SENDER', 'noreply@clubrobotica.com'),
+        recipients=[user.email]
+    )
+    msg.body = render_template('email/reset_password.txt', user=user, token=token)
+    msg.html = render_template('email/reset_password.html', user=user, token=token)
+    
+    thread = threading.Thread(target=send_async_email, args=(app, msg))
+    thread.start()
+
+# AL-01: Blueprint duplicado eliminado. El Blueprint se declara una sola vez arriba (línea 31).
 
 @main_bp.route('/')
 def index():
-    ultimas_noticias = Noticia.query.filter_by(activo=True).order_by(Noticia.fecha_publicacion.desc()).limit(3).all()
-    return render_template('index.html', ultimas_noticias=ultimas_noticias)
+    page = Page.query.filter_by(slug='about').first()
+    noticias = Noticia.query.filter_by(activo=True).order_by(Noticia.fecha_publicacion.desc()).limit(3).all()
+    # Fetch 5 most recent active photos
+    ultimas_fotos = Foto.query.filter_by(activo=True).order_by(Foto.fecha_subida.desc()).limit(5).all()
+    # Fetch active projects
+    proyectos = Proyecto.query.filter_by(activo=True).order_by(Proyecto.fecha_creacion.desc()).limit(3).all()
+    
+    # Fetch home team image config
+    img_equipo_config = Configuracion.query.get('IMAGEN_EQUIPO_HOME')
+    img_equipo = img_equipo_config.valor if img_equipo_config else None
+    
+    return render_template('index.html', 
+                          page=page, 
+                          ultimas_noticias=noticias, 
+                          ultimas_fotos=ultimas_fotos, 
+                          proyectos=proyectos,
+                          img_equipo=img_equipo)
+
 
 @main_bp.route('/about')
 def about():
     page = Page.query.filter_by(slug='about').first_or_404()
-    return render_template('about.html', page=page)
+    # Obtener equipos activos para agrupar a los miembros
+    equipos = Equipo.query.filter_by(activo=True).all()
+    return render_template('about.html', page=page, equipos=equipos)
 
 @main_bp.route('/noticias')
 def noticias():
@@ -115,6 +156,32 @@ def horarios():
 
     return render_template('horarios.html', horarios=horarios_ordenados)
 
+@main_bp.route('/perfil', methods=['GET', 'POST'])
+@login_required
+def perfil():
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        # Validar que la contraseña actual sea correcta
+        if not current_user.check_password(form.old_password.data):
+            flash('Error: La contraseña actual es incorrecta. Si te acaban de aprobar, posiblemente sea la contraseña por defecto (robotica2026).', 'error')
+            return redirect(url_for('main.perfil'))
+        
+        # Validar que la nueva contraseña no sea igual a la vieja
+        if form.old_password.data == form.new_password.data:
+            flash('Tu nueva contraseña no puede ser exactamente igual a la actual.', 'warning')
+            return redirect(url_for('main.perfil'))
+            
+        # Actualizar contraseña
+        current_user.set_password(form.new_password.data)
+        db.session.commit()
+        
+        # Opcional: Cerrar sesión después de cambiar la clave por seguridad
+        logout_user()
+        flash('¡Tu contraseña ha sido actualizada con éxito! Por favor inicia sesión con tu nueva clave.', 'success')
+        return redirect(url_for('main.login'))
+        
+    return render_template('perfil.html', form=form)
+
 @main_bp.route('/terminos')
 def terminos():
     page = Page.query.filter_by(slug='terminos').first_or_404()
@@ -131,8 +198,8 @@ def login():
             login_user(user, remember=form.remember_me.data)
             next_page = request.args.get('next')
             # Seguridad: garantizar que la página de redirección sea local
-            from werkzeug.urls import url_parse
-            if not next_page or url_parse(next_page).netloc != '':
+            from urllib.parse import urlsplit
+            if not next_page or urlsplit(next_page).netloc != '':
                 if current_user.rol == 'admin':
                     next_page = url_for('admin.index')
                 else:
@@ -141,6 +208,39 @@ def login():
         else:
             flash('Usuario o contraseña incorrectos', 'error')
     return render_template('login.html', form=form)
+
+@main_bp.route('/reset_password_request', methods=['GET', 'POST'])
+def reset_password_request():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    form = ResetPasswordRequestForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            send_password_reset_email(user, current_app._get_current_object())
+        # Siempre mostramos el mismo mensaje para no revelar si un email existe o no
+        flash('Verifica tu correo electrónico para las instrucciones de cómo restablecer tu contraseña', 'info')
+        return redirect(url_for('main.login'))
+    return render_template('reset_password_request.html', form=form)
+
+@main_bp.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    
+    user = User.verify_reset_password_token(token)
+    if not user:
+        flash('El enlace para restablecer la contraseña es inválido o ha expirado.', 'error')
+        return redirect(url_for('main.reset_password_request'))
+        
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        user.set_password(form.password.data)
+        db.session.commit()
+        flash('Tu contraseña ha sido restablecida exitosamente.', 'success')
+        return redirect(url_for('main.login'))
+        
+    return render_template('reset_password.html', form=form)
 
 @main_bp.route('/logout')
 @login_required
@@ -152,35 +252,19 @@ def logout():
 @main_bp.route('/miembros')
 @miembro_required
 def miembros_index():
-    return render_template('miembros/index.html')
+    drive_url_config = Configuracion.query.get('drive_virtual_url')
+    drive_url = drive_url_config.valor if drive_url_config else '#'
+    return render_template('miembros/index.html', drive_virtual_url=drive_url)
 
 @main_bp.route('/wro')
 def wro():
     return render_template('wro.html')
 
-@main_bp.route('/admin/login', methods=['GET', 'POST'])
-def admin_login():
-    if current_user.is_authenticated and current_user.rol == 'admin':
-        return redirect('/admin') # Ruta por defecto de Flask-Admin
-        
-    form = AdminLoginForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        if user and user.check_password(form.password.data) and user.rol == 'admin':
-            login_user(user)
-            flash('Sesión iniciada correctamente.', 'success')
-            return redirect('/admin')
-        else:
-            flash('Credenciales incorrectas o no tienes permisos de administrador.', 'error')
-            
-    return render_template('admin_login.html', form=form)
-
 @main_bp.route('/admin/logout')
 @login_required
 def admin_logout():
-    logout_user()
-    flash('Sesión cerrada correctamente.', 'success')
-    return redirect(url_for('main.index'))
+    # Redirigir al logout principal para unificar flujos
+    return redirect(url_for('main.logout'))
 
 @main_bp.route('/registro', methods=['GET', 'POST'])
 def registro():

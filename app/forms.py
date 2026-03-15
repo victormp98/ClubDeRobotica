@@ -44,12 +44,36 @@ class RegistrationForm(FlaskForm):
     
     submit = SubmitField('Registrarme')
 
-class AdminLoginForm(FlaskForm):
-    email = StringField('Correo Electrónico', validators=[DataRequired(), Email()])
-    password = PasswordField('Contraseña', validators=[DataRequired()])
-    submit = SubmitField('Iniciar Sesión')
+
 
 class NoticiaForm(FlaskForm):
     titulo = StringField('Título', validators=[DataRequired(), Length(max=200)])
     contenido = StringField('Contenido HTML', validators=[DataRequired()])
     submit = SubmitField('Publicar')
+
+class ResetPasswordRequestForm(FlaskForm):
+    email = StringField('Correo Electrónico', validators=[DataRequired(), Email()])
+    submit = SubmitField('Enviar correo de recuperación')
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('Nueva Contraseña', validators=[
+        DataRequired(),
+        Length(min=6, message="La contraseña debe tener al menos 6 caracteres")
+    ])
+    confirm_password = PasswordField('Confirmar Nueva Contraseña', validators=[
+        DataRequired(),
+        EqualTo('password', message="Las contraseñas no coinciden")
+    ])
+    submit = SubmitField('Restablecer Contraseña')
+
+class ChangePasswordForm(FlaskForm):
+    old_password = PasswordField('Contraseña Actual', validators=[DataRequired(message="Tu contraseña actual es requerida.")], render_kw={"placeholder": "Ej. robotica2026"})
+    new_password = PasswordField('Nueva Contraseña (Mínimo 6 caracteres)', validators=[
+        DataRequired(message="Escribe una nueva contraseña segura."),
+        Length(min=6, message="Debe tener al menos 6 caracteres.")
+    ])
+    confirm_new_password = PasswordField('Confirma Nueva Contraseña', validators=[
+        DataRequired(message="Confirma la nueva contraseña."),
+        EqualTo('new_password', message="Las nuevas contraseñas no coinciden.")
+    ])
+    submit = SubmitField('Actualizar Contraseña')

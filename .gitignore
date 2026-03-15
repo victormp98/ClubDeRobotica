@@ -1,7 +1,16 @@
 venv/
 __pycache__/
 *.pyc
+*.db
+app/app.db
 .env
 instance/
 .idea/
 .vscode/
+
+# Scripts de diagnóstico / archivos temporales
+scripts/
+find_admin.py
+reproduce_500.py
+test_dom_fetch.py
+test_admin.html

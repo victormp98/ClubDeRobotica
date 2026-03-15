@@ -1,0 +1,508 @@
+/* ============================================
+   LOTOS UI — Design Token System
+   Migrado para Flask/Jinja2 (ClubDeRobotica)
+   Dark-first · Contract-driven · Command Surface
+   ============================================ */
+
+/* ------------------------------------------ */
+/*  1. CUSTOM PROPERTIES (TOKENS)              */
+/* ------------------------------------------ */
+:root {
+  /* Backgrounds */
+  --lotos-bg:          #070711;
+  --lotos-surface:     #0d1117;
+  --lotos-surface-2:   #161b22;
+  --lotos-surface-3:   #1c2333;
+
+  /* Primary — Indigo */
+  --lotos-primary:      #6366f1;
+  --lotos-primary-dark: #4f46e5;
+  --lotos-primary-light:#818cf8;
+  --lotos-primary-glow: rgba(99, 102, 241, 0.30);
+
+  /* Accent — Teal/Cyan */
+  --lotos-accent:      #14b8a6;
+  --lotos-accent-dark: #0d9488;
+  --lotos-accent-light:#2dd4bf;
+  --lotos-accent-glow: rgba(20, 184, 166, 0.25);
+
+  /* Premium — Rose/Pink */
+  --lotos-premium:      #ec4899;
+  --lotos-premium-light:#f472b6;
+  --lotos-premium-glow: rgba(236, 72, 153, 0.25);
+
+  /* Semantic */
+  --lotos-success:  #22c55e;
+  --lotos-warning:  #f59e0b;
+  --lotos-critical: #ef4444;
+  --lotos-info:     #38bdf8;
+
+  /* Borders */
+  --lotos-border:   rgba(255, 255, 255, 0.07);
+  --lotos-border-2: rgba(255, 255, 255, 0.12);
+  --lotos-border-accent: rgba(99, 102, 241, 0.25);
+
+  /* Typography */
+  --lotos-font-body:    'Inter', sans-serif;
+  --lotos-font-display: 'Outfit', sans-serif;
+  --lotos-font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Radius */
+  --lotos-r-sm: 8px;
+  --lotos-r-md: 12px;
+  --lotos-r-lg: 16px;
+  --lotos-r-xl: 24px;
+  --lotos-r-2xl: 32px;
+
+  /* Blur levels */
+  --lotos-blur-sm: blur(8px);
+  --lotos-blur-md: blur(16px);
+  --lotos-blur-lg: blur(24px);
+}
+
+/* ------------------------------------------ */
+/*  2. SCROLLBAR                               */
+/* ------------------------------------------ */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--lotos-bg); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--lotos-primary), var(--lotos-accent));
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--lotos-primary-light); }
+
+/* ------------------------------------------ */
+/*  3. SCAN LINE (signature LotOS effect)      */
+/* ------------------------------------------ */
+@keyframes lotos-scan {
+  0%   { transform: translateY(-10px); opacity: 0; }
+  5%   { opacity: 1; }
+  95%  { opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+.lotos-scanline {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(99, 102, 241, 0.6) 30%,
+    rgba(20, 184, 166, 0.5) 60%,
+    transparent 100%
+  );
+  animation: lotos-scan 10s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ------------------------------------------ */
+/*  4. GLASS CARD                              */
+/* ------------------------------------------ */
+.lotos-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--lotos-border);
+  border-radius: var(--lotos-r-lg);
+  backdrop-filter: var(--lotos-blur-sm);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+.lotos-card:hover {
+  border-color: rgba(99, 102, 241, 0.30);
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.07), 0 8px 32px rgba(0, 0, 0, 0.3);
+  transform: translateY(-3px);
+}
+
+.lotos-card-accent {
+  background: linear-gradient(135deg, rgba(99,102,241,0.07) 0%, rgba(20,184,166,0.04) 100%);
+  border: 1px solid rgba(99, 102, 241, 0.18);
+  border-radius: var(--lotos-r-lg);
+}
+.lotos-card-accent:hover {
+  border-color: rgba(99, 102, 241, 0.35);
+  box-shadow: 0 0 24px rgba(99, 102, 241, 0.12);
+}
+
+/* ------------------------------------------ */
+/*  5. COMMAND SURFACE                         */
+/* ------------------------------------------ */
+.lotos-surface {
+  background: var(--lotos-surface);
+  border: 1px solid var(--lotos-border);
+  border-radius: var(--lotos-r-xl);
+  backdrop-filter: var(--lotos-blur-md);
+}
+
+.lotos-surface-elevated {
+  background: var(--lotos-surface-2);
+  border: 1px solid var(--lotos-border-2);
+  border-radius: var(--lotos-r-lg);
+}
+
+/* ------------------------------------------ */
+/*  6. BUTTONS                                 */
+/* ------------------------------------------ */
+
+/* Primary */
+.lotos-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  background: var(--lotos-primary);
+  color: #fff;
+  font-family: var(--lotos-font-display);
+  font-weight: 700;
+  font-size: 0.875rem;
+  letter-spacing: 0.01em;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.1);
+  cursor: pointer;
+  box-shadow: 0 0 24px var(--lotos-primary-glow);
+  transition: all 0.25s ease;
+  text-decoration: none;
+}
+.lotos-btn-primary:hover {
+  background: var(--lotos-primary-dark);
+  box-shadow: 0 0 40px var(--lotos-primary-glow);
+  transform: translateY(-2px);
+  color: #fff;
+}
+.lotos-btn-primary:active { transform: translateY(0); }
+
+/* Ghost */
+.lotos-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  background: rgba(255,255,255,0.04);
+  color: rgba(255, 255, 255, 0.70);
+  font-family: var(--lotos-font-display);
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: 999px;
+  border: 1px solid var(--lotos-border-2);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-decoration: none;
+  backdrop-filter: blur(8px);
+}
+.lotos-btn-ghost:hover {
+  border-color: rgba(99, 102, 241, 0.4);
+  background: rgba(99, 102, 241, 0.08);
+  color: #fff;
+}
+
+/* Accent (Teal) */
+.lotos-btn-accent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  background: var(--lotos-accent);
+  color: #fff;
+  font-family: var(--lotos-font-display);
+  font-weight: 700;
+  font-size: 0.875rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 24px var(--lotos-accent-glow);
+  transition: all 0.25s ease;
+  text-decoration: none;
+}
+.lotos-btn-accent:hover {
+  background: var(--lotos-accent-dark);
+  box-shadow: 0 0 40px var(--lotos-accent-glow);
+  transform: translateY(-2px);
+  color: #fff;
+}
+
+/* Destructive */
+.lotos-btn-destructive {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: 999px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-decoration: none;
+}
+.lotos-btn-destructive:hover {
+  background: rgba(239, 68, 68, 0.22);
+  border-color: rgba(239, 68, 68, 0.6);
+  color: #fff;
+}
+
+/* ------------------------------------------ */
+/*  7. BADGES                                  */
+/* ------------------------------------------ */
+.lotos-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.lotos-badge-primary  { background: rgba(99,102,241,0.12);  border: 1px solid rgba(99,102,241,0.30);  color: #818cf8; }
+.lotos-badge-accent   { background: rgba(20,184,166,0.12);  border: 1px solid rgba(20,184,166,0.30);  color: #2dd4bf; }
+.lotos-badge-premium  { background: rgba(236,72,153,0.12);  border: 1px solid rgba(236,72,153,0.30);  color: #f472b6; }
+.lotos-badge-success  { background: rgba(34,197,94,0.12);   border: 1px solid rgba(34,197,94,0.30);   color: #4ade80; }
+.lotos-badge-warning  { background: rgba(245,158,11,0.12);  border: 1px solid rgba(245,158,11,0.30);  color: #fbbf24; }
+.lotos-badge-critical { background: rgba(239,68,68,0.12);   border: 1px solid rgba(239,68,68,0.30);   color: #f87171; }
+.lotos-badge-neutral  { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.6); }
+
+/* ------------------------------------------ */
+/*  8. STATUS DOTS                             */
+/* ------------------------------------------ */
+@keyframes lotos-pulse { 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+
+.status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.status-dot.dot-success  { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.7);  animation: lotos-pulse 2s infinite; }
+.status-dot.dot-warning  { background: #f59e0b; box-shadow: 0 0 6px rgba(245,158,11,0.7); animation: lotos-pulse 2s infinite; }
+.status-dot.dot-critical { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.7);  animation: lotos-pulse 1.5s infinite; }
+.status-dot.dot-primary  { background: #6366f1; box-shadow: 0 0 6px rgba(99,102,241,0.7); animation: lotos-pulse 2.5s infinite; }
+.status-dot.dot-accent   { background: #14b8a6; box-shadow: 0 0 6px rgba(20,184,166,0.7); animation: lotos-pulse 2.5s infinite; }
+
+/* ------------------------------------------ */
+/*  9. STAT CARD (command surface style)       */
+/* ------------------------------------------ */
+.lotos-stat-card {
+  background: var(--lotos-surface-2);
+  border: 1px solid var(--lotos-border);
+  border-radius: var(--lotos-r-md);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  transition: border-color 0.3s;
+}
+.lotos-stat-card:hover { border-color: var(--lotos-border-accent); }
+
+.lotos-stat-value {
+  font-family: var(--lotos-font-display);
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1;
+  background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.55) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.lotos-stat-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+}
+
+/* ------------------------------------------ */
+/* 10. GLOW & TEXT UTILITIES                   */
+/* ------------------------------------------ */
+.lotos-glow-primary { box-shadow: 0 0 40px rgba(99,102,241,0.18), 0 0 80px rgba(99,102,241,0.07); }
+.lotos-glow-accent  { box-shadow: 0 0 40px rgba(20,184,166,0.18), 0 0 80px rgba(20,184,166,0.07); }
+.lotos-glow-premium { box-shadow: 0 0 40px rgba(236,72,153,0.20); }
+
+.lotos-text-primary  { color: var(--lotos-primary-light) !important; }
+.lotos-text-accent   { color: var(--lotos-accent-light)  !important; }
+.lotos-text-premium  { color: var(--lotos-premium-light) !important; }
+
+.lotos-gradient-text {
+  background: linear-gradient(135deg, var(--lotos-primary-light), var(--lotos-accent-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.lotos-gradient-text-premium {
+  background: linear-gradient(135deg, var(--lotos-primary-light), var(--lotos-premium-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ------------------------------------------ */
+/* 11. GRID BACKGROUND                         */
+/* ------------------------------------------ */
+.lotos-grid-bg {
+  background-image:
+    linear-gradient(rgba(99,102,241,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99,102,241,0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.lotos-dot-bg {
+  background-image: radial-gradient(circle, rgba(99,102,241,0.12) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* ------------------------------------------ */
+/* 12. SEPARATOR                               */
+/* ------------------------------------------ */
+.lotos-sep {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--lotos-primary), transparent);
+  opacity: 0.25;
+  margin: 0;
+  border: none;
+}
+
+.lotos-sep-accent {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--lotos-accent), transparent);
+  opacity: 0.25;
+}
+
+/* ------------------------------------------ */
+/* 13. NAV LINKS                               */
+/* ------------------------------------------ */
+.lotos-nav-link {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.50);
+  text-decoration: none;
+  letter-spacing: 0.01em;
+  transition: color 0.2s;
+  position: relative;
+  padding-bottom: 2px;
+}
+.lotos-nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 0; right: 0;
+  height: 1px;
+  background: var(--lotos-primary);
+  transform: scaleX(0);
+  transition: transform 0.2s;
+}
+.lotos-nav-link:hover { color: #fff; }
+.lotos-nav-link:hover::after { transform: scaleX(1); }
+
+/* ------------------------------------------ */
+/* 14. HERO STAT ROW                           */
+/* ------------------------------------------ */
+.lotos-hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+.lotos-hero-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+  font-family: var(--lotos-font-display);
+}
+.lotos-hero-stat-num {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+.lotos-hero-stat-desc {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.40);
+  font-weight: 500;
+}
+.lotos-hero-stat-divider {
+  width: 1px;
+  height: 22px;
+  background: var(--lotos-border-2);
+  flex-shrink: 0;
+}
+
+/* ------------------------------------------ */
+/* 15. ALERT / FLASH MESSAGES (LotOS style)   */
+/* ------------------------------------------ */
+.lotos-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-radius: var(--lotos-r-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+.lotos-alert-success  { background: rgba(34,197,94,0.08);  border: 1px solid rgba(34,197,94,0.22);  color: #4ade80; }
+.lotos-alert-warning  { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.22); color: #fbbf24; }
+.lotos-alert-error    { background: rgba(239,68,68,0.08);  border: 1px solid rgba(239,68,68,0.22);  color: #f87171; }
+.lotos-alert-info     { background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.22); color: #38bdf8; }
+
+/* ------------------------------------------ */
+/* 16. IMAGE / AVATAR FRAME                   */
+/* ------------------------------------------ */
+.lotos-img-frame {
+  border: 1px solid var(--lotos-border-2);
+  border-radius: var(--lotos-r-lg);
+  overflow: hidden;
+  position: relative;
+}
+.lotos-img-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(99,102,241,0.15);
+  pointer-events: none;
+}
+
+.lotos-avatar {
+  border-radius: 50%;
+  border: 2px solid var(--lotos-border-2);
+  transition: border-color 0.3s;
+}
+.lotos-avatar:hover { border-color: var(--lotos-primary); }
+
+/* ------------------------------------------ */
+/* 17. FORM INPUTS (LotOS style)              */
+/* ------------------------------------------ */
+.lotos-input {
+  background: var(--lotos-surface-2);
+  border: 1px solid var(--lotos-border-2);
+  border-radius: var(--lotos-r-md);
+  color: rgba(255,255,255,0.85);
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  outline: none;
+}
+.lotos-input:focus {
+  border-color: var(--lotos-primary);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
+.lotos-input::placeholder { color: rgba(255,255,255,0.25); }
+
+.lotos-label-text {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.40);
+  display: block;
+  margin-bottom: 0.375rem;
+}

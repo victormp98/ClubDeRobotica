@@ -1,0 +1,55 @@
+{% extends 'admin/base.html' %}
+{% import 'admin/layout.html' as layout with context %}
+
+{% block head_css %}
+    {{ super() }}
+    <!-- Inyectando Tailwind CSS en el Administrador como solicitó el usuario -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#6366f1', // Primary brand purple
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#081424', // Dark brand background
+                        },
+                        dark: {
+                            900: '#081424',
+                            800: '#111827',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Nuestro CSS personalizado Tech encima de Tailwind y Bootstrap -->
+    <link href="/static/css/admin_custom.css" rel="stylesheet">
+    {{ admin_fix | safe if admin_fix }}
+{% endblock %}
+
+{% block brand %}
+    <div class="flex items-center gap-4">
+        <a class="navbar-brand !m-0 !p-0" href="{{ admin_view.admin.url }}">{{ admin_view.admin.name }}</a>
+        
+        <!-- Botón Volver al Sitio visible SIEMPRE con estilo Tech -->
+        <a href="/" class="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-cyan-400 border border-cyan-400/30 rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400/60 transition-all duration-300 no-underline">
+            <i class="fa fa-home"></i> Volver al Sitio
+        </a>
+    </div>
+{% endblock %}
+
+{% block menu_links %}
+    <!-- En escritorio flotan a la derecha -->
+    <ul class="nav navbar-nav ml-auto hidden md:flex">
+        {{ layout.menu_links() }}
+    </ul>
+{% endblock %}

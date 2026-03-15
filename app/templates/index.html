@@ -3,78 +3,100 @@
 {% block content %}
 
 <!-- HERO SECTION -->
-<section class="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-dark-900 border-b-4 border-brand-500">
-    <!-- Abstract Background Elements -->
-    <div class="absolute inset-0 w-full h-full opacity-20">
-        <!-- Generative SVG Background to simulate tech/connections -->
-        <svg class="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                    <path d="M0 40L40 0H20L0 20M40 40V20L20 40" stroke="currentColor" stroke-width="0.5" class="text-brand-500 fill-none"/>
-                </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#grid)"/>
-        </svg>
-    </div>
-    <div class="absolute top-1/4 right-1/4 w-96 h-96 bg-brand-500/20 rounded-full blur-3xl rounded-full mix-blend-screen animate-pulse"></div>
-    <div class="absolute bottom-1/4 left-1/4 w-[30rem] h-[30rem] bg-indigo-500/10 rounded-full blur-3xl rounded-full mix-blend-screen"></div>
+<section class="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-transparent">
+    <!-- LotOS Grid background -->
+    <div class="absolute inset-0 lotos-grid-bg opacity-60"></div>
+    <!-- Glow blobs -->
+    <div class="absolute top-1/4 right-1/4 w-96 h-96 rounded-full blur-3xl mix-blend-screen animate-pulse" style="background: rgba(99,102,241,0.12);"></div>
+    <div class="absolute bottom-1/4 left-1/4 w-[30rem] h-[30rem] rounded-full blur-3xl mix-blend-screen" style="background: rgba(20,184,166,0.07);"></div>
+    <!-- Bottom separator glow -->
+    <div class="absolute bottom-0 left-0 right-0 lotos-sep"></div>
 
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-20 pb-16">
-        <div data-aos="fade-up" data-aos-duration="1000">
-            <span class="inline-block py-1 px-3 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-sm font-semibold tracking-wider font-display mb-6">
-                TECNOLOGÍA E INNOVACIÓN
-            </span>
+        <div data-aos="fade-up" data-aos-duration="900">
+            <!-- LotOS-style status chip -->
+            <div class="inline-flex items-center gap-2 mb-6 lotos-badge lotos-badge-accent">
+                <span class="status-dot dot-success"></span>
+                TECNOLOGÍA &middot; INNOVACIÓN &middot; UNACH
+            </div>
+
             <h1 class="text-5xl md:text-7xl font-display font-extrabold text-white tracking-tight mb-8 leading-tight">
-                Construyendo el <br class="hidden md:block"/> 
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-indigo-400">futuro de la robótica</span>
+                Construyendo el <br class="hidden md:block"/>
+                <span class="lotos-gradient-text">futuro de la robótica</span>
             </h1>
-            <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-300 font-light leading-relaxed mb-10">
+            <p class="mt-4 max-w-2xl mx-auto text-lg text-white/50 font-light leading-relaxed mb-10">
                 Únete a nuestra comunidad apasionada. Desarrolla habilidades prácticas, participa en torneos internacionales y diseña tecnología real.
             </p>
-            
-            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <a href="{{ url_for('main.registro') }}" class="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold rounded-full text-white bg-brand-500 hover:bg-brand-600 shadow-xl shadow-brand-500/30 transition-all duration-300 hover:scale-105 group">
+
+            <!-- CTA buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-14">
+                <a href="{{ url_for('main.registro') }}" class="lotos-btn-primary">
                     Únete al Club
                 </a>
-                <a href="#proyectos" class="w-full sm:w-auto px-8 py-4 border border-gray-600 text-lg font-medium rounded-full text-white hover:text-brand-400 hover:border-brand-400 transition-all duration-300 bg-dark-800/50 backdrop-blur-sm">
+                <a href="#proyectos" class="lotos-btn-ghost">
                     Ver Proyectos
                 </a>
             </div>
+
+            <!-- LotOS-style stat bar -->
+            <div class="flex justify-center">
+                <div class="lotos-hero-stats" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 999px; padding: 0.625rem 1.75rem;">
+                    <div class="lotos-hero-stat">
+                        <span class="lotos-hero-stat-num">27</span>
+                        <span class="lotos-hero-stat-desc">Miembros activos</span>
+                    </div>
+                    <div class="lotos-hero-stat-divider"></div>
+                    <div class="lotos-hero-stat">
+                        <span class="lotos-hero-stat-num">10</span>
+                        <span class="lotos-hero-stat-desc">Proyectos</span>
+                    </div>
+                    <div class="lotos-hero-stat-divider"></div>
+                    <div class="lotos-hero-stat">
+                        <span class="lotos-hero-stat-num">3</span>
+                        <span class="lotos-hero-stat-desc">Años activos</span>
+                    </div>
+                    <div class="lotos-hero-stat-divider"></div>
+                    <div class="lotos-hero-stat">
+                        <span class="lotos-hero-stat-num">WRO</span>
+                        <span class="lotos-hero-stat-desc">Meta del equipo</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    
-    <!-- Scroll down indicator -->
+
+    <!-- Scroll indicator -->
     <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce flex flex-col items-center">
-        <span class="text-xs text-gray-400 font-medium mb-2 tracking-widest uppercase">Descubre más</span>
-        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+        <span class="text-xs text-white/25 font-mono mb-2 tracking-widest uppercase">scroll</span>
+        <svg class="w-4 h-4 text-white/25" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
     </div>
 </section>
 
 <!-- ABOUT SECTION -->
-<section id="about" class="py-24 bg-white">
+<section id="about" class="py-24 bg-transparent border-b border-white/5">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div data-aos="fade-right">
-                <h2 class="text-base text-brand-600 font-semibold tracking-wide uppercase mb-2">Sobre el Club</h2>
-                <h3 class="text-3xl md:text-4xl font-display font-bold text-gray-900 mb-6">Un espacio para mentes curiosas</h3>
-                <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                <h2 class="text-base text-brand-400 font-semibold tracking-wide uppercase mb-2">Sobre el Club</h2>
+                <h3 class="text-3xl md:text-4xl font-display font-bold text-white mb-6">Un espacio para mentes curiosas</h3>
+                <p class="text-lg text-gray-400 mb-6 leading-relaxed">
                     Somos un grupo multidisciplinario dedicado al aprendizaje, diseño y construcción de sistemas robóticos automatizados y mecánicos. No importa tu nivel de experiencia, nuestro objetivo es compartir conocimiento.
                 </p>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8">
-                    <div class="p-6 bg-gray-50 rounded-2xl border border-gray-100 hover:shadow-md transition-shadow">
-                        <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center mb-4 text-brand-500">
+                    <div class="p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-brand-500/30 transition-all">
+                        <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-4 text-brand-400">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                         </div>
-                        <h4 class="font-bold text-gray-900 mb-2">Competencias</h4>
-                        <p class="text-gray-600 text-sm">Participación activa a nivel nacional e internacional demostrando nuestras habilidades.</p>
+                        <h4 class="font-bold text-white mb-2">Competencias</h4>
+                        <p class="text-gray-400 text-sm">Participación activa a nivel nacional e internacional demostrando nuestras habilidades.</p>
                     </div>
-                    <div class="p-6 bg-gray-50 rounded-2xl border border-gray-100 hover:shadow-md transition-shadow">
-                        <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center mb-4 text-brand-500">
+                    <div class="p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-brand-500/30 transition-all">
+                        <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-4 text-brand-400">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
                         </div>
-                        <h4 class="font-bold text-gray-900 mb-2">Talleres Integrales</h4>
-                        <p class="text-gray-600 text-sm">Desde programación de microcontroladores hasta diseño mecánico 3D avanzado.</p>
+                        <h4 class="font-bold text-white mb-2">Talleres Integrales</h4>
+                        <p class="text-gray-400 text-sm">Desde programación de microcontroladores hasta diseño mecánico 3D avanzado.</p>
                     </div>
                 </div>
             </div>
@@ -83,10 +105,14 @@
                 <div class="absolute -inset-2 bg-gradient-to-r from-brand-500 to-indigo-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
                 <!-- Placeholder for generic robot visual representation -->
                 <div class="relative bg-dark-800 rounded-2xl aspect-square overflow-hidden flex flex-col items-center justify-center border border-gray-800">
-                    <svg class="w-32 h-32 text-gray-600 opacity-50 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                    </svg>
-                    <span class="text-gray-400 font-display tracking-widest uppercase text-sm font-semibold">Imagen del Equipo/Robótica</span>
+                    {% if img_equipo %}
+                        <img src="{{ url_for('static', filename='uploads/config/' ~ img_equipo) }}" alt="Equipo Club de Robótica" class="w-full h-full object-cover">
+                    {% else %}
+                        <svg class="w-32 h-32 text-gray-600 opacity-50 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                        <span class="text-gray-400 font-display tracking-widest uppercase text-sm font-semibold">Imagen del Equipo/Robótica</span>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -94,111 +120,91 @@
 </section>
 
 <!-- PROYECTOS SECTION -->
-<section id="proyectos" class="py-24 bg-gray-50 border-y border-gray-200">
+<section id="proyectos" class="py-24 bg-transparent relative">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center max-w-3xl mx-auto mb-16" data-aos="fade-up">
-            <h2 class="text-base text-brand-600 font-semibold tracking-wide uppercase mb-2">Construcciones</h2>
-            <h3 class="text-3xl md:text-4xl font-display font-bold text-gray-900 mb-4">Nuestros Proyectos</h3>
-            <p class="text-lg text-gray-600">Conoce algunas de las creaciones tecnológicas desarrolladas completamente por los miembros de nuestro club.</p>
+            <h2 class="text-base text-brand-400 font-semibold tracking-wide uppercase mb-2">Construcciones</h2>
+            <h3 class="text-3xl md:text-4xl font-display font-bold text-white mb-4">Nuestros Proyectos</h3>
+            <p class="text-lg text-gray-400">Conoce algunas de las creaciones tecnológicas desarrolladas completamente por los miembros de nuestro club.</p>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Project Card 1 -->
-            <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group" data-aos="fade-up" data-aos-delay="100">
-                <div class="aspect-video bg-gray-200 relative overflow-hidden flex items-center justify-center">
-                    <div class="absolute inset-0 bg-brand-900/10 group-hover:bg-transparent transition-colors z-10"></div>
-                    <span class="text-gray-400 font-display z-0 uppercase tracking-widest text-xs font-semibold">Foto del Drone</span>
+            {% for proyecto in proyectos %}
+            <div class="lotos-card overflow-hidden group flex flex-col" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+                <div class="aspect-video bg-white/5 relative overflow-hidden flex items-center justify-center" style="border-bottom: 1px solid var(--lotos-border);">
+                    {% if proyecto.imagen_path %}
+                        <img src="{{ url_for('static', filename='uploads/proyectos/' ~ proyecto.imagen_path|replace('\\', '/')) }}" alt="{{ proyecto.titulo }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    {% else %}
+                        <div class="absolute inset-0 lotos-grid-bg opacity-40"></div>
+                        <span class="text-white/20 font-display uppercase tracking-widest text-xs font-semibold z-10">Sin Imagen</span>
+                    {% endif %}
                 </div>
-                <div class="p-6">
-                    <span class="text-xs font-semibold text-brand-600 uppercase tracking-wider mb-2 block">Drones Autonómos</span>
-                    <h4 class="text-xl font-bold text-gray-900 mb-2">Hexacóptero de Rescate</h4>
-                    <p class="text-gray-600 text-sm mb-4 line-clamp-3">Drone desarrollado con visión artificial capaz de identificar colores térmicos para misiones de búsqueda en zonas de desastre.</p>
-                </div>
-            </div>
-
-            <!-- Project Card 2 -->
-            <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group" data-aos="fade-up" data-aos-delay="200">
-                <div class="aspect-video bg-gray-200 relative overflow-hidden flex items-center justify-center">
-                    <div class="absolute inset-0 bg-brand-900/10 group-hover:bg-transparent transition-colors z-10"></div>
-                    <span class="text-gray-400 font-display z-0 uppercase tracking-widest text-xs font-semibold">Foto Seguidores</span>
-                </div>
-                <div class="p-6">
-                    <span class="text-xs font-semibold text-brand-600 uppercase tracking-wider mb-2 block">Competencia Velocista</span>
-                    <h4 class="text-xl font-bold text-gray-900 mb-2">Seguidor de Línea V2</h4>
-                    <p class="text-gray-600 text-sm mb-4 line-clamp-3">Robot ultraligero con motores brushles y chasis de fibra de carbono. Diseñado para optimizar los tiempos en pistas de circuitos de turbinas.</p>
+                <div class="p-6 flex flex-col flex-grow">
+                    <span class="lotos-badge lotos-badge-primary mb-3">{{ proyecto.categoria }}</span>
+                    <h4 class="text-base font-bold text-white mb-2">{{ proyecto.titulo }}</h4>
+                    <p class="text-white/40 text-sm mb-4 line-clamp-3 flex-grow">{{ proyecto.descripcion_corta }}</p>
                 </div>
             </div>
-
-            <!-- Project Card 3 -->
-            <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group" data-aos="fade-up" data-aos-delay="300">
-                <div class="aspect-video bg-gray-200 relative overflow-hidden flex items-center justify-center">
-                    <div class="absolute inset-0 bg-brand-900/10 group-hover:bg-transparent transition-colors z-10"></div>
-                    <span class="text-gray-400 font-display z-0 uppercase tracking-widest text-xs font-semibold">Foto Brazo 3D</span>
-                </div>
-                <div class="p-6">
-                    <span class="text-xs font-semibold text-brand-600 uppercase tracking-wider mb-2 block">Domótica y Herramientas</span>
-                    <h4 class="text-xl font-bold text-gray-900 mb-2">Brazo Robótico 6-DoF</h4>
-                    <p class="text-gray-600 text-sm mb-4 line-clamp-3">Manipulador industrial a escala impreso en 3D con cinemática inversa resuelta mediante Python e integrada a una interfaz web remota.</p>
-                </div>
+            {% else %}
+            <div class="col-span-1 md:col-span-3 text-center py-12 text-white/30 lotos-card">
+                Aún no hay proyectos destacados. Pronto mostraremos nuestro trabajo aquí.
             </div>
+            {% endfor %}
         </div>
     </div>
 </section>
 
 <!-- ÚLTIMAS NOTICIAS SECTION -->
-<section id="noticias" class="py-24 bg-white relative">
+<section id="noticias" class="py-24 bg-transparent border-t border-white/5 relative">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-end mb-12" data-aos="fade-up">
             <div>
-                <h2 class="text-base text-brand-600 font-semibold tracking-wide uppercase mb-2">Actualidad</h2>
-                <h3 class="text-3xl md:text-4xl font-display font-bold text-gray-900">Últimas Noticias</h3>
+                <h2 class="text-base text-brand-400 font-semibold tracking-wide uppercase mb-2">Actualidad</h2>
+                <h3 class="text-3xl md:text-4xl font-display font-bold text-white">Últimas Noticias</h3>
             </div>
-            <a href="{{ url_for('main.noticias') }}" class="hidden sm:inline-flex items-center gap-1 text-brand-600 font-medium hover:text-dark-900 transition-colors">
+            <a href="{{ url_for('main.noticias') }}" class="hidden sm:inline-flex items-center gap-1 text-brand-400 font-medium hover:text-white transition-colors">
                 Ver Todas <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
             </a>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             {% for noticia in ultimas_noticias %}
-            <div class="bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group flex flex-col" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+            <div class="lotos-card overflow-hidden group flex flex-col" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
                 <!-- Imagen Superior -->
-                <div class="aspect-video bg-gray-200 relative overflow-hidden flex items-center justify-center">
+                <div class="aspect-video bg-white/5 relative overflow-hidden flex items-center justify-center" style="border-bottom: 1px solid var(--lotos-border);">
                     {% if noticia.imagen %}
                         <img src="{{ url_for('static', filename='uploads/noticias/' ~ noticia.imagen|replace('\\', '/')) }}" alt="{{ noticia.titulo }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     {% else %}
-                        <div class="absolute inset-0 bg-brand-900/10 group-hover:bg-transparent transition-colors z-10"></div>
-                        <svg class="w-12 h-12 text-gray-400 opacity-50 z-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+                        <div class="absolute inset-0 lotos-grid-bg opacity-40"></div>
+                        <svg class="w-10 h-10 text-white/20 z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
                     {% endif %}
                 </div>
-                
+
                 <!-- Contenido -->
                 <div class="p-6 flex flex-col flex-grow">
-                    <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 block flex items-center gap-1 text-brand-600">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        {{ noticia.fecha_publicacion.strftime('%d %b, %Y') }}
-                    </span>
-                    <h4 class="text-xl font-bold text-gray-900 mb-3 line-clamp-2 hover:text-brand-600 transition-colors">
+                    <div class="flex items-center gap-1.5 mb-3">
+                        <span class="status-dot dot-accent"></span>
+                        <span class="text-xs font-mono text-white/30">{{ noticia.fecha_publicacion.strftime('%d %b %Y') }}</span>
+                    </div>
+                    <h4 class="text-base font-bold text-white mb-3 line-clamp-2 hover:text-brand-400 transition-colors">
                         <a href="{{ url_for('main.noticia_detalle', id=noticia.id) }}">{{ noticia.titulo }}</a>
                     </h4>
-                    <!-- Mostramos solo un extracto limpio de tags HTML -->
-                    <div class="text-gray-600 text-sm mb-6 line-clamp-3 overflow-hidden flex-grow">
+                    <div class="text-white/40 text-sm mb-6 line-clamp-3 overflow-hidden flex-grow">
                         {{ noticia.contenido | striptags }}
                     </div>
-                    
-                    <a href="{{ url_for('main.noticia_detalle', id=noticia.id) }}" class="inline-flex items-center text-brand-600 font-semibold text-sm hover:text-dark-900 transition-colors mt-auto">
+                    <a href="{{ url_for('main.noticia_detalle', id=noticia.id) }}" class="inline-flex items-center text-brand-400 font-semibold text-sm hover:text-white transition-colors mt-auto">
                         Leer artículo <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                     </a>
                 </div>
             </div>
             {% else %}
-            <div class="col-span-3 text-center py-12 text-gray-500">
+            <div class="col-span-3 text-center py-12 text-white/30">
                 Aún no hay noticias publicadas.
             </div>
             {% endfor %}
         </div>
-        
         <div class="mt-8 text-center sm:hidden">
-            <a href="{{ url_for('main.noticias') }}" class="inline-flex items-center justify-center w-full px-6 py-3 border border-gray-300 text-base font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50">
+            <a href="{{ url_for('main.noticias') }}" class="inline-flex items-center justify-center w-full px-6 py-3 border border-white/10 text-sm font-medium rounded-xl text-white/50 bg-transparent hover:bg-white/5 transition-all">
                 Ver Todas las Noticias
             </a>
         </div>
@@ -206,7 +212,7 @@
 </section>
 
 <!-- WRO MENTION SECTION -->
-<section id="wro" class="py-24 bg-dark-900 relative overflow-hidden">
+<section id="wro" class="py-24 bg-transparent relative overflow-hidden">
     <div class="absolute top-0 right-0 w-64 h-64 bg-brand-600/30 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
     <div class="absolute bottom-0 left-0 w-64 h-64 bg-indigo-600/20 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2"></div>
     
@@ -246,66 +252,75 @@
 </section>
 
 <!-- GALERIA PREVIEW -->
-<section id="galeria" class="py-24 bg-white">
+<section id="galeria" class="py-24 bg-transparent relative border-t border-white/5">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-end mb-12" data-aos="fade-up">
             <div>
-                <h2 class="text-base text-brand-600 font-semibold tracking-wide uppercase mb-2">Momentos</h2>
-                <h3 class="text-3xl md:text-4xl font-display font-bold text-gray-900">Galería del Club</h3>
+                <h2 class="text-base text-brand-400 font-semibold tracking-wide uppercase mb-2">Momentos</h2>
+                <h3 class="text-3xl md:text-4xl font-display font-bold text-white">Galería del Club</h3>
             </div>
-            <a href="{{ url_for('main.galeria') }}" class="hidden sm:inline-flex items-center gap-1 text-brand-600 font-medium hover:text-dark-900 transition-colors">
+            <a href="{{ url_for('main.galeria') }}" class="hidden sm:inline-flex items-center gap-1 text-brand-400 font-medium hover:text-white transition-colors">
                 Ver Todo <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
             </a>
         </div>
         
         <!-- Placeholder Images Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4" data-aos="fade-up" data-aos-delay="100">
-            <div class="aspect-square bg-gray-100 rounded-xl flex flex-col items-center justify-center text-gray-400 border border-gray-200 hover:border-brand-300 transition-colors">
-                <svg class="w-8 h-8 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                <span class="text-xs uppercase tracking-wider font-semibold">Taller Lógica</span>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4" data-aos="fade-up" data-aos-delay="100">
+            {% for foto in ultimas_fotos %}
+            <a href="{{ url_for('static', filename='uploads/galeria/' ~ foto.imagen_path|replace('\\', '/')) }}" class="glightbox block aspect-square bg-white/5 rounded-xl flex flex-col items-center justify-center text-gray-500 border border-white/10 hover:border-brand-500/50 transition-colors overflow-hidden relative group" data-gallery="home-gallery" data-title="{{ foto.titulo }}" data-description="{{ foto.album.nombre }}">
+                <img src="{{ url_for('static', filename='uploads/galeria/' ~ foto.imagen_path|replace('\\', '/')) }}" alt="{{ foto.titulo }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                <div class="absolute inset-0 bg-dark-900/80 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity duration-300 p-4 text-center">
+                    <span class="text-white font-bold text-sm truncate w-full">{{ foto.titulo }}</span>
+                    {% if foto.album %}
+                    <span class="text-brand-400 text-xs mt-1 font-mono uppercase tracking-wider">{{ foto.album.nombre }}</span>
+                    {% endif %}
+                </div>
+            </a>
+            {% else %}
+            <div class="col-span-2 md:col-span-5 text-center py-8 text-gray-500 border border-dashed border-white/20 rounded-xl">
+                Próximamente fotos de la comunidad.
             </div>
-            <div class="aspect-[4/5] md:aspect-square md:row-span-2 md:col-span-2 bg-gray-100 rounded-xl flex flex-col items-center justify-center text-gray-400 border border-gray-200 hover:border-brand-300 transition-colors">
-                 <svg class="w-10 h-10 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                 <span class="text-sm uppercase tracking-wider font-semibold">Torneo Nacional 2025</span>
-            </div>
-            <div class="aspect-square bg-gray-100 rounded-xl flex flex-col items-center justify-center text-gray-400 border border-gray-200 hover:border-brand-300 transition-colors">
-                <svg class="w-8 h-8 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                <span class="text-xs uppercase tracking-wider font-semibold">Hackathon</span>
-            </div>
-            <div class="aspect-square bg-gray-100 rounded-xl flex flex-col items-center justify-center text-gray-400 border border-gray-200 hover:border-brand-300 transition-colors">
-                <svg class="w-8 h-8 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                <span class="text-xs uppercase tracking-wider font-semibold">Impresión 3D</span>
-            </div>
-            <div class="aspect-square bg-gray-100 rounded-xl flex flex-col items-center justify-center text-gray-400 border border-gray-200 hover:border-brand-300 transition-colors">
-                <svg class="w-8 h-8 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                <span class="text-xs uppercase tracking-wider font-semibold">Diseño CAD</span>
-            </div>
+            {% endfor %}
         </div>
         
         <div class="mt-8 text-center sm:hidden">
-            <a href="{{ url_for('main.galeria') }}" class="inline-flex items-center justify-center w-full px-6 py-3 border border-gray-300 text-base font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50">
+            <a href="{{ url_for('main.galeria') }}" class="inline-flex items-center justify-center w-full px-6 py-3 border border-white/20 text-base font-medium rounded-xl text-gray-300 bg-transparent hover:bg-white/5">
                 Ver Toda la Galería
             </a>
         </div>
     </div>
 </section>
 
-<!-- REGISTRATION BANNER / CTA -->
-<section id="registro" class="py-20 bg-brand-500 relative overflow-hidden">
-    <!-- Decorative patterns -->
-    <div class="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-white opacity-10 rounded-full blur-3xl"></div>
-    <div class="absolute bottom-0 left-0 -mb-20 -ml-20 w-80 h-80 bg-brand-900 opacity-20 rounded-full blur-3xl"></div>
+<!-- CTA SECTION — LotOS Command Surface -->
+<section id="registro" class="py-20 relative overflow-hidden">
+    <!-- Dark glass background -->
+    <div class="absolute inset-0" style="background: linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(7,7,17,0.95) 40%, rgba(20,184,166,0.07) 100%); backdrop-filter: blur(4px);"></div>
+    <div class="lotos-sep absolute top-0 left-0 right-0"></div>
+    <div class="lotos-sep-accent absolute bottom-0 left-0 right-0"></div>
+    <!-- Glow blobs -->
+    <div class="absolute top-0 right-0 w-80 h-80 rounded-full blur-3xl" style="background: rgba(99,102,241,0.10);"></div>
+    <div class="absolute bottom-0 left-0 w-64 h-64 rounded-full blur-3xl" style="background: rgba(20,184,166,0.08);"></div>
 
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10" data-aos="zoom-in">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10" data-aos="zoom-in">
+        <!-- Status chip -->
+        <div class="inline-flex items-center gap-2 lotos-badge lotos-badge-primary mb-6">
+            <span class="status-dot dot-primary"></span>
+            INSCRIPCIONES ABIERTAS
+        </div>
         <h2 class="text-3xl md:text-5xl font-display font-bold text-white mb-6">¿Listo para formar parte del equipo?</h2>
-        <p class="text-xl text-brand-50 mb-10 max-w-2xl mx-auto font-light">
-            Inscríbete ahora y comienza a dar vida a tus ideas. Las inscripciones para este semestre están a punto de cerrar.
+        <p class="text-lg text-white/50 mb-10 max-w-xl mx-auto">
+            Inscríbete ahora y comienza a dar vida a tus ideas.
         </p>
-        
-        <a href="{{ url_for('main.registro') }}" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-full text-brand-600 bg-white shadow-xl hover:bg-gray-50 transition-all duration-300 hover:-translate-y-1">
-            Completar Formulario de Registro
-        </a>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{{ url_for('main.registro') }}" class="lotos-btn-primary">
+                Completar Formulario de Registro
+            </a>
+            <a href="{{ url_for('main.about') }}" class="lotos-btn-ghost">
+                Conocer el Club
+            </a>
+        </div>
     </div>
 </section>
+
 
 {% endblock %}
