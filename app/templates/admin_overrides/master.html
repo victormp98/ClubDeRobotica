@@ -103,8 +103,25 @@
 
 {% block extra_js %}
     {{ super() }}
+    <!-- CKEditor 4 CDN -->
+    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar CKEditor en todos los campos con la clase 'ckeditor-field'
+            const editors = document.querySelectorAll('.ckeditor-field');
+            editors.forEach(function(el) {
+                CKEDITOR.replace(el, {
+                    language: 'es',
+                    // Ajustes de altura opcionales
+                    height: 400,
+                    // Quitar plugins que no queramos o añadir otros
+                    removeButtons: 'About',
+                    // Permitir todo el HTML para que no limpie etiquetas LotOS
+                    allowedContent: true
+                });
+            });
+
+            // Toggler de menú móvil existente
             const btn = document.getElementById('admin-mobile-btn');
             const menu = document.getElementById('admin-mobile-menu');
             if (btn && menu) {
