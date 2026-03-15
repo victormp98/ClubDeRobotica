@@ -84,15 +84,25 @@ class UserAdmin(SecureModelView):
         'fecha_registro': 'Registro'
     }
 
-    # Restringir los roles a opciones predeterminadas para evitar errores tipográficos
+    # Restringir los roles, carreras e intereses a opciones predeterminadas
     form_overrides = {
-        'rol': SelectField
+        'rol': SelectField,
+        'carrera': SelectField
     }
     
     form_args = {
         'rol': {
             'choices': [('usuario', 'Estudiante / Miembro / Usuario Normal'), ('admin', 'Administrador Total (Cuidado)')],
             'default': 'usuario'
+        },
+        'carrera': {
+            'choices': [
+                ('Ingeniería en sistemas computacionales', 'Ingeniería en sistemas computacionales'),
+                ('Ingeniería en inteligencia artificial', 'Ingeniería en inteligencia artificial'),
+                ('Ingeniería en mecatrónica', 'Ingeniería en mecatrónica'),
+                ('Ingeniería en electrónica', 'Ingeniería en electrónica')
+            ],
+            'validators': [DataRequired(message="La carrera es obligatoria.")]
         }
     }
 
@@ -438,16 +448,29 @@ class MiembroEquipoAdmin(SecureModelView):
     column_labels = {
         'equipo': 'Equipo Perteneciente',
         'user': 'Usuario Vinculado',
-        'nombre': 'Nombre (Opcional, sobrescribe User)',
-        'cargo': 'Cargo / Nivel',
-        'area': 'Área de Especialidad',
-        'foto_path': 'Subir Fotografía (Máx 800px)',
+        'nombre': 'Nombre en Display (Legacy)',
+        'cargo': 'Cargo / Rol en Equipo',
+        'area': 'Área de Trabajo',
+        'foto_path': 'Subir Foto (Opcional)',
         'miniatura_preview': 'Foto',
-        'orden': 'Prioridad (Menor = Arriba)',
-        'activo': 'Activo en este Equipo'
+        'orden': 'Orden de Aparición',
+        'activo': 'Socio Activo'
+    }
+
+    # Restringir cargos a opciones predeterminadas
+    form_overrides = {
+        'cargo': SelectField
     }
 
     form_args = {
+        'cargo': {
+            'choices': [
+                ('Líder - Equipo', 'Líder - Equipo'),
+                ('Miembro - Equipo', 'Miembro - Equipo'),
+                ('Entrenador - Equipo', 'Entrenador - Equipo')
+            ],
+            'default': 'Miembro - Equipo'
+        },
         'user': {
             'validators': [DataRequired(message="Debe seleccionar un Usuario Vinculado obligatoriamente.")]
         },

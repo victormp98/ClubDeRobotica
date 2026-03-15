@@ -20,13 +20,18 @@ class RegistrationForm(FlaskForm):
         Length(max=120)
     ])
     
-    carrera = StringField('Carrera', validators=[
-        DataRequired(message="La carrera es obligatoria."),
-        Length(max=100)
+    carrera = SelectField('Carrera', choices=[
+        ('Ingeniería en sistemas computacionales', 'Ingeniería en sistemas computacionales'),
+        ('Ingeniería en inteligencia artificial', 'Ingeniería en inteligencia artificial'),
+        ('Ingeniería en mecatrónica', 'Ingeniería en mecatrónica'),
+        ('Ingeniería en electrónica', 'Ingeniería en electrónica')
+    ], validators=[
+        DataRequired(message="La carrera es obligatoria.")
     ])
     
     area_interes = SelectField('Área de Interés Principal', choices=[
-        ('programacion', 'Programación (Python, C++, ROS)'),
+        ('programacion', 'Desarrollo de Software y Algoritmos'),
+        ('inteligencia_artificial', 'Inteligencia Artificial y Machine Learning'),
         ('electronica', 'Electrónica y Circuitos'),
         ('mecanica', 'Diseño Mecánico y CAD'),
         ('general', 'Aprender de todo un poco')

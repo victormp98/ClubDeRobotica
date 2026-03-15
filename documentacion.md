@@ -155,6 +155,7 @@ ClubDeRobotica/
 - **Decorador custom**: `@miembro_required` — verifica sesión activa **y** `aprobado=True`.
 - **Admin Reset**: Acción de lote en `UserAdmin` para resetear contraseña a valor por defecto (ej. `"robotica2026"`).
 - **Perfil de Usuario**: Ruta `/perfil` que permite a miembros autenticados cambiar su contraseña de manera segura sin depender de correos electrónicos.
+- **Estandarización UI**: Uso de `SelectField` en formularios de registro y paneles admin para campos críticos (`carrera`, `cargo`) para asegurar integridad de datos.
 
 ### 5.2 Panel Administrativo (Flask-Admin en `/admin`)
 
