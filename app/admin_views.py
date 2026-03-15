@@ -209,13 +209,6 @@ class NoticiaAdmin(SecureModelView):
         'autor': 'Autor',
         'imagen': 'Subir Imagen'
     }
-    
-    form_widget_args = {
-        'contenido': {
-            'class': 'ckeditor-field',
-            'rows': 10
-        }
-    }
 
     # Custom formatter para mostrar la miniatura en la lista
     def _list_thumbnail(view, context, model, name):
@@ -411,13 +404,6 @@ class ProyectoAdmin(SecureModelView):
         'imagen_path': 'Subir Fotografía (Máx 1200px)',
         'miniatura_preview': 'Vista Previa',
         'activo': 'Visible'
-    }
-
-    form_widget_args = {
-        'descripcion_larga': {
-            'class': 'ckeditor-field',
-            'rows': 10
-        }
     }
 
     def _list_thumbnail(view, context, model, name):

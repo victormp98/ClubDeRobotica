@@ -45,21 +45,6 @@
     <style>
         body { padding-top: 80px !important; }
         @media (max-width: 768px) { body { padding-top: 70px !important; } }
-        
-        /* Fix para CKEditor: Evitar que herede transparencias del tema LotOS */
-        .cke_chrome {
-            background: #fff !important;
-            color: #333 !important;
-            border-radius: 8px !important;
-            overflow: hidden;
-            margin: 10px 0 !important;
-        }
-        .cke_top, .cke_contents, .cke_bottom {
-            background: #fff !important;
-        }
-        .cke_toolbar_break { display: none !important; }
-        /* Asegurar visibilidad de etiquetas de texto en el editor */
-        .cke_reset { color: #333 !important; }
     </style>
 {% endblock %}
 
@@ -118,48 +103,15 @@
 
 {% block extra_js %}
     {{ super() }}
-    <!-- CKEditor 4 CDN -->
-    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
     <script>
-        window.onload = function() {
-            console.log("LotOS Admin: Verificando CKEditor...");
-            
-            if (typeof CKEDITOR === 'undefined') {
-                console.error("LotOS Admin Error: No se pudo cargar CKEditor desde el CDN.");
-                return;
-            }
-
-            const editors = document.querySelectorAll('.ckeditor-field');
-            console.log("LotOS Admin: Campos detectados:", editors.length);
-
-            editors.forEach(function(el) {
-                console.log("LotOS Admin: Inicializando editor en:", el.name || el.id);
-                try {
-                    CKEDITOR.replace(el, {
-                        language: 'es',
-                        height: 500,
-                        width: '100%',
-                        // Permitir todo el contenido para evitar que limpie etiquetas personalizadas
-                        allowedContent: true,
-                        // Forzar que el toolbar sea visible
-                        toolbarCanCollapse: false,
-                        // Configuración de skin por defecto para evitar problemas de carga
-                        skin: 'moono-lisa',
-                        removeButtons: 'About'
-                    });
-                } catch (e) {
-                    console.error("LotOS Admin Error al inicializar:", e);
-                }
-            });
-
-            // Toggler de menú móvil existente
+        document.addEventListener('DOMContentLoaded', function() {
             const btn = document.getElementById('admin-mobile-btn');
             const menu = document.getElementById('admin-mobile-menu');
             if (btn && menu) {
-                btn.onclick = () => {
+                btn.addEventListener('click', () => {
                     menu.classList.toggle('hidden');
-                };
+                });
             }
-        };
+        });
     </script>
 {% endblock %}
