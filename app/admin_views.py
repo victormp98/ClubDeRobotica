@@ -87,7 +87,8 @@ class UserAdmin(SecureModelView):
     # Restringir los roles, carreras e intereses a opciones predeterminadas
     form_overrides = {
         'rol': SelectField,
-        'carrera': SelectField
+        'carrera': SelectField,
+        'area_interes': SelectField
     }
     
     form_args = {
@@ -103,6 +104,16 @@ class UserAdmin(SecureModelView):
                 ('Ingeniería en electrónica', 'Ingeniería en electrónica')
             ],
             'validators': [DataRequired(message="La carrera es obligatoria.")]
+        },
+        'area_interes': {
+            'choices': [
+                ('Programación', 'Desarrollo de Software y Algoritmos'),
+                ('Inteligencia Artificial', 'Inteligencia Artificial y Machine Learning'),
+                ('Electrónica', 'Electrónica y Circuitos'),
+                ('Mecánica', 'Diseño Mecánico y CAD'),
+                ('General', 'Aprender de todo un poco')
+            ],
+            'validators': [DataRequired(message="Selecciona un área de interés.")]
         }
     }
 
@@ -457,9 +468,10 @@ class MiembroEquipoAdmin(SecureModelView):
         'activo': 'Socio Activo'
     }
 
-    # Restringir cargos a opciones predeterminadas
+    # Restringir cargos y áreas a opciones predeterminadas
     form_overrides = {
-        'cargo': SelectField
+        'cargo': SelectField,
+        'area': SelectField
     }
 
     form_args = {
@@ -470,6 +482,16 @@ class MiembroEquipoAdmin(SecureModelView):
                 ('Entrenador - Equipo', 'Entrenador - Equipo')
             ],
             'default': 'Miembro - Equipo'
+        },
+        'area': {
+            'choices': [
+                ('Arquitecto de sistemas', 'Arquitecto de sistemas'),
+                ('Programación', 'Programación'),
+                ('Mecánica', 'Mecánica'),
+                ('Electrónica', 'Electrónica'),
+                ('Integración de IA', 'Integración de IA')
+            ],
+            'default': 'Programación'
         },
         'user': {
             'validators': [DataRequired(message="Debe seleccionar un Usuario Vinculado obligatoriamente.")]

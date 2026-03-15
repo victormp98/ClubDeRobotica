@@ -30,11 +30,11 @@ class RegistrationForm(FlaskForm):
     ])
     
     area_interes = SelectField('Área de Interés Principal', choices=[
-        ('programacion', 'Desarrollo de Software y Algoritmos'),
-        ('inteligencia_artificial', 'Inteligencia Artificial y Machine Learning'),
-        ('electronica', 'Electrónica y Circuitos'),
-        ('mecanica', 'Diseño Mecánico y CAD'),
-        ('general', 'Aprender de todo un poco')
+        ('Programación', 'Desarrollo de Software y Algoritmos'),
+        ('Inteligencia Artificial', 'Inteligencia Artificial y Machine Learning'),
+        ('Electrónica', 'Electrónica y Circuitos'),
+        ('Mecánica', 'Diseño Mecánico y CAD'),
+        ('General', 'Aprender de todo un poco')
     ], validators=[DataRequired(message="Selecciona un área de interés.")])
     
     password = PasswordField('Contraseña', validators=[
