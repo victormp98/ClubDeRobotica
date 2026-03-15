@@ -97,12 +97,24 @@ def index():
     img_equipo_config = Configuracion.query.get('IMAGEN_EQUIPO_HOME')
     img_equipo = img_equipo_config.valor if img_equipo_config else None
     
+    # --- Estadísticas Dinámicas ---
+    total_miembros = User.query.filter_by(aprobado=True, activo=True).count()
+    total_proyectos = Proyecto.query.filter_by(activo=True).count()
+    
+    from datetime import datetime
+    # Base: 2023 (Año de fundación del Club según contexto)
+    anios_activos = datetime.now().year - 2023
+    if anios_activos < 1: anios_activos = 1
+    
     return render_template('index.html', 
-                          page=page, 
-                          ultimas_noticias=noticias, 
-                          ultimas_fotos=ultimas_fotos, 
-                          proyectos=proyectos,
-                          img_equipo=img_equipo)
+                           page=page, 
+                           ultimas_noticias=noticias, 
+                           ultimas_fotos=ultimas_fotos, 
+                           proyectos=proyectos,
+                           img_equipo=img_equipo,
+                           total_miembros=total_miembros,
+                           total_proyectos=total_proyectos,
+                           anios_activos=anios_activos)
 
 
 @main_bp.route('/about')
