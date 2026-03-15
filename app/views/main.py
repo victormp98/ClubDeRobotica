@@ -157,21 +157,40 @@ def galeria_album(id):
 def horarios():
     horarios_activos = Horario.query.filter_by(activo=True).all()
     
-    # Custom sort by day of the week, then by start time
-    dias_orden = {
-        'Lunes': 1, 'Martes': 2, 'Miércoles': 3, 
-        'Jueves': 4, 'Viernes': 5, 'Sábado': 6, 'Domingo': 7
-    }
+    # Custom sort by day of the week
+    dias_orden = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
     
-    def sort_horarios(h):
-        peso_dia = dias_orden.get(h.dia_semana, 99)
-        # Handle time safely if present
-        peso_hora = h.hora_inicio.strftime('%H:%M:%S') if h.hora_inicio else '00:00:00'
-        return (peso_dia, peso_hora)
+    # Agrupar por día
+    horarios_por_dia = {}
+    for dia in dias_orden:
+        # Filtrar horarios para este día y ordenarlos por hora de inicio
+        slots = [h for h in horarios_activos if h.dia_semana == dia]
+        if slots:
+            slots.sort(key=lambda x: x.hora_inicio)
+            horarios_por_dia[dia] = slots
+            
+    # Calcular resumen para la tabla
+    resumen_semanal = []
+    total_general = 0
+    for dia, slots in horarios_por_dia.items():
+        horas_dia = 0
+        for s in slots:
+            if s.hora_inicio and s.hora_fin:
+                # Cálculo simple de duración en horas
+                duracion = (s.hora_fin.hour + s.hora_fin.minute/60) - (s.hora_inicio.hour + s.hora_inicio.minute/60)
+                horas_dia += max(0, duracion)
         
-    horarios_ordenados = sorted(horarios_activos, key=sort_horarios)
+        resumen_semanal.append({
+            'dia': dia,
+            'slots': slots,
+            'total_horas': round(horas_dia, 1)
+        })
+        total_general += horas_dia
 
-    return render_template('horarios.html', horarios=horarios_ordenados)
+    return render_template('horarios.html', 
+                           horarios_por_dia=horarios_por_dia, 
+                           resumen_semanal=resumen_semanal,
+                           total_general=round(total_general, 1))
 
 @main_bp.route('/perfil', methods=['GET', 'POST'])
 @login_required
