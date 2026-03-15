@@ -294,6 +294,11 @@ def miembros_index():
 
 @main_bp.route('/wro')
 def wro():
+    # Intenta buscar una página dinámica con slug 'wro'
+    page = Page.query.filter_by(slug='wro').first()
+    if page:
+        return render_template('wro_dynamic.html', page=page)
+    # Si no existe, usa la plantilla estática por defecto (WRO 2026)
     return render_template('wro.html')
 
 @main_bp.route('/admin/logout')
