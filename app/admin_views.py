@@ -58,6 +58,8 @@ class SecureModelView(ModelView):
         return redirect(url_for('main.login'))
 
 class UserAdmin(SecureModelView):
+    # Deshabilitar la creación manual para forzar el flujo de "Registro Autónomo -> Aprobación" y evitar contraseñas no encriptadas.
+    can_create = False
     column_list = ('nombre', 'email', 'carrera', 'area_interes', 'rol', 'aprobado', 'activo', 'fecha_registro')
     
     # Columnas por las que se puede buscar
