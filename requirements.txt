@@ -1,4 +1,4 @@
-﻿alembic==1.18.4
+alembic==1.18.4
 blinker==1.9.0
 certifi==2026.2.25
 charset-normalizer==3.4.5
@@ -33,7 +33,7 @@ gunicorn==23.0.0
 
 Flask-Mail==0.10.0
 Flask-Login==0.6.3
-Flask-Admin==1.6.1
+Flask-Admin==1.5.8
 WTForms==3.2.1
 email-validator==2.2.0
 
