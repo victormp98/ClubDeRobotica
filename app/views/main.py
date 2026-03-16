@@ -294,7 +294,45 @@ def miembros_index():
 
 @main_bp.route('/wro')
 def wro():
-    return render_template('wro.html')
+    # Intenta buscar una página dinámica con slug 'wro'
+    page = Page.query.filter_by(slug='wro').first()
+    if page:
+        return render_template('wro_dynamic.html', page=page)
+    
+    # Si no existe, usa la plantilla estática pero con datos dinámicos de Configuración
+    configs = {}
+    keys = [
+        'WRO_TITULO', 'WRO_SLOGAN', 'WRO_SUBTITULO', 'WRO_HERO_DESC',
+        'WRO_FECHA_COUNTDOWN', 'WRO_COUNTDOWN_LABEL', 'WRO_INFO_TITULO',
+        'WRO_INFO_DESC', 'WRO_FECHAS', 'WRO_RECUADROS', 'WRO_CATEGORIAS',
+        'WRO_REQUISITOS', 'WRO_PROYECTOS', 'WRO_CTA_TITULO', 'WRO_CTA_DESC',
+        'WRO_SECTION_CAT_TITULO', 'WRO_SECTION_FECHAS_TITULO',
+        'WRO_SECTION_REQ_TITULO', 'WRO_SECTION_PROY_TITULO'
+    ]
+    for key in keys:
+        cfg = Configuracion.query.get(key)
+        configs[key] = cfg.valor if cfg else None
+
+    import json
+    def safe_json(val, default):
+        try:
+            return json.loads(val) if val else default
+        except:
+            return default
+
+    fechas_json = safe_json(configs.get('WRO_FECHAS'), [])
+    recuadros_json = safe_json(configs.get('WRO_RECUADROS'), [])
+    categorias_json = safe_json(configs.get('WRO_CATEGORIAS'), [])
+    requisitos_json = safe_json(configs.get('WRO_REQUISITOS'), [])
+    proyectos_json = safe_json(configs.get('WRO_PROYECTOS'), [])
+
+    return render_template('wro.html', 
+                           config_wro=configs, 
+                           fechas_wro=fechas_json,
+                           recuadros_wro=recuadros_json,
+                           categorias_wro=categorias_json,
+                           requisitos_wro=requisitos_json,
+                           proyectos_wro=proyectos_json)
 
 @main_bp.route('/admin/logout')
 @login_required

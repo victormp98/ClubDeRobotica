@@ -14,7 +14,7 @@ from app.models.user import User
 from app.models.noticia import Noticia
 from app.models.album import Album
 from app.models.foto import Foto
-from app.extensions import mail
+from app.extensions import mail, db
 import threading
 import traceback
 import os
@@ -366,6 +366,33 @@ class ConfiguracionAdmin(SecureModelView):
         }
     }
 
+    form_args = {
+        'llave': {
+            'description': 'Identificador interno. NO cambiar si ya está en uso por el sistema.'
+        },
+        'valor': {
+            'description': 'Contenido de la configuración. Formatos: Texto simple, HTML (safe), o JSON para listas.'
+        }
+    }
+
+    # Diccionario de etiquetas amigables para las llaves
+    column_labels = {
+        'llave': 'Identificador',
+        'valor': 'Valor / Contenido',
+        'descripcion': 'Descripción'
+    }
+
+    def get_query(self):
+        return self.session.query(self.model).filter(self.model.llave.notlike('WRO_%'))
+
+    def get_count_query(self):
+        return self.session.query(db.func.count('*')).filter(self.model.llave.notlike('WRO_%'))
+
+    def on_model_change(self, form, model, is_created):
+        # Asegurar que las llaves WRO se agrupen visualmente si fuera necesario
+        # (Aunque Flask-Admin suele agrupar por categoría en el menú, no en el listado)
+        pass
+
     base_path_config = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads', 'config')
 
     form_extra_fields = {
@@ -388,6 +415,30 @@ class ConfiguracionAdmin(SecureModelView):
             filename = form.valor_imagen.data.filename
             if filename:
                 model.valor = filename
+
+class WROConfigAdmin(SecureModelView):
+    column_list = ['llave', 'valor', 'descripcion']
+    column_searchable_list = ['llave', 'descripcion']
+    
+    column_labels = {
+        'llave': 'Identificador (WRO)',
+        'valor': 'Contenido / Dato',
+        'descripcion': 'Propósito'
+    }
+
+    form_widget_args = {
+        'valor': {
+            'rows': 8,
+            'class': 'form-control',
+            'style': 'font-family: monospace; font-size: 13px;'
+        }
+    }
+
+    def get_query(self):
+        return self.session.query(self.model).filter(self.model.llave.like('WRO_%'))
+
+    def get_count_query(self):
+        return self.session.query(db.func.count('*')).filter(self.model.llave.like('WRO_%'))
 
 class ProyectoAdmin(SecureModelView):
     column_list = ('titulo', 'equipo', 'miniatura_preview', 'categoria', 'fecha_creacion', 'activo')

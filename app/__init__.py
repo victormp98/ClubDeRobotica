@@ -40,7 +40,7 @@ def create_app(config_class=Config):
     from app.models.proyecto import Proyecto
     from app.models.equipo import Equipo
     from app.models.miembro_equipo import MiembroEquipo
-    from app.admin_views import UserAdmin, MyAdminIndexView, NoticiaAdmin, AlbumAdmin, FotoAdmin, HorarioAdmin, PageAdmin, ConfiguracionAdmin, ProyectoAdmin, EquipoAdmin, MiembroEquipoAdmin
+    from app.admin_views import UserAdmin, MyAdminIndexView, NoticiaAdmin, AlbumAdmin, FotoAdmin, HorarioAdmin, PageAdmin, ConfiguracionAdmin, ProyectoAdmin, EquipoAdmin, MiembroEquipoAdmin, WROConfigAdmin
     
     # Initialize Flask-Admin here (to avoid circular imports with models)
     from flask_admin import Admin
@@ -59,13 +59,12 @@ def create_app(config_class=Config):
     admin.add_view(MiembroEquipoAdmin(MiembroEquipo, db.session, name='Miembros de Equipo', category='Contenido', endpoint='miembros_equipo'))
     
     admin.add_view(ConfiguracionAdmin(Configuracion, db.session, name='Configuración Global', category='Ajustes', endpoint='configuraciones'))
+    admin.add_view(WROConfigAdmin(Configuracion, db.session, name='🏆 Gestión Certamen', endpoint='wro_config'))
 
     # Botones de navegación salida (MenuLink)
     admin.add_link(MenuLink(name='Volver al Sitio', url='/', icon_type='fa', icon_value='fa-home'))
     admin.add_link(MenuLink(name='Cerrar Sesión', url='/logout', icon_type='fa', icon_value='fa-sign-out'))
     
-    return app
-
     @app.errorhandler(500)
     def handle_500(e):
         import traceback

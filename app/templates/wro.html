@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}WRO México 2026 – Club de Robótica{% endblock %}
+{% block title %}{{ config_wro.WRO_TITULO or "WRO México 2026" }} – Club de Robótica{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -32,16 +32,15 @@
 
     <div class="relative z-10 max-w-4xl mx-auto" data-aos="fade-up">
         <span class="inline-flex items-center gap-2 py-1 px-4 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-sm font-semibold tracking-widest uppercase mb-8 font-mono">
-            <span class="w-2 h-2 rounded-full bg-brand-400 animate-pulse"></span> Certamen 2026
+            <span class="w-2 h-2 rounded-full bg-brand-400 animate-pulse"></span> {{ config_wro.WRO_TITULO or "Certamen 2026" }}
         </span>
         <h1 class="text-6xl md:text-8xl font-display font-black text-white tracking-tight leading-none mb-6">
-            Certamen de<br/>
+            {{ config_wro.WRO_SLOGAN or "Certamen de" | safe }}<br/>
             <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-indigo-400">Robótica</span>
         </h1>
-        <p class="text-gray-300/70 tracking-widest uppercase text-sm font-mono mb-8">WRO · México · 2026</p>
+        <p class="text-gray-300/70 tracking-widest uppercase text-sm font-mono mb-8">{{ config_wro.WRO_SUBTITULO or "WRO · México · 2026" }}</p>
         <p class="text-xl text-gray-300 font-light leading-relaxed max-w-2xl mx-auto mb-10">
-            El Club de Robótica participa en el <strong class="text-white">World Robot Olympiad México 2026</strong>.
-            Diseña, programa y compite con el robot que construirás junto a tu equipo.
+            {{ (config_wro.WRO_HERO_DESC or 'El Club de Robótica participa en el <strong class="text-white">World Robot Olympiad México 2026</strong>. Diseña, programa y compite con el robot que construirás junto a tu equipo.') | safe }}
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="{{ url_for('main.registro') }}" class="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold rounded-full text-dark-900 bg-white hover:bg-gray-50 shadow-xl transition-all duration-300 hover:scale-105">
@@ -56,7 +55,7 @@
 
 <!-- COUNTDOWN -->
 <div class="relative z-10 bg-transparent border-y border-white/5 py-12 text-center">
-    <p class="text-xs font-mono text-gray-500 uppercase tracking-widest mb-6">Tiempo para la fase regional</p>
+    <p class="text-xs font-mono text-gray-500 uppercase tracking-widest mb-6">{{ config_wro.WRO_COUNTDOWN_LABEL or "Tiempo para la fase regional" }}</p>
     <div class="flex gap-4 justify-center flex-wrap">
         {% for unit_id, label in [('cd-d','Días'),('cd-h','Horas'),('cd-m','Minutos'),('cd-s','Segundos')] %}
         <div class="bg-white/5 border border-white/10 rounded-2xl px-6 py-5 min-w-[100px] text-center">
@@ -72,20 +71,17 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div data-aos="fade-up" class="mb-14">
             <p class="text-xs font-mono text-brand-400 uppercase tracking-widest mb-2 flex items-center gap-2"><span class="w-5 h-0.5 bg-brand-400 inline-block"></span>Competencia internacional</p>
-            <h2 class="text-4xl md:text-5xl font-display font-bold text-white">World Robot <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-indigo-400">Olympiad 2026</span></h2>
-            <p class="mt-3 text-gray-400 max-w-lg mt-4">La WRO es la competencia de robótica más grande del mundo. México participa en fases regionales con acceso a la final nacional en septiembre 2026.</p>
+            <h2 class="text-4xl md:text-5xl font-display font-bold text-white">{{ (config_wro.WRO_INFO_TITULO or 'World Robot <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-indigo-400">Olympiad 2026</span>') | safe }}</h2>
+            <p class="mt-3 text-gray-400 max-w-lg mt-4">{{ config_wro.WRO_INFO_DESC or 'La WRO es la competencia de robótica más grande del mundo. México participa en fases regionales con acceso a la final nacional en septiembre 2026.' }}</p>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {% for icon, label, val in [
-                ('👥','Equipo','2 a 3 integrantes por equipo + 1 coach obligatorio'),
-                ('🌍','Alcance','Competencia internacional presente en +90 países del mundo'),
-                ('🏆','Meta del club','Inscribir al menos 1 equipo en la fase regional 2026'),
-                ('📋','Inscripciones','Proceso a través del portal oficial WRO México'),
-            ] %}
+            {% for item in recuadros_wro %}
             <div class="bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-brand-500/30 hover:bg-white/8 transition-all" data-aos="fade-up" data-aos-delay="{{ loop.index * 80 }}">
-                <div class="text-3xl mb-4">{{ icon }}</div>
-                <p class="text-xs font-mono text-brand-400 uppercase tracking-wider mb-2">{{ label }}</p>
-                <p class="text-white font-semibold text-sm leading-relaxed">{{ val }}</p>
+                <div class="w-12 h-12 rounded-xl bg-brand-500/10 flex items-center justify-center text-brand-400 mb-4 group-hover:scale-110 transition-transform">
+                    <i class="fas {{ item.icon }}"></i>
+                </div>
+                <p class="text-xs font-mono text-brand-400 uppercase tracking-wider mb-2">{{ item.label }}</p>
+                <p class="text-white font-semibold text-sm leading-relaxed">{{ item.value }}</p>
             </div>
             {% endfor %}
         </div>
@@ -97,41 +93,27 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-14" data-aos="fade-up">
             <p class="text-xs font-mono text-yellow-400 uppercase tracking-widest mb-2">Modalidades</p>
-            <h2 class="text-4xl md:text-5xl font-display font-bold text-white">Categorías <span class="text-brand-400">WRO</span></h2>
-            <p class="mt-4 text-gray-400 max-w-lg mx-auto">Tres categorías principales. El club orienta a los equipos según sus habilidades e intereses.</p>
+            <h2 class="text-4xl md:text-5xl font-display font-bold text-white">{{ (config_wro.WRO_SECTION_CAT_TITULO or 'Categorías <span class="text-brand-400">WRO</span>') | safe }}</h2>
+            <p class="mt-4 text-gray-400 max-w-lg mx-auto">Explora las diferentes modalidades de participación en el World Robot Olympiad.</p>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- RoboMission -->
-            <div class="bg-white/5 border border-white/10 rounded-3xl overflow-hidden hover:border-yellow-400/30 hover:-translate-y-2 transition-all duration-300" data-aos="fade-up" data-aos-delay="100">
-                <div class="h-1 bg-gradient-to-r from-yellow-400 to-orange-400"></div>
-                <div class="p-8 text-center">
-                    <div class="text-5xl mb-4">🤖</div>
-                    <h3 class="text-xl font-display font-bold text-white mb-3">RoboMission</h3>
-                    <p class="text-gray-400 text-sm leading-relaxed mb-5">El robot debe completar misiones en una mesa de juego en el menor tiempo posible. Combina programación, construcción mecánica y estrategia.</p>
-                    <span class="inline-block text-xs font-bold px-3 py-1 rounded-full bg-yellow-400/10 text-yellow-400 border border-yellow-400/20 font-mono">Recomendada para principiantes</span>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {% for cat in categorias_wro %}
+            <div class="lotos-card group overflow-hidden flex flex-col md:flex-row items-center" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+                <div class="w-full md:w-2/5 aspect-[4/3] overflow-hidden">
+                    <img src="{{ url_for('static', filename=cat.imagen) }}" alt="{{ cat.nombre }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                </div>
+                <div class="w-full md:w-3/5 p-8">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="lotos-badge lotos-badge-primary">{{ cat.edades }}</span>
+                    </div>
+                    <h3 class="text-2xl font-display font-bold text-white mb-3 group-hover:text-brand-400 transition-colors">{{ cat.nombre }}</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                        {{ cat.mision }}
+                    </p>
                 </div>
             </div>
-            <!-- Future Innovators -->
-            <div class="bg-white/5 border border-white/10 rounded-3xl overflow-hidden hover:border-brand-400/30 hover:-translate-y-2 transition-all duration-300 md:-translate-y-4" data-aos="fade-up" data-aos-delay="200">
-                <div class="h-1 bg-gradient-to-r from-brand-500 to-indigo-500"></div>
-                <div class="p-8 text-center">
-                    <span class="inline-block text-xs font-bold px-3 py-1 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/20 font-mono mb-4">Recomendada para el Club</span>
-                    <div class="text-5xl mb-4">💡</div>
-                    <h3 class="text-xl font-display font-bold text-white mb-3">Future Innovators</h3>
-                    <p class="text-gray-400 text-sm leading-relaxed mb-5">Proyecto de investigación e innovación tecnológica. Los equipos proponen soluciones a problemas reales usando robótica e inteligencia artificial.</p>
-                    <span class="inline-block text-xs font-bold px-3 py-1 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/20 font-mono">Proyecto + presentación</span>
-                </div>
-            </div>
-            <!-- RoboSports -->
-            <div class="bg-white/5 border border-white/10 rounded-3xl overflow-hidden hover:border-red-400/30 hover:-translate-y-2 transition-all duration-300" data-aos="fade-up" data-aos-delay="300">
-                <div class="h-1 bg-gradient-to-r from-red-500 to-pink-500"></div>
-                <div class="p-8 text-center">
-                    <div class="text-5xl mb-4">⚽</div>
-                    <h3 class="text-xl font-display font-bold text-white mb-3">RoboSports</h3>
-                    <p class="text-gray-400 text-sm leading-relaxed mb-5">Robots autónomos que juegan en equipo. Coordinación, sensores y algoritmos de visión artificial para lograr los objetivos del juego.</p>
-                    <span class="inline-block text-xs font-bold px-3 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 font-mono">Nivel avanzado</span>
-                </div>
-            </div>
+            {% endfor %}
         </div>
     </div>
 </section>
@@ -141,11 +123,11 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="mb-14" data-aos="fade-up">
             <p class="text-xs font-mono text-brand-400 uppercase tracking-widest mb-2 flex items-center gap-2"><span class="w-5 h-0.5 bg-brand-400 inline-block"></span>Calendario 2026</p>
-            <h2 class="text-4xl md:text-5xl font-display font-bold text-white">Fechas <span class="text-brand-400">Clave</span></h2>
+            <h2 class="text-4xl md:text-5xl font-display font-bold text-white">{{ (config_wro.WRO_SECTION_FECHAS_TITULO or 'Fechas <span class="text-brand-400">Clave</span>') | safe }}</h2>
             <p class="mt-4 text-gray-400 max-w-lg">Roadmap de la competencia WRO México 2026 y actividades del club.</p>
         </div>
         <div class="space-y-3">
-            {% set fechas = [
+            {% set fechas = fechas_wro if fechas_wro else [
                 ("Abr – May 2026", "Inscripciones al Club de Robótica", "Registro a través del portal web del club + formación de equipos", "f-open", "✓ Abierto"),
                 ("Mayo 2026", "Inscripciones WRO México", "Portal oficial wro-mexico.org — equipos de 2–3 integrantes", "f-open", "✓ Abierto"),
                 ("May – Jun 2026", "Capacitación y construcción de robots", "Talleres en laboratorio — programación, sensores, mecánica", "f-coming", "En preparación"),
@@ -172,44 +154,14 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-14" data-aos="fade-up">
             <p class="text-xs font-mono text-brand-400 uppercase tracking-widest mb-2">Para participar</p>
-            <h2 class="text-4xl md:text-5xl font-display font-bold text-white">Requisitos y <span class="text-brand-400">Beneficios</span></h2>
+            <h2 class="text-4xl md:text-5xl font-display font-bold text-white">{{ (config_wro.WRO_SECTION_REQ_TITULO or 'Requisitos y <span class="text-brand-400">Beneficios</span>') | safe }}</h2>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {% set tarjetas = [
-                ("📋 Requisitos para unirse al club", [
-                    "Ser alumno activo de la institución educativa",
-                    "Completar el formulario de registro en el portal",
-                    "Interés en robótica, programación o electrónica",
-                    "Disponibilidad para asistir a sesiones semanales",
-                    "No se requiere experiencia previa",
-                ]),
-                ("🎯 Beneficios de ser miembro", [
-                    "Acceso a laboratorio y equipo de robótica",
-                    "Capacitación en programación (Python, Arduino, ROS)",
-                    "Participación en certámenes nacionales e internacionales",
-                    "Certificado de participación en el club",
-                    "Desarrollo de portafolio tecnológico profesional",
-                ]),
-                ("🤖 Requisitos WRO por equipo", [
-                    "2 a 3 integrantes (mismo nivel educativo)",
-                    "1 coach adulto obligatorio (puede ser profesor)",
-                    "Pago de cuota de inscripción WRO México",
-                    "Cumplir las reglas oficiales de la categoría elegida",
-                    "Presentarse en la sede de la fase regional",
-                ]),
-                ("🛠️ Materiales disponibles en el club", [
-                    "Kits LEGO Mindstorms y LEGO Spike Prime",
-                    "Microcontroladores Arduino y Raspberry Pi",
-                    "Sensores: ultrasonido, color, giroscopio, cámara",
-                    "Herramientas básicas de electrónica y mecánica",
-                    "Acceso a laptops con software de programación",
-                ]),
-            ] %}
-            {% for titulo, items in tarjetas %}
+            {% for tarjeta in requisitos_wro %}
             <div class="bg-white/5 border border-white/10 rounded-2xl p-7 hover:border-brand-500/20 transition-colors" data-aos="fade-up" data-aos-delay="{{ loop.index * 80 }}">
-                <h4 class="text-base font-bold text-brand-400 mb-5 flex items-center gap-2">{{ titulo }}</h4>
+                <h4 class="text-base font-bold text-brand-400 mb-5 flex items-center gap-2">{{ tarjeta.titulo }}</h4>
                 <ul class="space-y-3">
-                    {% for item in items %}
+                    {% for item in tarjeta['items'] %}
                     <li class="flex items-start gap-3 pb-3 border-b border-white/5 last:border-0 last:pb-0">
                         <span class="text-brand-400 font-bold text-sm mt-0.5 flex-shrink-0">→</span>
                         <span class="text-gray-400 text-sm leading-relaxed">{{ item }}</span>
@@ -227,20 +179,15 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-14" data-aos="fade-up">
             <p class="text-xs font-mono text-brand-400 uppercase tracking-widest mb-2">Lo que construirás</p>
-            <h2 class="text-4xl md:text-5xl font-display font-bold text-white">Proyectos <span class="text-brand-400">del Club</span></h2>
+            <h2 class="text-4xl md:text-5xl font-display font-bold text-white">{{ (config_wro.WRO_SECTION_PROY_TITULO or 'Proyectos <span class="text-brand-400">del Club</span>') | safe }}</h2>
             <p class="mt-4 text-gray-400 max-w-lg mx-auto">Estos son los proyectos robóticos en los que trabajará el club durante 2026.</p>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {% for emoji, nombre, desc in [
-                ('🏎️','Robot Seguidor de Línea','Sensor infrarrojo y algoritmo PID para seguir trayectorias con precisión milimétrica.'),
-                ('🥊','Robot Sumo','Competencia 1v1 en arena circular. Detección del contrincante y estrategia de empuje.'),
-                ('🧭','Robot Autónomo','Navegación con sensores ultrasónicos, evita obstáculos y toma decisiones en tiempo real.'),
-                ('🦾','Brazo Robótico','Control de servomotores con Arduino y cinemática inversa para manipulación de objetos.'),
-            ] %}
+            {% for p in proyectos_wro %}
             <div class="bg-white/5 border border-white/10 rounded-2xl p-7 text-center hover:border-brand-500/30 hover:-translate-y-2 transition-all duration-300" data-aos="fade-up" data-aos-delay="{{ loop.index * 80 }}">
-                <div class="text-4xl mb-4">{{ emoji }}</div>
-                <h4 class="font-bold text-white mb-2">{{ nombre }}</h4>
-                <p class="text-gray-500 text-sm leading-relaxed">{{ desc }}</p>
+                <div class="text-4xl mb-4">{{ p.emoji }}</div>
+                <h4 class="font-bold text-white mb-2">{{ p.nombre }}</h4>
+                <p class="text-gray-500 text-sm leading-relaxed">{{ p.desc }}</p>
             </div>
             {% endfor %}
         </div>
@@ -251,10 +198,10 @@
 <section id="registro" class="relative z-10 py-28 text-center overflow-hidden" style="background:radial-gradient(ellipse at center, rgba(13,77,140,.4) 0%, #0f172a 70%);">
     <div class="max-w-3xl mx-auto px-4" data-aos="zoom-in">
         <h2 class="text-5xl md:text-7xl font-display font-black text-white leading-none mb-6">
-            ¿Listo para<br/><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-indigo-400">competir?</span>
+            {{ (config_wro.WRO_CTA_TITULO or '¿Listo para<br/><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-indigo-400">competir?</span>') | safe }}
         </h2>
         <p class="text-gray-400 text-lg max-w-xl mx-auto mb-10 leading-relaxed">
-            Únete al Club de Robótica, aprende a construir y programar robots, y representa al club en WRO México 2026.
+            {{ config_wro.WRO_CTA_DESC or 'Únete al Club de Robótica, aprende a construir y programar robots, y representa al club en WRO México 2026.' }}
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center mb-10">
             <a href="{{ url_for('main.registro') }}" class="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold rounded-full text-dark-900 bg-white hover:bg-gray-100 shadow-xl transition-all duration-300 hover:scale-105">
@@ -276,9 +223,10 @@
 
 {% block extra_js %}
 <script>
-// Countdown to August 1, 2026 (estimated regional phase)
+// Countdown to target date from config
 function updateCountdown() {
-    const target = new Date('2026-08-01T00:00:00');
+    const targetStr = "{{ config_wro.WRO_FECHA_COUNTDOWN or '2026-08-01T00:00:00' }}";
+    const target = new Date(targetStr);
     const now    = new Date();
     const diff   = target - now;
     if (diff <= 0) {
