@@ -73,4 +73,8 @@ def create_app(config_class=Config):
         traceback.print_exc()
         return "Error interno del servidor. Por favor contacta al administrador.", 500
 
+    # Initialize image cleanup listeners
+    from app.utils.image_cleanup import register_cleanup_listeners
+    register_cleanup_listeners(db)
+
     return app
