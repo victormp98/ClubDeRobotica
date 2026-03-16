@@ -33,7 +33,7 @@ gunicorn==23.0.0
 
 Flask-Mail==0.10.0
 Flask-Login==0.6.3
-Flask-Admin==1.5.8
+Flask-Admin==1.5.0
 WTForms==3.2.1
 email-validator==2.2.0
 
