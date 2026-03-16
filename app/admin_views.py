@@ -342,9 +342,6 @@ class PageAdmin(SecureModelView):
             'rows': 20,
             'class': 'form-control',
             'style': 'font-family: monospace; font-size: 13px;'
-        },
-        'slug': {
-            'readonly': True
         }
     }
 
