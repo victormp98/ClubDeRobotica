@@ -45,6 +45,7 @@ def seed_admin_command():
 
 def auto_seed_admin(app):
     """Función para ejecutar automáticamente al inicio de la app."""
+    app.logger.info("Ejecutando auto_seed_admin...")
     # Usamos el logger de la app para la salida
     run_seed_logic(app, app.logger.info, app.logger.error)
 
