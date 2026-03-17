@@ -22,3 +22,7 @@ class Config:
 
     # CR-02: Contraseña temporal para reset masivo (configurable via .env)
     DEFAULT_RESET_PASSWORD = os.environ.get('DEFAULT_RESET_PASSWORD') or 'robotica2026'
+
+    # AD-01: Configuración para Inicializador de Administrador (seed_admin.py)
+    INITIAL_ADMIN_EMAIL = os.environ.get('INITIAL_ADMIN_EMAIL') or 'admin@club.com'
+    INITIAL_ADMIN_PASSWORD = os.environ.get('INITIAL_ADMIN_PASSWORD') or 'admin123'
