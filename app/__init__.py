@@ -2,7 +2,7 @@ from flask import Flask
 from markupsafe import Markup  # BA-02: import explícito (antes se usaba sin importar)
 from .extensions import db, migrate
 from .config import Config
-from .cli import register_commands
+from .cli import register_commands, auto_seed_admin
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -80,5 +80,9 @@ def create_app(config_class=Config):
 
     # Register CLI commands
     register_commands(app)
+
+    # Auto-seed admin on startup
+    with app.app_context():
+        auto_seed_admin(app)
 
     return app
