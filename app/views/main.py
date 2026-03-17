@@ -23,11 +23,20 @@ def miembro_required(f):
         if not current_user.is_authenticated:
             flash('Debes iniciar sesión para ver este contenido.', 'warning')
             return redirect(url_for('main.login', next=request.url))
-        # BA-04: Los admins siempre tienen acceso aunque aprobado=False.
-        # Esto es intencional: permite au admin recién creado entrar sin aprobarse a sí mismo.
-        if current_user.rol != 'admin' and not current_user.aprobado:
+        # BA-04: Los admins siempre tienen acceso.
+        if current_user.rol == 'admin':
+            return f(*args, **kwargs)
+
+        # Verificar si el usuario está aprobado
+        if not current_user.aprobado:
             flash('Tu cuenta aún no ha sido aprobada por un administrador.', 'error')
             return redirect(url_for('main.index'))
+
+        # SE-01: Verificar si pertenece a al menos un equipo activo
+        if not current_user.es_miembro_equipo:
+            flash('Acceso restringido: Solo los miembros vinculados a un equipo activo pueden acceder a esta zona.', 'warning')
+            return redirect(url_for('main.index'))
+
         return f(*args, **kwargs)
     return decorated_function
 

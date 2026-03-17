@@ -113,7 +113,7 @@
                     <a href="{{ url_for('main.wro') }}" class="lotos-nav-link">WRO</a>
                     <a href="{{ url_for('main.noticias') }}" class="lotos-nav-link">Noticias</a>
                     <a href="{{ url_for('main.galeria') }}" class="lotos-nav-link">Galería</a>
-                    {% if current_user.is_authenticated and (current_user.rol == 'admin' or current_user.aprobado) %}
+                    {% if current_user.is_authenticated and (current_user.rol == 'admin' or (current_user.aprobado and current_user.es_miembro_equipo)) %}
                     <a href="{{ url_for('main.miembros_index') }}" class="lotos-badge lotos-badge-accent text-xs">⬡ Zona Miembros</a>
                     {% endif %}
                 </nav>
@@ -162,7 +162,7 @@
                 <a href="{{ url_for('main.galeria') }}" class="block px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/[0.06] transition-all">Galería</a>
                 <div class="my-2" style="height:1px; background: linear-gradient(90deg, transparent, rgba(99,102,241,0.3), transparent);"></div>
                 {% if current_user.is_authenticated %}
-                    {% if current_user.aprobado or current_user.rol == 'admin' %}
+                    {% if current_user.rol == 'admin' or (current_user.aprobado and current_user.es_miembro_equipo) %}
                     <a href="{{ url_for('main.miembros_index') }}" class="block px-3 py-2.5 rounded-lg text-sm font-semibold text-accent-400 bg-white/[0.04] border border-white/[0.08] hover:border-accent-500/40 transition-all">⬡ Zona Miembros</a>
                     {% endif %}
                     {% if current_user.rol == 'admin' %}

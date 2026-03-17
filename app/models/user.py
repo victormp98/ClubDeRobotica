@@ -32,10 +32,15 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    # Flask-Login requires `is_active` to return True only if user is active.
     @property
     def is_active(self):
         return self.activo
+
+    @property
+    def es_miembro_equipo(self):
+        """Verifica si el usuario pertenece a al menos un equipo activo."""
+        # membresias_equipo es el backref definido en MiembroEquipo
+        return any(m.activo for m in self.membresias_equipo)
 
     def get_reset_password_token(self, expires_in=3600):
         return jwt.encode(
