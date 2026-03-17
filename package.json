@@ -1,0 +1,15 @@
+{
+  "name": "club-de-robotica",
+  "version": "1.0.0",
+  "description": "Sistema de gestión para el Club de Robótica UNACH",
+  "main": "run.py",
+  "scripts": {
+    "build": "tailwindcss -i ./app/static/css/input.css -o ./app/static/css/dist/tailwind.css --minify",
+    "watch": "tailwindcss -i ./app/static/css/input.css -o ./app/static/css/dist/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.1",
+    "autoprefixer": "^10.4.17",
+    "postcss": "^8.4.35"
+  }
+}

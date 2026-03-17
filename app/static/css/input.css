@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Aquí puedes agregar capas personalizadas si es necesario */
+@layer components {
+    /* Clases de utilidad que quieras pre-compilar */
+}
