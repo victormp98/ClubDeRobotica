@@ -2,6 +2,7 @@ from flask import Flask
 from markupsafe import Markup  # BA-02: import explícito (antes se usaba sin importar)
 from .extensions import db, migrate
 from .config import Config
+from .cli import register_commands
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -76,5 +77,8 @@ def create_app(config_class=Config):
     # Initialize image cleanup listeners
     from app.utils.image_cleanup import register_cleanup_listeners
     register_cleanup_listeners(db)
+
+    # Register CLI commands
+    register_commands(app)
 
     return app
