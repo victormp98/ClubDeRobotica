@@ -240,6 +240,11 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user and user.check_password(form.password.data):
+            # SE-02: Bloquear login si no está aprobado (excepto si es admin)
+            if user.rol != 'admin' and not user.aprobado:
+                flash('Tu cuenta aún no ha sido aprobada por un administrador. No puedes iniciar sesión todavía.', 'warning')
+                return redirect(url_for('main.login'))
+                
             login_user(user, remember=form.remember_me.data)
             next_page = request.args.get('next')
             # Seguridad: garantizar que la página de redirección sea local
