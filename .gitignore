@@ -14,3 +14,7 @@ find_admin.py
 reproduce_500.py
 test_dom_fetch.py
 test_admin.html
+
+# Node / Tailwind
+node_modules/
+app/static/css/dist/
