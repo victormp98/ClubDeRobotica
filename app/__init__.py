@@ -71,6 +71,9 @@ def create_app(config_class=Config):
         import traceback
         # CR-04: Traza solo en logs del servidor, NUNCA expuesta al navegador
         print("INTERNAL SERVER ERROR DETECTED:")
+        with open(r'C:\tmp\error_500.txt', 'a') as f:
+            f.write("\n--- ERROR 500 ---\n")
+            traceback.print_exc(file=f)
         traceback.print_exc()
         return "Error interno del servidor. Por favor contacta al administrador.", 500
 
