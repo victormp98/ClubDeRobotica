@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- HEADER SECTION -->
+<section class="relative min-h-[40vh] py-20 flex items-center overflow-hidden">
+    <div class="absolute inset-0 lotos-grid-bg opacity-40"></div>
+    <div class="absolute bottom-0 left-0 right-0 lotos-sep"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center">
+        <div data-aos="fade-up">
+            <span class="inline-flex items-center gap-2 mb-6 lotos-badge lotos-badge-primary">
+                <span class="status-dot dot-primary"></span>
+                CONSTRUCCIONES &middot; I+D
+            </span>
+            <h1 class="text-4xl md:text-6xl font-display font-bold text-white mb-6 uppercase tracking-tight">
+                Nuestros <span class="lotos-gradient-text">Proyectos</span>
+            </h1>
+            <p class="text-lg text-white/50 max-w-2xl mx-auto font-light leading-relaxed">
+                Explora el trabajo técnico y creativo de los miembros del Club de Robótica. Desde prototipos autónomos hasta sistemas industriales.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- PROJECTS GRID -->
+<section class="py-20 bg-transparent relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {% for proyecto in proyectos %}
+            <a href="{{ url_for('main.proyecto_detalle', id=proyecto.id) }}" class="lotos-card overflow-hidden group flex flex-col hover:no-underline" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+                <div class="aspect-video bg-white/5 relative overflow-hidden flex items-center justify-center" style="border-bottom: 1px solid var(--lotos-border);">
+                    {% if proyecto.imagen_path %}
+                        <img src="{{ url_for('static', filename='uploads/proyectos/' ~ proyecto.imagen_path|replace('\\', '/')) }}" alt="{{ proyecto.titulo }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    {% else %}
+                        <div class="absolute inset-0 lotos-grid-bg opacity-40"></div>
+                        <span class="text-white/20 font-display uppercase tracking-widest text-xs font-semibold z-10">Sin Imagen</span>
+                    {% endif %}
+                </div>
+                <div class="p-6 flex flex-col flex-grow">
+                    <span class="lotos-badge lotos-badge-primary mb-3">{{ proyecto.categoria }}</span>
+                    <h4 class="text-base font-bold text-white mb-2">{{ proyecto.titulo }}</h4>
+                    <p class="text-white/40 text-sm mb-4 line-clamp-3 flex-grow">{{ proyecto.descripcion_corta }}</p>
+                    
+                    <div class="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
+                        <span class="text-[10px] font-mono text-white/25 uppercase tracking-widest">Ver Detalles</span>
+                        <svg class="w-4 h-4 text-brand-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                </div>
+            </a>
+            {% else %}
+            <div class="col-span-1 md:col-span-3 text-center py-20 lotos-card">
+                <div class="opacity-20 mb-4 flex justify-center">
+                    <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                </div>
+                <h3 class="text-white/40 font-display uppercase tracking-widest">Aún no hay proyectos registrados</h3>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

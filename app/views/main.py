@@ -144,6 +144,12 @@ def noticias():
     pagination = Noticia.query.filter_by(activo=True).order_by(Noticia.fecha_publicacion.desc()).paginate(page=page, per_page=9)
     return render_template('noticias/index.html', pagination=pagination)
 
+@main_bp.route('/proyectos')
+def proyectos():
+    # Obtener todos los proyectos activos ordenados por fecha de forma descendente
+    proyectos = Proyecto.query.filter_by(activo=True).order_by(Proyecto.fecha_creacion.desc()).all()
+    return render_template('proyectos/index.html', proyectos=proyectos)
+
 @main_bp.route('/noticias/<int:id>')
 def noticia_detalle(id):
     noticia = Noticia.query.filter_by(id=id, activo=True).first_or_404()
