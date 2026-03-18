@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="relative min-h-[40vh] py-20 flex items-center overflow-hidden">
+    <div class="absolute inset-0 lotos-grid-bg opacity-40"></div>
+    <div class="absolute bottom-0 left-0 right-0 lotos-sep"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div data-aos="fade-up">
+            <a href="{{ url_for('main.index') }}#proyectos" class="inline-flex items-center gap-2 text-brand-400 hover:text-white transition-colors mb-6 font-medium">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Volver a Proyectos
+            </a>
+            <div class="flex flex-wrap items-center gap-3 mb-6">
+                <span class="lotos-badge lotos-badge-primary">{{ proyecto.categoria }}</span>
+                {% if proyecto.equipo %}
+                    <span class="lotos-badge lotos-badge-accent">Equipo: {{ proyecto.equipo.nombre }}</span>
+                {% endif %}
+            </div>
+            <h1 class="text-4xl md:text-6xl font-display font-bold text-white mb-6 uppercase tracking-tight">
+                {{ proyecto.titulo }}
+            </h1>
+        </div>
+    </div>
+</section>
+
+<section class="py-16 bg-transparent">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <!-- Left Side: Content -->
+            <div class="lg:col-span-2" data-aos="fade-up">
+                <div class="lotos-card p-8 md:p-10 mb-12">
+                    <h3 class="text-xl font-bold text-white mb-6 lotos-gradient-text uppercase tracking-widest">Descripción del Proyecto</h3>
+                    <div class="prose prose-invert max-w-none text-gray-400 leading-relaxed">
+                        {{ proyecto.descripcion_larga | safe }}
+                    </div>
+                </div>
+
+                <!-- GALERÍA DEL PROYECTO (v2) -->
+                {% if albumes %}
+                <div class="mt-16" data-aos="fade-up">
+                    <h3 class="text-2xl font-display font-bold text-white mb-8 border-l-4 border-brand-500 pl-4 uppercase">Galería Técnica y Avances</h3>
+                    <div class="space-y-12">
+                        {% for album in albumes %}
+                        <div class="lotos-card p-6 bg-white/[0.02]">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <h4 class="text-lg font-bold text-white">{{ album.nombre }}</h4>
+                                    <p class="text-white/40 text-sm">{{ album.descripcion or 'Sin descripción' }}</p>
+                                </div>
+                                {% if not album.es_publico %}
+                                    <span class="lotos-badge lotos-badge-critical">Privado de Equipo</span>
+                                {% else %}
+                                    <span class="lotos-badge lotos-badge-success">Público</span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                                {% for foto in album.fotos if foto.activo %}
+                                <a href="{{ url_for('static', filename='uploads/galeria/' ~ foto.imagen_path|replace('\\', '/')) }}" 
+                                   class="glightbox block aspect-square rounded-lg overflow-hidden border border-white/10 hover:border-brand-500/50 transition-all group"
+                                   data-gallery="gallery-{{ album.id }}"
+                                   data-title="{{ foto.titulo }}">
+                                    <img src="{{ url_for('static', filename='uploads/galeria/' ~ foto.imagen_path|replace('\\', '/')) }}" 
+                                         alt="{{ foto.titulo }}" 
+                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Right Side: Sidebar info -->
+            <div class="lg:col-span-1 space-y-8" data-aos="fade-left">
+                {% if proyecto.imagen_path %}
+                <div class="lotos-img-frame aspect-square">
+                    <img src="{{ url_for('static', filename='uploads/proyectos/' ~ proyecto.imagen_path|replace('\\', '/')) }}" 
+                         alt="{{ proyecto.titulo }}" class="w-full h-full object-cover">
+                </div>
+                {% endif %}
+
+                <div class="lotos-surface p-6 space-y-6">
+                    <div>
+                        <span class="text-xs font-bold text-white/30 uppercase tracking-widest block mb-2">Estado del Proyecto</span>
+                        <div class="flex items-center gap-2">
+                             <span class="status-dot dot-success"></span>
+                             <span class="text-white font-medium">Activo / En Desarrollo</span>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold text-white/30 uppercase tracking-widest block mb-2">Fecha de Inicio</span>
+                        <span class="text-white font-medium">{{ proyecto.fecha_creacion.strftime('%d %B, %Y') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

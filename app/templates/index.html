@@ -136,7 +136,7 @@
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             {% for proyecto in proyectos %}
-            <div class="lotos-card overflow-hidden group flex flex-col" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+            <a href="{{ url_for('main.proyecto_detalle', id=proyecto.id) }}" class="lotos-card overflow-hidden group flex flex-col hover:no-underline" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
                 <div class="aspect-video bg-white/5 relative overflow-hidden flex items-center justify-center" style="border-bottom: 1px solid var(--lotos-border);">
                     {% if proyecto.imagen_path %}
                         <img src="{{ url_for('static', filename='uploads/proyectos/' ~ proyecto.imagen_path|replace('\\', '/')) }}" alt="{{ proyecto.titulo }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -150,7 +150,7 @@
                     <h4 class="text-base font-bold text-white mb-2">{{ proyecto.titulo }}</h4>
                     <p class="text-white/40 text-sm mb-4 line-clamp-3 flex-grow">{{ proyecto.descripcion_corta }}</p>
                 </div>
-            </div>
+            </a>
             {% else %}
             <div class="col-span-1 md:col-span-3 text-center py-12 text-white/30 lotos-card">
                 Aún no hay proyectos destacados. Pronto mostraremos nuestro trabajo aquí.

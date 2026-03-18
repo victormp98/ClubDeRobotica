@@ -97,8 +97,8 @@ def send_password_reset_email(user, app):
 def index():
     page = Page.query.filter_by(slug='about').first()
     noticias = Noticia.query.filter_by(activo=True).order_by(Noticia.fecha_publicacion.desc()).limit(3).all()
-    # Fetch 5 most recent active photos
-    ultimas_fotos = Foto.query.filter_by(activo=True).order_by(Foto.fecha_subida.desc()).limit(5).all()
+    # Fetch 5 most recent active photos from PUBLIC albums (v2)
+    ultimas_fotos = Foto.query.join(Album).filter(Foto.activo==True, Album.es_publico==True).order_by(Foto.fecha_subida.desc()).limit(5).all()
     # Fetch active projects
     proyectos = Proyecto.query.filter_by(activo=True).order_by(Proyecto.fecha_creacion.desc()).limit(3).all()
     
@@ -149,10 +149,39 @@ def noticia_detalle(id):
     noticia = Noticia.query.filter_by(id=id, activo=True).first_or_404()
     return render_template('noticias/detalle.html', noticia=noticia)
 
+@main_bp.route('/proyectos/<int:id>')
+def proyecto_detalle(id):
+    proyecto = Proyecto.query.filter_by(id=id, activo=True).first_or_404()
+    
+    # Lógica de acceso a álbumes del proyecto (v2)
+    # 1. Si el álbum es público, cualquiera lo ve.
+    # 2. Si el álbum es privado del proyecto, solo miembros del equipo o admin lo ven.
+    
+    es_miembro_o_admin = False
+    if current_user.is_authenticated:
+        if current_user.rol == 'admin':
+            es_miembro_o_admin = True
+        elif proyecto.equipo:
+            # Verificar si el usuario está en el equipo del proyecto
+            es_miembro_o_admin = MiembroEquipo.query.filter_by(
+                user_id=current_user.id, 
+                equipo_id=proyecto.equipo_id,
+                activo=True
+            ).first() is not None
+
+    if es_miembro_o_admin:
+        # Ver todos los álbumes del proyecto
+        albumes_proyecto = [a for a in proyecto.albumes if a.activo]
+    else:
+        # Ver solo álbumes públicos vinculados a este proyecto
+        albumes_proyecto = [a for a in proyecto.albumes if a.activo and a.es_publico]
+
+    return render_template('proyectos/detalle.html', proyecto=proyecto, albumes=albumes_proyecto)
+
 @main_bp.route('/galeria')
 def galeria():
-    # Obtener todos los Álbumes activos, ordenados por fecha de creación desc
-    albumes = Album.query.filter_by(activo=True).order_by(Album.fecha_creacion.desc()).all()
+    # Obtener todos los Álbumes activos y PÚBLICOS (v2), ordenados por fecha de creación desc
+    albumes = Album.query.filter_by(activo=True, es_publico=True).order_by(Album.fecha_creacion.desc()).all()
     return render_template('galeria/index.html', albumes=albumes)
 
 @main_bp.route('/galeria/<int:id>')

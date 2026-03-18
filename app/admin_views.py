@@ -242,12 +242,14 @@ class NoticiaAdmin(SecureModelView):
             model.autor_id = current_user.id
 
 class AlbumAdmin(SecureModelView):
-    column_list = ('nombre', 'descripcion', 'fecha_creacion', 'activo')
+    column_list = ('nombre', 'proyecto', 'es_publico', 'fecha_creacion', 'activo')
     column_searchable_list = ('nombre', 'descripcion')
-    form_columns = ('nombre', 'descripcion', 'activo')
+    form_columns = ('nombre', 'descripcion', 'proyecto', 'es_publico', 'activo')
     column_labels = {
         'nombre': 'Nombre del Álbum',
         'descripcion': 'Descripción',
+        'proyecto': 'Proyecto Vinculado',
+        'es_publico': '¿Es Público?',
         'fecha_creacion': 'Fecha de Creación',
         'activo': 'Activo'
     }

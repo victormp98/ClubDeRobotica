@@ -15,6 +15,9 @@ class Proyecto(db.Model):
     # Relación con Equipo (Opcional, un proyecto puede no tener equipo aún o ser independiente)
     equipo_id = db.Column(db.Integer, db.ForeignKey('equipos.id'), nullable=True)
     equipo = db.relationship('Equipo', backref='proyectos')
+    
+    # NUEVOS: Álbumes asociados al proyecto (v2)
+    albumes = db.relationship('Album', back_populates='proyecto', lazy=True)
 
     def __repr__(self):
         return f'<Proyecto {self.titulo}>'
