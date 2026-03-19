@@ -46,7 +46,7 @@ def create_app(config_class=Config):
     from app.models.checklist_item import ChecklistItem
     from app.models.comentario import Comentario
     from app.models.adjunto import Adjunto
-    from app.admin_views import UserAdmin, MyAdminIndexView, NoticiaAdmin, AlbumAdmin, FotoAdmin, HorarioAdmin, PageAdmin, ConfiguracionAdmin, ProyectoAdmin, EquipoAdmin, MiembroEquipoAdmin, WROConfigAdmin, TareaAdmin, ColumnaAdmin
+    from app.admin_views import UserAdmin, MyAdminIndexView, NoticiaAdmin, AlbumAdmin, FotoAdmin, HorarioAdmin, PageAdmin, ConfiguracionAdmin, ProyectoAdmin, EquipoAdmin, MiembroEquipoAdmin, TorneoConfigAdmin, TareaAdmin, ColumnaAdmin
     
     # Initialize Flask-Admin here (to avoid circular imports with models)
     from flask_admin import Admin
@@ -66,7 +66,7 @@ def create_app(config_class=Config):
     admin.add_view(TareaAdmin(Tarea, db.session, name='Gestión de Tareas', category='Contenido', endpoint='tareas_admin'))
     
     admin.add_view(ConfiguracionAdmin(Configuracion, db.session, name='Configuración Global', category='Ajustes', endpoint='configuraciones'))
-    admin.add_view(WROConfigAdmin(Configuracion, db.session, name='🏆 Gestión Certamen', endpoint='wro_config'))
+    admin.add_view(TorneoConfigAdmin(Configuracion, db.session, name='🏆 Gestión Certamen', endpoint='torneo_config'))
 
     # Botones de navegación salida (MenuLink)
     admin.add_link(MenuLink(name='Volver al Sitio', url='/', icon_type='fa', icon_value='fa-home'))

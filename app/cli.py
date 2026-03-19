@@ -1,8 +1,8 @@
 import click
 from flask.cli import with_appcontext
 from flask import current_app
-from app.extensions import db
 from app.models.user import User
+from app.utils.seed_config import auto_seed_config
 
 def get_admin_credentials(app):
     """Obtiene las credenciales del admin desde la configuración."""
@@ -48,6 +48,7 @@ def auto_seed_admin(app):
     app.logger.info("Ejecutando auto_seed_admin...")
     # Usamos el logger de la app para la salida
     run_seed_logic(app, app.logger.info, app.logger.error)
+    auto_seed_config(app)
 
 def register_commands(app):
     """Registra los comandos personalizados en la aplicación Flask."""

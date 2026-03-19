@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ config_wro.WRO_TITULO or "WRO México 2026" }} – Club de Robótica{% endblock %}
+{% block title %}{{ config_torneo.TORNEO_TITULO or "WRO México 2026" }} – Club de Robótica{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -32,22 +32,22 @@
 
     <div class="relative z-10 max-w-4xl mx-auto" data-aos="fade-up">
         <span class="inline-flex items-center gap-2 py-1 px-4 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-sm font-semibold tracking-widest uppercase mb-8 font-mono">
-            <span class="w-2 h-2 rounded-full bg-brand-400 animate-pulse"></span> <span data-config-key="WRO_TITULO">{{ config_wro.WRO_TITULO or "Certamen 2026" }}</span>
+            <span class="w-2 h-2 rounded-full bg-brand-400 animate-pulse"></span> <span data-config-key="TORNEO_TITULO">{{ config_torneo.TORNEO_TITULO or "Certamen 2026" }}</span>
         </span>
         <h1 class="text-6xl md:text-8xl font-display font-black text-white tracking-tight leading-none mb-6">
-            <span data-config-key="WRO_SLOGAN">{{ config_wro.WRO_SLOGAN or "Certamen de" | safe }}</span><br/>
+            <span data-config-key="TORNEO_SLOGAN">{{ config_torneo.TORNEO_SLOGAN or "Certamen de" | safe }}</span><br/>
             <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-indigo-400">Robótica</span>
         </h1>
-        <p class="text-gray-300/70 tracking-widest uppercase text-sm font-mono mb-8" data-config-key="WRO_SUBTITULO">{{ config_wro.WRO_SUBTITULO or "WRO · México · 2026" }}</p>
-        <p class="text-xl text-gray-300 font-light leading-relaxed max-w-2xl mx-auto mb-10" data-config-key="WRO_HERO_DESC">
-            {{ (config_wro.WRO_HERO_DESC or 'El Club de Robótica participa en el <strong class="text-white">World Robot Olympiad México 2026</strong>. Diseña, programa y compite con el robot que construirás junto a tu equipo.') | safe }}
+        <p class="text-gray-300/70 tracking-widest uppercase text-sm font-mono mb-8" data-config-key="TORNEO_SUBTITULO">{{ config_torneo.TORNEO_SUBTITULO or "WRO · México · 2026" }}</p>
+        <p class="text-xl text-gray-300 font-light leading-relaxed max-w-2xl mx-auto mb-10" data-config-key="TORNEO_HERO_DESC">
+            {{ (config_torneo.TORNEO_HERO_DESC or 'El Club de Robótica participa en el <strong class="text-white">World Robot Olympiad México 2026</strong>. Diseña, programa y compite con el robot que construirás junto a tu equipo.') | safe }}
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="{{ url_for('main.registro') }}" class="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold rounded-full text-dark-900 bg-white hover:bg-gray-50 shadow-xl transition-all duration-300 hover:scale-105">
-                🤖 <span data-config-key="WRO_HERO_BTN1_LABEL" onclick="if(typeof isEditMode !== 'undefined' && isEditMode) { event.preventDefault(); event.stopPropagation(); }">{{ config_wro.WRO_HERO_BTN1_LABEL or "Registrarme al club" }}</span>
+                🤖 <span data-config-key="TORNEO_HERO_BTN1_LABEL" onclick="if(typeof isEditMode !== 'undefined' && isEditMode) { event.preventDefault(); event.stopPropagation(); }">{{ config_torneo.TORNEO_HERO_BTN1_LABEL or "Registrarme al club" }}</span>
             </a>
             <a href="#wro" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-full text-white border border-white/20 hover:border-white/40 hover:bg-white/5 transition-all duration-300">
-                <span data-config-key="WRO_HERO_BTN2_LABEL" onclick="if(typeof isEditMode !== 'undefined' && isEditMode) { event.preventDefault(); event.stopPropagation(); }">{{ config_wro.WRO_HERO_BTN2_LABEL or "Conocer WRO →" }}</span>
+                <span data-config-key="TORNEO_HERO_BTN2_LABEL" onclick="if(typeof isEditMode !== 'undefined' && isEditMode) { event.preventDefault(); event.stopPropagation(); }">{{ config_torneo.TORNEO_HERO_BTN2_LABEL or "Conocer WRO →" }}</span>
             </a>
         </div>
     </div>
@@ -58,7 +58,7 @@
     <div class="absolute right-4 top-4 z-20">
         <button onclick="editCountdownDate()" class="edit-array-btn hidden bg-dark-800 border border-white/20 hover:border-brand-500/50 p-2 rounded-lg text-brand-400 hover:text-white transition-all shadow-xl" title="Editar Fecha Objetivo">⚙️ Fecha</button>
     </div>
-    <p class="text-xs font-mono text-gray-500 uppercase tracking-widest mb-6" data-config-key="WRO_COUNTDOWN_LABEL">{{ config_wro.WRO_COUNTDOWN_LABEL or "Tiempo para la fase regional" }}</p>
+    <p class="text-xs font-mono text-gray-500 uppercase tracking-widest mb-6" data-config-key="TORNEO_COUNTDOWN_LABEL">{{ config_torneo.TORNEO_COUNTDOWN_LABEL or "Tiempo para la fase regional" }}</p>
     <div class="flex gap-4 justify-center flex-wrap">
         {% for unit_id, label in [('cd-d','Días'),('cd-h','Horas'),('cd-m','Minutos'),('cd-s','Segundos')] %}
         <div class="bg-white/5 border border-white/10 rounded-2xl px-6 py-5 min-w-[100px] text-center">
@@ -73,13 +73,13 @@
 <section id="wro" class="relative z-10 py-24 bg-transparent">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div data-aos="fade-up" class="mb-14 relative">
-            <button onclick="openJsonModal('WRO_RECUADROS')" class="edit-array-btn hidden absolute -left-12 top-0 bg-dark-800 border border-white/20 hover:border-brand-500/50 p-2 rounded-lg text-brand-400 hover:text-white transition-all z-20 shadow-xl" title="Editar Cuadros Estadísticos">⚙️</button>
+            <button onclick="openJsonModal('TORNEO_RECUADROS')" class="edit-array-btn hidden absolute -left-12 top-0 bg-dark-800 border border-white/20 hover:border-brand-500/50 p-2 rounded-lg text-brand-400 hover:text-white transition-all z-20 shadow-xl" title="Editar Cuadros Estadísticos">⚙️</button>
             <p class="text-xs font-mono text-brand-400 uppercase tracking-widest mb-2 flex items-center gap-2"><span class="w-5 h-0.5 bg-brand-400 inline-block"></span>Competencia internacional</p>
-            <h2 class="text-4xl md:text-5xl font-display font-bold text-white" data-config-key="WRO_INFO_TITULO">{{ (config_wro.WRO_INFO_TITULO or 'World Robot <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-indigo-400">Olympiad 2026</span>') | safe }}</h2>
-            <p class="mt-3 text-gray-400 max-w-lg mt-4" data-config-key="WRO_INFO_DESC">{{ config_wro.WRO_INFO_DESC or 'La WRO es la competencia de robótica más grande del mundo. México participa en fases regionales con acceso a la final nacional en septiembre 2026.' }}</p>
+            <h2 class="text-4xl md:text-5xl font-display font-bold text-white" data-config-key="TORNEO_INFO_TITULO">{{ (config_torneo.TORNEO_INFO_TITULO or 'World Robot <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-indigo-400">Olympiad 2026</span>') | safe }}</h2>
+            <p class="mt-3 text-gray-400 max-w-lg mt-4" data-config-key="TORNEO_INFO_DESC">{{ config_torneo.TORNEO_INFO_DESC or 'La WRO es la competencia de robótica más grande del mundo. México participa en fases regionales con acceso a la final nacional en septiembre 2026.' }}</p>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {% for item in recuadros_wro %}
+            {% for item in recuadros_torneo %}
             <div class="bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-brand-500/30 hover:bg-white/8 transition-all" data-aos="fade-up" data-aos-delay="{{ loop.index * 80 }}">
                 <div class="w-12 h-12 rounded-xl bg-brand-500/10 flex items-center justify-center text-brand-400 mb-4 group-hover:scale-110 transition-transform">
                     <i class="fas {{ item.icon }}"></i>
@@ -96,14 +96,14 @@
 <section id="categorias" class="relative z-10 py-24 bg-transparent">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-14 relative" data-aos="fade-up">
-            <button onclick="openJsonModal('WRO_CATEGORIAS')" class="edit-array-btn hidden absolute -left-12 top-0 bg-dark-800 border border-white/20 hover:border-brand-500/50 p-2 rounded-lg text-brand-400 hover:text-white transition-all z-20 shadow-xl" title="Editar Categorías WRO">⚙️</button>
-            <p class="text-xs font-mono text-yellow-400 uppercase tracking-widest mb-2" data-config-key="WRO_SECTION_CAT_SUB">{{ config_wro.WRO_SECTION_CAT_SUB or 'Competencias' }}</p>
-            <h2 class="text-4xl md:text-5xl font-display font-bold text-white" data-config-key="WRO_SECTION_CAT_TITULO">{{ (config_wro.WRO_SECTION_CAT_TITULO or 'Categorías <span class="text-brand-400">WRO</span>') | safe }}</h2>
+            <button onclick="openJsonModal('TORNEO_CATEGORIAS')" class="edit-array-btn hidden absolute -left-12 top-0 bg-dark-800 border border-white/20 hover:border-brand-500/50 p-2 rounded-lg text-brand-400 hover:text-white transition-all z-20 shadow-xl" title="Editar Categorías WRO">⚙️</button>
+            <p class="text-xs font-mono text-yellow-400 uppercase tracking-widest mb-2" data-config-key="TORNEO_SECTION_CAT_SUB">{{ config_torneo.TORNEO_SECTION_CAT_SUB or 'Competencias' }}</p>
+            <h2 class="text-4xl md:text-5xl font-display font-bold text-white" data-config-key="TORNEO_SECTION_CAT_TITULO">{{ (config_torneo.TORNEO_SECTION_CAT_TITULO or 'Categorías <span class="text-brand-400">WRO</span>') | safe }}</h2>
             <p class="mt-4 text-gray-400 max-w-lg mx-auto">Explora las diferentes modalidades de participación en el World Robot Olympiad.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {% for cat in categorias_wro %}
+            {% for cat in categorias_torneo %}
             <div class="lotos-card group overflow-hidden flex flex-col md:flex-row items-center" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
                 <div class="w-full md:w-2/5 aspect-[4/3] overflow-hidden">
                     <img src="{{ url_for('static', filename=cat.imagen) }}" alt="{{ cat.nombre }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
@@ -127,13 +127,13 @@
 <section id="fechas" class="relative z-10 py-24 bg-transparent">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="mb-14 relative" data-aos="fade-up">
-            <button onclick="openJsonModal('WRO_FECHAS')" class="edit-array-btn hidden absolute -left-12 top-0 bg-dark-800 border border-white/20 hover:border-brand-500/50 p-2 rounded-lg text-brand-400 hover:text-white transition-all z-20 shadow-xl" title="Editar Calendario WRO">⚙️</button>
-            <p class="text-xs font-mono text-brand-400 uppercase tracking-widest mb-2 flex items-center gap-2" data-config-key="WRO_SECTION_FECHAS_SUB">{{ config_wro.WRO_SECTION_FECHAS_SUB or '<span class="w-5 h-0.5 bg-brand-400 inline-block"></span>Calendario 2026' | safe }}</p>
-            <h2 class="text-4xl md:text-5xl font-display font-bold text-white" data-config-key="WRO_SECTION_FECHAS_TITULO">{{ (config_wro.WRO_SECTION_FECHAS_TITULO or 'Fechas <span class="text-brand-400">Clave</span>') | safe }}</h2>
+            <button onclick="openJsonModal('TORNEO_FECHAS')" class="edit-array-btn hidden absolute -left-12 top-0 bg-dark-800 border border-white/20 hover:border-brand-500/50 p-2 rounded-lg text-brand-400 hover:text-white transition-all z-20 shadow-xl" title="Editar Calendario WRO">⚙️</button>
+            <p class="text-xs font-mono text-brand-400 uppercase tracking-widest mb-2 flex items-center gap-2" data-config-key="TORNEO_SECTION_FECHAS_SUB">{{ config_torneo.TORNEO_SECTION_FECHAS_SUB or '<span class="w-5 h-0.5 bg-brand-400 inline-block"></span>Calendario 2026' | safe }}</p>
+            <h2 class="text-4xl md:text-5xl font-display font-bold text-white" data-config-key="TORNEO_SECTION_FECHAS_TITULO">{{ (config_torneo.TORNEO_SECTION_FECHAS_TITULO or 'Fechas <span class="text-brand-400">Clave</span>') | safe }}</h2>
             <p class="mt-4 text-gray-400 max-w-lg">Roadmap de la competencia WRO México 2026 y actividades del club.</p>
         </div>
         <div class="space-y-3">
-            {% set fechas = fechas_wro if fechas_wro else [
+            {% set fechas = fechas_torneo if fechas_torneo else [
                 ("Abr – May 2026", "Inscripciones al Club de Robótica", "Registro a través del portal web del club + formación de equipos", "f-open", "✓ Abierto"),
                 ("Mayo 2026", "Inscripciones WRO México", "Portal oficial wro-mexico.org — equipos de 2–3 integrantes", "f-open", "✓ Abierto"),
                 ("May – Jun 2026", "Capacitación y construcción de robots", "Talleres en laboratorio — programación, sensores, mecánica", "f-coming", "En preparación"),
@@ -159,12 +159,12 @@
 <section class="relative z-10 py-24" style="background:#081424;">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-14 relative" data-aos="fade-up">
-            <button onclick="openJsonModal('WRO_REQUISITOS')" class="edit-array-btn hidden absolute -left-12 top-0 bg-dark-800 border border-white/20 hover:border-brand-500/50 p-2 rounded-lg text-brand-400 hover:text-white transition-all z-20 shadow-xl" title="Editar Beneficios (JSON)">⚙️</button>
-            <p class="text-xs font-mono text-brand-400 uppercase tracking-widest mb-2" data-config-key="WRO_SECTION_REQ_SUB">{{ config_wro.WRO_SECTION_REQ_SUB or 'Para participar' }}</p>
-            <h2 class="text-4xl md:text-5xl font-display font-bold text-white" data-config-key="WRO_SECTION_REQ_TITULO">{{ (config_wro.WRO_SECTION_REQ_TITULO or 'Requisitos y <span class="text-brand-400">Beneficios</span>') | safe }}</h2>
+            <button onclick="openJsonModal('TORNEO_REQUISITOS')" class="edit-array-btn hidden absolute -left-12 top-0 bg-dark-800 border border-white/20 hover:border-brand-500/50 p-2 rounded-lg text-brand-400 hover:text-white transition-all z-20 shadow-xl" title="Editar Beneficios (JSON)">⚙️</button>
+            <p class="text-xs font-mono text-brand-400 uppercase tracking-widest mb-2" data-config-key="TORNEO_SECTION_REQ_SUB">{{ config_torneo.TORNEO_SECTION_REQ_SUB or 'Para participar' }}</p>
+            <h2 class="text-4xl md:text-5xl font-display font-bold text-white" data-config-key="TORNEO_SECTION_REQ_TITULO">{{ (config_torneo.TORNEO_SECTION_REQ_TITULO or 'Requisitos y <span class="text-brand-400">Beneficios</span>') | safe }}</h2>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {% for tarjeta in requisitos_wro %}
+            {% for tarjeta in requisitos_torneo %}
             <div class="bg-white/5 border border-white/10 rounded-2xl p-7 hover:border-brand-500/20 transition-colors" data-aos="fade-up" data-aos-delay="{{ loop.index * 80 }}">
                 <h4 class="text-base font-bold text-brand-400 mb-5 flex items-center gap-2">{{ tarjeta.titulo }}</h4>
                 <ul class="space-y-3">
@@ -185,13 +185,13 @@
 <section id="proyectos" class="relative z-10 py-24 bg-transparent">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-14 relative" data-aos="fade-up">
-            <button onclick="openJsonModal('WRO_PROYECTOS')" class="edit-array-btn hidden absolute -left-12 top-0 bg-dark-800 border border-white/20 hover:border-brand-500/50 p-2 rounded-lg text-brand-400 hover:text-white transition-all z-20 shadow-xl" title="Editar Proyectos (JSON)">⚙️</button>
-            <p class="text-xs font-mono text-brand-400 uppercase tracking-widest mb-2" data-config-key="WRO_SECTION_PROY_SUB">{{ config_wro.WRO_SECTION_PROY_SUB or 'Lo que construirás' }}</p>
-            <h2 class="text-4xl md:text-5xl font-display font-bold text-white" data-config-key="WRO_SECTION_PROY_TITULO">{{ (config_wro.WRO_SECTION_PROY_TITULO or 'Proyectos <span class="text-brand-400">del Club</span>') | safe }}</h2>
+            <button onclick="openJsonModal('TORNEO_PROYECTOS')" class="edit-array-btn hidden absolute -left-12 top-0 bg-dark-800 border border-white/20 hover:border-brand-500/50 p-2 rounded-lg text-brand-400 hover:text-white transition-all z-20 shadow-xl" title="Editar Proyectos (JSON)">⚙️</button>
+            <p class="text-xs font-mono text-brand-400 uppercase tracking-widest mb-2" data-config-key="TORNEO_SECTION_PROY_SUB">{{ config_torneo.TORNEO_SECTION_PROY_SUB or 'Lo que construirás' }}</p>
+            <h2 class="text-4xl md:text-5xl font-display font-bold text-white" data-config-key="TORNEO_SECTION_PROY_TITULO">{{ (config_torneo.TORNEO_SECTION_PROY_TITULO or 'Proyectos <span class="text-brand-400">del Club</span>') | safe }}</h2>
             <p class="mt-4 text-gray-400 max-w-lg mx-auto">Estos son los proyectos robóticos en los que trabajará el club durante 2026.</p>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {% for p in proyectos_wro %}
+            {% for p in proyectos_torneo %}
             <div class="bg-white/5 border border-white/10 rounded-2xl p-7 text-center hover:border-brand-500/30 hover:-translate-y-2 transition-all duration-300" data-aos="fade-up" data-aos-delay="{{ loop.index * 80 }}">
                 <div class="text-4xl mb-4">{{ p.emoji }}</div>
                 <h4 class="font-bold text-white mb-2">{{ p.nombre }}</h4>
@@ -205,18 +205,18 @@
 <!-- CTA REGISTRO -->
 <section id="registro" class="relative z-10 py-28 text-center overflow-hidden" style="background:radial-gradient(ellipse at center, rgba(13,77,140,.4) 0%, #0f172a 70%);">
     <div class="max-w-3xl mx-auto px-4" data-aos="zoom-in">
-        <h2 class="text-5xl md:text-7xl font-display font-black text-white leading-none mb-6" data-config-key="WRO_CTA_TITULO">
-            {{ (config_wro.WRO_CTA_TITULO or '¿Listo para<br/><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-indigo-400">competir?</span>') | safe }}
+        <h2 class="text-5xl md:text-7xl font-display font-black text-white leading-none mb-6" data-config-key="TORNEO_CTA_TITULO">
+            {{ (config_torneo.TORNEO_CTA_TITULO or '¿Listo para<br/><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-indigo-400">competir?</span>') | safe }}
         </h2>
-        <p class="text-gray-400 text-lg max-w-xl mx-auto mb-10 leading-relaxed" data-config-key="WRO_CTA_DESC">
-            {{ config_wro.WRO_CTA_DESC or 'Únete al Club de Robótica, aprende a construir y programar robots, y representa al club en WRO México 2026.' }}
+        <p class="text-gray-400 text-lg max-w-xl mx-auto mb-10 leading-relaxed" data-config-key="TORNEO_CTA_DESC">
+            {{ config_torneo.TORNEO_CTA_DESC or 'Únete al Club de Robótica, aprende a construir y programar robots, y representa al club en WRO México 2026.' }}
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center mb-10">
             <a href="{{ url_for('main.registro') }}" class="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold rounded-full text-dark-900 bg-white hover:bg-gray-100 shadow-xl transition-all duration-300 hover:scale-105">
-                🤖 <span data-config-key="WRO_CTA_BTN1_LABEL" onclick="if(typeof isEditMode !== 'undefined' && isEditMode) { event.preventDefault(); event.stopPropagation(); }">{{ config_wro.WRO_CTA_BTN1_LABEL or "Registrarme ahora" }}</span>
+                🤖 <span data-config-key="TORNEO_CTA_BTN1_LABEL" onclick="if(typeof isEditMode !== 'undefined' && isEditMode) { event.preventDefault(); event.stopPropagation(); }">{{ config_torneo.TORNEO_CTA_BTN1_LABEL or "Registrarme ahora" }}</span>
             </a>
             <a href="{{ url_for('main.index') }}" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-full text-white border border-white/20 hover:border-white/40 hover:bg-white/5 transition-all duration-300">
-                <span data-config-key="WRO_CTA_BTN2_LABEL" onclick="if(typeof isEditMode !== 'undefined' && isEditMode) { event.preventDefault(); event.stopPropagation(); }">{{ config_wro.WRO_CTA_BTN2_LABEL or "Ver portal del club →" }}</span>
+                <span data-config-key="TORNEO_CTA_BTN2_LABEL" onclick="if(typeof isEditMode !== 'undefined' && isEditMode) { event.preventDefault(); event.stopPropagation(); }">{{ config_torneo.TORNEO_CTA_BTN2_LABEL or "Ver portal del club →" }}</span>
             </a>
         </div>
         <!-- QR Placeholder -->
@@ -233,7 +233,7 @@
 <script>
 // Countdown to target date from config
 function updateCountdown() {
-    const targetStr = "{{ config_wro.WRO_FECHA_COUNTDOWN or '2026-08-01T00:00:00' }}";
+    const targetStr = "{{ config_torneo.TORNEO_FECHA_COUNTDOWN or '2026-08-01T00:00:00' }}";
     const target = new Date(targetStr);
     const now    = new Date();
     const diff   = target - now;

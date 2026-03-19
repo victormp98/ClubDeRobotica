@@ -385,10 +385,10 @@ class ConfiguracionAdmin(SecureModelView):
     }
 
     def get_query(self):
-        return self.session.query(self.model).filter(self.model.llave.notlike('WRO_%'))
+        return self.session.query(self.model).filter(self.model.llave.notlike('TORNEO_%'))
 
     def get_count_query(self):
-        return self.session.query(db.func.count('*')).filter(self.model.llave.notlike('WRO_%'))
+        return self.session.query(db.func.count('*')).filter(self.model.llave.notlike('TORNEO_%'))
 
     def on_model_change(self, form, model, is_created):
         # Asegurar que las llaves WRO se agrupen visualmente si fuera necesario
@@ -418,7 +418,7 @@ class ConfiguracionAdmin(SecureModelView):
             if filename:
                 model.valor = filename
 
-class WROConfigAdmin(SecureModelView):
+class TorneoConfigAdmin(SecureModelView):
     column_list = ['llave', 'valor', 'descripcion']
     column_searchable_list = ['llave', 'descripcion']
     
@@ -437,10 +437,10 @@ class WROConfigAdmin(SecureModelView):
     }
 
     def get_query(self):
-        return self.session.query(self.model).filter(self.model.llave.like('WRO_%'))
+        return self.session.query(self.model).filter(self.model.llave.like('TORNEO_%'))
 
     def get_count_query(self):
-        return self.session.query(db.func.count('*')).filter(self.model.llave.like('WRO_%'))
+        return self.session.query(db.func.count('*')).filter(self.model.llave.like('TORNEO_%'))
 
 class ProyectoAdmin(SecureModelView):
     column_list = ('titulo', 'equipo', 'miniatura_preview', 'categoria', 'fecha_creacion', 'activo')

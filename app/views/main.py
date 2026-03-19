@@ -827,20 +827,20 @@ def wro():
     # Intenta buscar una página dinámica con slug 'wro'
     page = Page.query.filter_by(slug='wro').first()
     if page:
-        return render_template('wro_dynamic.html', page=page)
+        return render_template('TORNEO_dynamic.html', page=page)
     
     # Si no existe, usa la plantilla estática pero con datos dinámicos de Configuración
     configs = {}
     keys = [
-        'WRO_TITULO', 'WRO_SLOGAN', 'WRO_SUBTITULO', 'WRO_HERO_DESC',
-        'WRO_FECHA_COUNTDOWN', 'WRO_COUNTDOWN_LABEL', 'WRO_INFO_TITULO',
-        'WRO_INFO_DESC', 'WRO_FECHAS', 'WRO_RECUADROS', 'WRO_CATEGORIAS',
-        'WRO_REQUISITOS', 'WRO_PROYECTOS', 'WRO_CTA_TITULO', 'WRO_CTA_DESC',
-        'WRO_SECTION_CAT_TITULO', 'WRO_SECTION_FECHAS_TITULO',
-        'WRO_SECTION_REQ_TITULO', 'WRO_SECTION_PROY_TITULO',
-        'WRO_SECTION_CAT_SUB', 'WRO_SECTION_FECHAS_SUB',
-        'WRO_SECTION_REQ_SUB', 'WRO_SECTION_PROY_SUB',
-        'WRO_HERO_BTN1_LABEL', 'WRO_HERO_BTN2_LABEL', 'WRO_CTA_BTN1_LABEL', 'WRO_CTA_BTN2_LABEL'
+        'TORNEO_TITULO', 'TORNEO_SLOGAN', 'TORNEO_SUBTITULO', 'TORNEO_HERO_DESC',
+        'TORNEO_FECHA_COUNTDOWN', 'TORNEO_COUNTDOWN_LABEL', 'TORNEO_INFO_TITULO',
+        'TORNEO_INFO_DESC', 'TORNEO_FECHAS', 'TORNEO_RECUADROS', 'TORNEO_CATEGORIAS',
+        'TORNEO_REQUISITOS', 'TORNEO_PROYECTOS', 'TORNEO_CTA_TITULO', 'TORNEO_CTA_DESC',
+        'TORNEO_SECTION_CAT_TITULO', 'TORNEO_SECTION_FECHAS_TITULO',
+        'TORNEO_SECTION_REQ_TITULO', 'TORNEO_SECTION_PROY_TITULO',
+        'TORNEO_SECTION_CAT_SUB', 'TORNEO_SECTION_FECHAS_SUB',
+        'TORNEO_SECTION_REQ_SUB', 'TORNEO_SECTION_PROY_SUB',
+        'TORNEO_HERO_BTN1_LABEL', 'TORNEO_HERO_BTN2_LABEL', 'TORNEO_CTA_BTN1_LABEL', 'TORNEO_CTA_BTN2_LABEL'
     ]
     for key in keys:
         cfg = Configuracion.query.get(key)
@@ -853,18 +853,18 @@ def wro():
         except:
             return default
 
-    fechas_json = safe_json(configs.get('WRO_FECHAS'), [])
-    recuadros_json = safe_json(configs.get('WRO_RECUADROS'), [])
-    categorias_json = safe_json(configs.get('WRO_CATEGORIAS'), [])
-    requisitos_json = safe_json(configs.get('WRO_REQUISITOS'), [])
-    proyectos_json = safe_json(configs.get('WRO_PROYECTOS'), [])
+    fechas_json = safe_json(configs.get('TORNEO_FECHAS'), [])
+    recuadros_json = safe_json(configs.get('TORNEO_RECUADROS'), [])
+    categorias_json = safe_json(configs.get('TORNEO_CATEGORIAS'), [])
+    requisitos_json = safe_json(configs.get('TORNEO_REQUISITOS'), [])
+    proyectos_json = safe_json(configs.get('TORNEO_PROYECTOS'), [])
 
     return render_template('wro.html', 
-                           config_wro=configs, lotos_config=configs, fechas_wro=fechas_json,
-                           recuadros_wro=recuadros_json,
-                           categorias_wro=categorias_json,
-                           requisitos_wro=requisitos_json,
-                           proyectos_wro=proyectos_json)
+                           config_torneo=configs, lotos_config=configs, fechas_torneo=fechas_json,
+                           recuadros_torneo=recuadros_json,
+                           categorias_torneo=categorias_json,
+                           requisitos_torneo=requisitos_json,
+                           proyectos_torneo=proyectos_json)
 
 @main_bp.route('/admin/logout')
 @login_required
