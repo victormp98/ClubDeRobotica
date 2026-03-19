@@ -446,7 +446,8 @@ def get_task_details(tarea_id):
                 'ruta': url_for('static', filename=f'uploads/kanban/{a.ruta}'),
                 'fecha': a.fecha_subida.strftime('%d/%m/%Y')
             } for a in tarea.adjuntos],
-            'miembros': [{'id': m.user_id, 'nombre': m.user.nombre, 'cargo': m.cargo} for m in tarea.proyecto.equipo.miembros if m.activo and m.user] if tarea.proyecto.equipo else []
+            'miembros': [{'id': m.user_id, 'nombre': m.user.nombre, 'cargo': m.cargo} for m in tarea.proyecto.equipo.miembros if m.activo and m.user] if tarea.proyecto.equipo else [],
+            'columnas_proyecto': [{'id': c.id, 'titulo': c.titulo} for c in tarea.proyecto.columnas]
         }
     })
 

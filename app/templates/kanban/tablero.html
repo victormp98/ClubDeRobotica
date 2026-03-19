@@ -145,16 +145,18 @@
     <div class="flex justify-between items-start mb-3">
         <!-- Asignado (AHORA ARRIBA) -->
         <div class="flex items-center gap-2">
-            {% if tarea.asignado %}
-                {% set pn = tarea.asignado.nombre.split() %}
-                <div class="h-7 px-3 rounded-md bg-brand-600/50 flex items-center justify-center text-[11px] font-bold text-white border border-brand-400/30 whitespace-nowrap" title="{{ tarea.asignado.nombre }}">
-                    {{ pn[0] }}{% if pn|length > 1 %} {{ pn[1][0] }}.{% endif %}
-                </div>
-{% else %}
-                <div class="h-7 px-3 rounded-md bg-white/5 flex items-center justify-center text-[11px] text-white/20 border border-white/10" title="Sin asignar">
-                    NO ASIGNADO
-                </div>
-{% endif %}
+            <div id="assignee-container-{{ tarea.id }}">
+                {% if tarea.asignado %}
+                    {% set pn = tarea.asignado.nombre.split() %}
+                    <div class="h-7 px-3 rounded-md bg-brand-600/50 flex items-center justify-center text-[11px] font-bold text-white border border-brand-400/30 whitespace-nowrap" title="{{ tarea.asignado.nombre }}">
+                        {{ pn[0] }}{% if pn|length > 1 %} {{ pn[1][0] }}.{% endif %}
+                    </div>
+                {% else %}
+                    <div class="h-7 px-3 rounded-md bg-white/5 flex items-center justify-center text-[11px] text-white/20 border border-white/10" title="Sin asignar">
+                        NO ASIGNADO
+                    </div>
+                {% endif %}
+            </div>
             <span class="text-[9px] font-mono text-white/20 uppercase tracking-tighter">#{{ tarea.id }}</span>
         </div>
 
@@ -186,13 +188,16 @@
                 {% endif %}
             </div>
 
-            <div id="priority-dot-{{ tarea.id }}" class="flex-shrink-0">
+            <div id="priority-dot-{{ tarea.id }}" class="flex-shrink-0 flex items-center gap-1.5 bg-dark-900 px-1.5 py-0.5 rounded-sm border border-white/5">
                 {% if tarea.prioridad == 'alta' %}
-                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.8)]" title="Prioridad Alta"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.8)]"></span>
+                    <span class="text-[8px] font-bold text-red-500 uppercase tracking-wider">Alta</span>
                 {% elif tarea.prioridad == 'media' %}
-                    <span class="w-1.5 h-1.5 rounded-full bg-brand-400 shadow-[0_0_6px_rgba(99,102,241,0.6)]" title="Prioridad Media"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand-400 shadow-[0_0_6px_rgba(99,102,241,0.6)]"></span>
+                    <span class="text-[8px] font-bold text-brand-400 uppercase tracking-wider">Media</span>
                 {% else %}
-                    <span class="w-1.5 h-1.5 rounded-full bg-accent-400 shadow-[0_0_6px_rgba(20,184,166,0.5)]" title="Prioridad Baja"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-accent-400 shadow-[0_0_6px_rgba(20,184,166,0.5)]"></span>
+                    <span class="text-[8px] font-bold text-accent-400 uppercase tracking-wider">Baja</span>
                 {% endif %}
             </div>
         </div>
@@ -426,6 +431,8 @@
     let currentTaskId = null;
 
     document.addEventListener('DOMContentLoaded', function() {
+        const board = document.getElementById('kanban-board');
+
         // 1. Sortable para las Tareas (Mover entre columnas)
         const taskColumns = document.querySelectorAll('.kanban-column');
         taskColumns.forEach(column => {
@@ -433,6 +440,11 @@
                 group: 'tasks',
                 animation: 250,
                 ghostClass: 'sortable-ghost',
+                scroll: board,
+                scrollSensitivity: 150,
+                scrollSpeed: 25,
+                forceAutoScrollFallback: true,
+                bubbleScroll: true,
                 onEnd: async function (evt) {
                     const tareaId = evt.item.getAttribute('data-id');
                     const nuevaColumnaId = evt.to.getAttribute('data-columna-id');
@@ -448,6 +460,10 @@
             animation: 250,
             handle: '.column-handle',
             draggable: '.kanban-column-wrapper',
+            scroll: board,
+            scrollSensitivity: 150,
+            scrollSpeed: 25,
+            forceAutoScrollFallback: true,
             onEnd: async function () {
                 const ordenes = Array.from(document.querySelectorAll('.kanban-column-wrapper')).map((el, index) => ({
                     id: el.getAttribute('data-columna-id'),
@@ -459,7 +475,6 @@
         {% endif %}
 
         // 3. Grab-to-Scroll (Desplazamiento horizontal por arrastre)
-        const board = document.getElementById('kanban-board');
         let isDown = false;
         let startX;
         let scrollLeft;
@@ -507,7 +522,15 @@
                 body: JSON.stringify({ tarea_id: tareaId, columna_id: nuevaColumnaId })
             });
             const res = await resp.json();
-            if (!res.success) location.reload();
+            if (res.success) {
+                // Si el modal de ESTA tarea está abierto, actualizar el selector de estado
+                if (currentTaskId == tareaId) {
+                    const select = document.getElementById('detail-column-input');
+                    if (select) select.value = nuevaColumnaId;
+                }
+            } else {
+                location.reload();
+            }
         } catch (e) { console.error(e); }
     }
 
@@ -777,18 +800,48 @@
     }
 
     async function saveTaskChanges(id) {
-        const titulo = document.getElementById('detail-title-input').value;
-        const descripcion = document.getElementById('detail-desc-input').value;
-        const asignado_id = document.getElementById('detail-assignee-input').value;
-        const prioridad = document.getElementById('detail-priority-input').value;
-        const fecha_limite = document.getElementById('detail-deadline-input').value;
-        const columna_id = document.getElementById('detail-column-input').value;
+        // [ROBUSTEZ] 1. Mover físicamente la tarjeta de INMEDIATO si el estado cambió.
+        // Hacemos esto primero para que ninguna otra validación del DOM bloquee la visualización.
+        let columna_id = null;
+        let columnInput = document.getElementById('detail-column-input');
+        if (columnInput) {
+            columna_id = columnInput.value.trim();
+            const card = document.querySelector(`.task-card[data-id="${id}"]`);
+            if (card && columna_id) {
+                const currentColumnEl = card.closest('.kanban-column');
+                if (currentColumnEl) {
+                    const currentColumnId = currentColumnEl.getAttribute('data-columna-id');
+                    if (currentColumnId != columna_id) {
+                        const targetColumn = document.querySelector(`.kanban-column[data-columna-id="${columna_id}"]`);
+                        if (targetColumn) {
+                            // Mover tarjeta al inicio de la nueva columna para que sea visible
+                            targetColumn.insertBefore(card, targetColumn.firstChild);
+                            updateTaskStatus(id, columna_id); // Persistir
+                            updateCounters();
+                        }
+                    }
+                }
+            }
+        }
+
+        // 2. Recolectar el resto de valores
+        const tituloEl = document.getElementById('detail-title-input');
+        const descEl = document.getElementById('detail-desc-input');
+        const asigEl = document.getElementById('detail-assignee-input');
+        const prioEl = document.getElementById('detail-priority-input');
+        const limiteEl = document.getElementById('detail-deadline-input');
+
+        const titulo = tituloEl ? tituloEl.value : '';
+        const descripcion = descEl ? descEl.value : '';
+        const asignado_id = asigEl ? asigEl.value : '';
+        const prioridad = prioEl ? prioEl.value : 'media';
+        const fecha_limite = limiteEl ? limiteEl.value : '';
         
-        // Recolectar etiquetas
+        // Recolectar etiquetas de forma segura
         const etiquetas = {};
         ['blue', 'green', 'yellow', 'red', 'purple', 'teal'].forEach(c => {
-            const val = document.getElementById(`tag-input-${c}`).value;
-            if (val) etiquetas[c] = val;
+            const input = document.getElementById(`tag-input-${c}`);
+            if (input && input.value) etiquetas[c] = input.value;
         });
 
         const statusLabel = document.getElementById('desc-save-status');
@@ -823,14 +876,28 @@
                     }).join('');
                 }
 
-                // Actualizar punto de prioridad
+                // Actualizar prioridad
                 const priorityDot = document.getElementById(`priority-dot-${id}`);
                 if (priorityDot) {
                     let dotHtml = '';
-                    if (prioridad === 'alta') dotHtml = '<span class="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]" title="Prioridad Alta"></span>';
-                    else if (prioridad === 'media') dotHtml = '<span class="w-2 h-2 rounded-full bg-brand-400 shadow-[0_0_8px_rgba(99,102,241,0.6)]" title="Prioridad Media"></span>';
-                    else dotHtml = '<span class="w-2 h-2 rounded-full bg-accent-400 shadow-[0_0_8px_rgba(20,184,166,0.5)]" title="Prioridad Baja"></span>';
+                    if (prioridad === 'alta') dotHtml = '<span class="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.8)]"></span><span class="text-[8px] font-bold text-red-500 uppercase tracking-wider">Alta</span>';
+                    else if (prioridad === 'media') dotHtml = '<span class="w-1.5 h-1.5 rounded-full bg-brand-400 shadow-[0_0_6px_rgba(99,102,241,0.6)]"></span><span class="text-[8px] font-bold text-brand-400 uppercase tracking-wider">Media</span>';
+                    else dotHtml = '<span class="w-1.5 h-1.5 rounded-full bg-accent-400 shadow-[0_0_6px_rgba(20,184,166,0.5)]"></span><span class="text-[8px] font-bold text-accent-400 uppercase tracking-wider">Baja</span>';
                     priorityDot.innerHTML = dotHtml;
+                }
+
+                // Actualizar responsable (assignee)
+                const assigneeContainer = document.getElementById(`assignee-container-${id}`);
+                if (assigneeContainer) {
+                    if (asignado_id && asigEl && asigEl.selectedIndex > 0) {
+                        const rawText = asigEl.options[asigEl.selectedIndex].text; // ej. "Víctor (Programador)"
+                        const fullName = rawText.split('(')[0].trim();
+                        const parts = fullName.split(' ');
+                        const shortName = parts[0] + (parts.length > 1 ? ' ' + parts[1][0] + '.' : '');
+                        assigneeContainer.innerHTML = `<div class="h-7 px-3 rounded-md bg-brand-600/50 flex items-center justify-center text-[11px] font-bold text-white border border-brand-400/30 whitespace-nowrap" title="${fullName}">${shortName}</div>`;
+                    } else {
+                        assigneeContainer.innerHTML = `<div class="h-7 px-3 rounded-md bg-white/5 flex items-center justify-center text-[11px] text-white/20 border border-white/10" title="Sin asignar">NO ASIGNADO</div>`;
+                    }
                 }
 
                 // Mostrar status temporal
@@ -930,7 +997,7 @@
                         <div class="text-[9px] text-white/30 uppercase font-mono truncate">${a.fecha}</div>
                     </div>
                 </a>
-                <button onclick="removeAttachment(${a.id})" class="flex-shrink-0 opacity-0 group-hover/adj:opacity-100 p-2 text-red-500 hover:text-red-400 transition-all" title="Eliminar archivo">✕</button>
+                <button type="button" onclick="event.stopPropagation(); removeAttachment(${a.id})" class="flex-shrink-0 opacity-0 group-hover/adj:opacity-100 p-2 text-red-500 hover:text-red-400 transition-all focus:outline-none" title="Eliminar archivo">✕</button>
             </div>
         `).join('');
     }
@@ -952,13 +1019,21 @@
     }
 
     async function removeAttachment(adjuntoId) {
-        if (!confirm("¿Seguro de que quieres eliminar este archivo permanentemente?")) return;
+        if (!confirm("¿Seguro de que quieres eliminar este archivo permanentemente del disco y la base de datos?")) return;
         try {
             const resp = await fetch(`/api/kanban/adjunto/${adjuntoId}`, {
                 method: 'DELETE'
             });
-            if ((await resp.json()).success) openTaskDetail(currentTaskId);
-        } catch (e) { console.error(e); }
+            const res = await resp.json();
+            if (res.success) {
+                openTaskDetail(currentTaskId);
+            } else {
+                alert("Error al eliminar el archivo: " + (res.message || "Desconocido"));
+            }
+        } catch (e) { 
+            console.error(e); 
+            alert("Error de red o servidor al intentar eliminar el archivo.");
+        }
     }
 
     // --- Nueva Tarea ---
