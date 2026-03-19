@@ -128,6 +128,16 @@ def index():
         # Si pasan los años, mostrará "1", "2", etc.
         anios_activos = str(anios_activos + 1)
     
+    # Configuración de Live Editor para la sección Torneo
+    lotos_config = {}
+    keys = [
+        'INDEX_TORNEO_BADGE', 'INDEX_TORNEO_TITULO', 'INDEX_TORNEO_DESC', 
+        'INDEX_TORNEO_LINK_TEXT', 'INDEX_TORNEO_LINK_URL', 'INDEX_TORNEO_TARGET', 'INDEX_TORNEO_TARGET_SUB'
+    ]
+    for key in keys:
+        cfg = Configuracion.query.get(key)
+        lotos_config[key] = cfg.valor if cfg else None
+        
     return render_template('index.html', 
                            page=page, 
                            ultimas_noticias=noticias, 
@@ -136,8 +146,8 @@ def index():
                            img_equipo=img_equipo,
                            total_miembros=total_miembros,
                            total_proyectos=total_proyectos,
-                           anios_activos=anios_activos)
-
+                           anios_activos=anios_activos,
+                           lotos_config=lotos_config)
 
 @main_bp.route('/about')
 def about():
@@ -335,6 +345,41 @@ def reset_password(token):
         
     return render_template('reset_password.html', form=form)
 
+@main_bp.route('/api/certamen/update', methods=['POST'])
+@login_required
+def update_certamen_config():
+    if current_user.rol != 'admin':
+        return jsonify({'success': False, 'message': 'Sin permisos'}), 403
+        
+    data = request.get_json()
+    if isinstance(data, dict):
+        data = [data]
+        
+    try:
+        keys_updated = []
+        for item in data:
+            clave = item.get('clave')
+            valor = item.get('valor')
+            if not clave:
+                continue
+                
+            # Serializar arrays a JSON
+            if isinstance(valor, (list, dict)):
+                valor = json.dumps(valor)
+                
+            config = Configuracion.query.get(clave)
+            if config:
+                config.valor = str(valor)
+            else:
+                config = Configuracion(clave=clave, valor=str(valor), descripcion=f"Config dynamically created: {clave}")
+                db.session.add(config)
+            keys_updated.append(clave)
+            
+        db.session.commit()
+        return jsonify({'success': True, 'keys': keys_updated})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
 @main_bp.route('/logout')
 @login_required
 def logout():
@@ -792,7 +837,10 @@ def wro():
         'WRO_INFO_DESC', 'WRO_FECHAS', 'WRO_RECUADROS', 'WRO_CATEGORIAS',
         'WRO_REQUISITOS', 'WRO_PROYECTOS', 'WRO_CTA_TITULO', 'WRO_CTA_DESC',
         'WRO_SECTION_CAT_TITULO', 'WRO_SECTION_FECHAS_TITULO',
-        'WRO_SECTION_REQ_TITULO', 'WRO_SECTION_PROY_TITULO'
+        'WRO_SECTION_REQ_TITULO', 'WRO_SECTION_PROY_TITULO',
+        'WRO_SECTION_CAT_SUB', 'WRO_SECTION_FECHAS_SUB',
+        'WRO_SECTION_REQ_SUB', 'WRO_SECTION_PROY_SUB',
+        'WRO_HERO_BTN1_LABEL', 'WRO_HERO_BTN2_LABEL', 'WRO_CTA_BTN1_LABEL', 'WRO_CTA_BTN2_LABEL'
     ]
     for key in keys:
         cfg = Configuracion.query.get(key)
@@ -812,8 +860,7 @@ def wro():
     proyectos_json = safe_json(configs.get('WRO_PROYECTOS'), [])
 
     return render_template('wro.html', 
-                           config_wro=configs, 
-                           fechas_wro=fechas_json,
+                           config_wro=configs, lotos_config=configs, fechas_wro=fechas_json,
                            recuadros_wro=recuadros_json,
                            categorias_wro=categorias_json,
                            requisitos_wro=requisitos_json,
@@ -868,3 +915,4 @@ def api_proyecto_users(proyecto_id):
     miembros = MiembroEquipo.query.filter_by(equipo_id=p.equipo_id, activo=True).all()
     user_data = {str(m.user_id): m.cargo for m in miembros if m.user_id}
     return jsonify({'success': True, 'users': user_data})
+

@@ -106,7 +106,7 @@
                     <a href="{{ url_for('main.about') }}" class="lotos-nav-link">Sobre el Club</a>
                     <a href="{{ url_for('main.proyectos') }}" class="lotos-nav-link">Proyectos</a>
                     <a href="{{ url_for('main.horarios') }}" class="lotos-nav-link">Horarios</a>
-                    <a href="{{ url_for('main.wro') }}" class="lotos-nav-link">WRO</a>
+                    <a href="{{ url_for('main.wro') }}" class="lotos-nav-link">Torneo</a>
                     <a href="{{ url_for('main.noticias') }}" class="lotos-nav-link">Noticias</a>
                     <a href="{{ url_for('main.galeria') }}" class="lotos-nav-link">Galería</a>
                     {% if current_user.is_authenticated and (current_user.rol == 'admin' or (current_user.aprobado and current_user.es_miembro_equipo)) %}
@@ -296,6 +296,8 @@
             }
         });
     </script>
+    
+    {% include 'partials/live_editor.html' %}
     {% block extra_js %}{% endblock %}
 </body>
 </html>

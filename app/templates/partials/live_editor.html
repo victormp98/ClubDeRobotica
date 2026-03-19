@@ -1,0 +1,183 @@
+<!-- Admin Edit Tools -->
+{% if current_user.is_authenticated and current_user.rol == 'admin' %}
+<div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+    <button id="toggleEditModeBtn" onclick="toggleEditMode()" class="bg-brand-500 hover:bg-brand-400 text-white p-4 rounded-full shadow-lg shadow-brand-500/20 flex items-center justify-center transition-all group">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+        <span class="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-300 ease-in-out font-bold text-sm ml-0 group-hover:ml-2">Modo Edición</span>
+    </button>
+</div>
+
+<!-- Modal Raw JSON Editor para Listas -->
+<div id="jsonModal" class="hidden fixed inset-0 z-[100] bg-dark-900/80 backdrop-blur-sm flex items-center justify-center px-4">
+    <div class="bg-dark-800 border border-white/10 p-6 rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col h-[80vh]">
+        <h3 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
+            ⚙️ Editor Avanzado <span id="jsonModalKey" class="text-sm font-mono text-brand-400 bg-brand-500/10 px-2 py-0.5 rounded"></span>
+        </h3>
+        <p class="text-gray-400 text-xs mb-4">Asegúrate de que la estructura JSON sea válida antes de guardar.</p>
+        <textarea id="jsonModalTextarea" class="w-full flex-grow bg-dark-900 border border-white/10 rounded-lg p-4 font-mono text-sm text-gray-300 outline-none focus:border-brand-500/50 resize-none"></textarea>
+        <div class="mt-4 flex justify-end gap-3 shrink-0">
+            <button onclick="closeJsonModal()" class="lotos-btn-neutral px-6 py-2">Cancelar</button>
+            <button onclick="saveJsonModal()" class="lotos-btn-primary px-6 py-2">Guardar JSON</button>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- JavaScript de Edición Compartida -->
+<script>
+window.LOTOS_CONFIG = {{ lotos_config | default('{}') | tojson | safe }};
+
+{% if current_user.is_authenticated and current_user.rol == 'admin' %}
+let isEditMode = false;
+
+function toggleEditMode() {
+    isEditMode = !isEditMode;
+    const btnSpan = document.querySelector('#toggleEditModeBtn span');
+    if(btnSpan) btnSpan.textContent = isEditMode ? 'Guardar y Salir' : 'Modo Edición';
+    if(isEditMode) {
+        document.getElementById('toggleEditModeBtn').classList.add('ring-2', 'ring-brand-400');
+    } else {
+        document.getElementById('toggleEditModeBtn').classList.remove('ring-2', 'ring-brand-400');
+    }
+    
+    // Toggle contenteditable for texts
+    document.querySelectorAll('[data-config-key]').forEach(el => {
+        if (isEditMode) {
+            el.setAttribute('contenteditable', 'true');
+            el.classList.add('border-2', 'border-brand-500/50', 'bg-brand-500/5', 'rounded', 'p-1', 'transition-none', 'outline-none', 'focus:ring-2', 'focus:ring-brand-500');
+            el.addEventListener('blur', saveConfigOnBlur);
+        } else {
+            el.removeAttribute('contenteditable');
+            el.classList.remove('border-2', 'border-brand-500/50', 'bg-brand-500/5', 'rounded', 'p-1', 'transition-none', 'outline-none', 'focus:ring-2', 'focus:ring-brand-500');
+            el.removeEventListener('blur', saveConfigOnBlur);
+        }
+    });
+
+    // Toggle visibility of Edit buttons for Arrays
+    document.querySelectorAll('.edit-array-btn').forEach(btn => {
+        btn.style.display = isEditMode ? 'inline-flex' : 'none';
+        btn.classList.toggle('hidden', !isEditMode);
+    });
+}
+
+function showToast(msg, type="success") {
+    const d = document.createElement('div');
+    d.className = `fixed top-6 right-6 z-[1000] px-6 py-3 rounded shadow-lg text-white font-bold transition-all ${type==='success'?'bg-green-500':'bg-red-500'}`;
+    d.textContent = msg;
+    document.body.appendChild(d);
+    setTimeout(() => d.remove(), 3000);
+}
+
+async function saveConfigOnBlur(event) {
+    const el = event.target;
+    // Si contiene hijos bloqueables u otros, extraemos el innerHTML, pero a veces es mejor text? no, innerHTML permite links
+    const key = el.getAttribute('data-config-key');
+    const value = el.innerHTML;
+    
+    try {
+        const resp = await fetch('/api/certamen/update', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({clave: key, valor: value})
+        });
+        const data = await resp.json();
+        if (data.success) {
+            window.LOTOS_CONFIG[key] = value;
+            el.classList.add('bg-green-500/20');
+            setTimeout(()=> el.classList.remove('bg-green-500/20'), 500);
+        } else {
+            showToast("Error guardando: " + data.message, "error");
+        }
+    } catch(e) { console.error(e); }
+}
+
+// Modal JSON
+let currentJsonKey = null;
+function openJsonModal(key) {
+    currentJsonKey = key;
+    document.getElementById('jsonModalKey').textContent = key;
+    let rawVal = window.LOTOS_CONFIG[key] || "[]";
+    try {
+        document.getElementById('jsonModalTextarea').value = JSON.stringify(JSON.parse(rawVal), null, 4);
+    } catch(e) {
+        document.getElementById('jsonModalTextarea').value = rawVal;
+    }
+    document.getElementById('jsonModal').classList.remove('hidden');
+}
+
+function closeJsonModal() {
+    document.getElementById('jsonModal').classList.add('hidden');
+    currentJsonKey = null;
+}
+
+async function saveJsonModal() {
+    const rawVal = document.getElementById('jsonModalTextarea').value;
+    try {
+        JSON.parse(rawVal); // Validate
+    } catch(e) {
+        alert("El JSON no es válido: " + e.message);
+        return;
+    }
+    
+    try {
+        const resp = await fetch('/api/certamen/update', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({clave: currentJsonKey, valor: rawVal})
+        });
+        const data = await resp.json();
+        if (data.success) {
+            showToast("Guardado con éxito");
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            showToast("Error guardando: " + data.message, "error");
+        }
+    } catch(e) { 
+        showToast("Error de red", "error"); 
+    }
+}
+
+// Funciones Auxiliares Modales Nativas
+async function editCountdownDate() {
+    const rawVal = window.LOTOS_CONFIG['WRO_FECHA_COUNTDOWN'] || '2026-08-01T00:00:00';
+    const newDate = prompt("Introduce la fecha y hora objetivo (formato: YYYY-MM-DDTHH:MM:SS)", rawVal);
+    if (newDate !== null && newDate !== rawVal) {
+        try {
+            const resp = await fetch('/api/certamen/update', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({clave: 'WRO_FECHA_COUNTDOWN', valor: newDate})
+            });
+            const data = await resp.json();
+            if (data.success) {
+                showToast("Fecha actualizada");
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showToast("Error al guardar", "error");
+            }
+        } catch(e) { showToast("Error", "error"); }
+    }
+}
+
+async function editTorneoLink() {
+    const rawVal = window.LOTOS_CONFIG['INDEX_TORNEO_LINK_URL'] || 'https://wro-association.org/';
+    const newLink = prompt("Introduce el enlace de la tarjeta Torneo (ej. https://... o /certamen)", rawVal);
+    if (newLink !== null && newLink !== rawVal) {
+        try {
+            const resp = await fetch('/api/certamen/update', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({clave: 'INDEX_TORNEO_LINK_URL', valor: newLink})
+            });
+            const data = await resp.json();
+            if (data.success) {
+                showToast("Enlace actualizado");
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showToast("Error al guardar", "error");
+            }
+        } catch(e) { showToast("Error", "error"); }
+    }
+}
+{% endif %}
+</script>
