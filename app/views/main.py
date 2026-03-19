@@ -1,18 +1,26 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
+from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, jsonify
 from flask_mail import Message
 from werkzeug.security import generate_password_hash
 from sqlalchemy.exc import IntegrityError
+import os
+import uuid
 import threading
 import traceback
 import sys
+import json
+from werkzeug.utils import secure_filename
 
 from app.forms import RegistrationForm, NoticiaForm, LoginForm, ResetPasswordRequestForm, ResetPasswordForm, ChangePasswordForm
-from app.models import Noticia, Album, Foto, Horario, User
+from app.models import Noticia, Album, Foto, Horario, User, Columna
 from app.models.page import Page
 from app.models.configuracion import Configuracion
 from app.models.proyecto import Proyecto
 from app.models.equipo import Equipo
+from app.models.tarea import Tarea
 from app.models.miembro_equipo import MiembroEquipo
+from app.models.checklist_item import ChecklistItem
+from app.models.comentario import Comentario
+from app.models.adjunto import Adjunto
 from functools import wraps
 from app.extensions import db, mail
 from flask_login import login_user, logout_user, current_user, login_required
@@ -339,7 +347,434 @@ def logout():
 def miembros_index():
     drive_url_config = Configuracion.query.get('drive_virtual_url')
     drive_url = drive_url_config.valor if drive_url_config else '#'
-    return render_template('miembros/index.html', drive_virtual_url=drive_url)
+    
+    # Obtener proyectos vinculados al usuario para el acceso rápido al Kanban
+    proyectos_usuario = []
+    if current_user.rol == 'admin':
+        proyectos_usuario = Proyecto.query.filter_by(activo=True).all()
+    else:
+        # Encontrar proyectos donde el usuario es miembro del equipo
+        proyectos_usuario = [m.equipo.proyectos[0] for m in current_user.membresias_equipo if m.activo and m.equipo.proyectos]
+    
+    return render_template('miembros/index.html', drive_virtual_url=drive_url, proyectos_usuario=proyectos_usuario)
+
+@main_bp.route('/kanban/<int:proyecto_id>')
+@miembro_required
+def kanban_tablero(proyecto_id):
+    proyecto = Proyecto.query.get_or_404(proyecto_id)
+    
+    # Seguridad: Un miembro solo puede ver el tablero de su proyecto (a menos que sea admin)
+    if current_user.rol != 'admin':
+        es_miembro = any(m.equipo_id == proyecto.equipo_id for m in current_user.membresias_equipo if m.activo)
+        if not es_miembro:
+            flash('No tienes permiso para acceder al tablero de este proyecto.', 'error')
+            return redirect(url_for('main.miembros_index'))
+            
+    tareas = Tarea.query.filter_by(proyecto_id=proyecto_id).order_by(Tarea.fecha_creacion.desc()).all()
+    # Ya no es necesario agrupar manualmente, el template usa proyecto.columnas
+    # Obtener usuarios del equipo para asignación
+    usuarios_equipo = []
+    if proyecto.equipo:
+        usuarios_equipo = [{'id': m.user_id, 'nombre': m.user.nombre, 'cargo': m.cargo} for m in proyecto.equipo.miembros if m.activo and m.user]
+    elif current_user.rol == 'admin':
+        # Si es admin y no hay equipo, permitir asignar a cualquier admin o a sí mismo
+        usuarios_equipo = [{'id': u.id, 'nombre': u.nombre, 'cargo': u.rol.capitalize()} for u in User.query.filter_by(rol='admin').all()]
+
+    return render_template('kanban/tablero.html', 
+                           proyecto=proyecto, 
+                           usuarios_equipo=usuarios_equipo)
+
+@main_bp.route('/api/kanban/update_status', methods=['POST'])
+@login_required
+def update_task_status():
+    data = request.get_json()
+    tarea_id = data.get('tarea_id')
+    nueva_columna_id = data.get('columna_id')
+    
+    tarea = Tarea.query.get_or_404(tarea_id)
+    
+    # Seguridad básica
+    if current_user.rol != 'admin':
+        es_miembro = any(m.equipo_id == tarea.proyecto.equipo_id for m in current_user.membresias_equipo if m.activo)
+        if not es_miembro:
+            return jsonify({'success': False, 'message': 'Sin permisos'}), 403
+            
+    tarea.columna_id = nueva_columna_id
+    db.session.commit()
+    return jsonify({'success': True})
+
+@main_bp.route('/api/kanban/tarea/<int:tarea_id>', methods=['GET'])
+@login_required
+def get_task_details(tarea_id):
+    tarea = Tarea.query.get_or_404(tarea_id)
+    
+    # Seguridad básica
+    if current_user.rol != 'admin':
+        es_miembro = any(m.equipo_id == tarea.proyecto.equipo_id for m in current_user.membresias_equipo if m.activo)
+        if not es_miembro:
+            return jsonify({'success': False, 'message': 'Sin permisos'}), 403
+            
+    return jsonify({
+        'success': True,
+        'tarea': {
+            'id': tarea.id,
+            'titulo': tarea.titulo,
+            'descripcion': tarea.descripcion,
+            'columna': tarea.columna_obj.titulo,
+            'columna_id': tarea.columna_id,
+            'prioridad': tarea.prioridad,
+            'color': tarea.color,
+            'asignado': tarea.asignado.nombre if tarea.asignado else 'Sin asignar',
+            'asignado_id': tarea.asignado_id,
+            'fecha_creacion': tarea.fecha_creacion.strftime('%d/%m/%Y'),
+            'fecha_limite': tarea.fecha_limite.strftime('%Y-%m-%d') if tarea.fecha_limite else None,
+            'etiquetas': json.loads(tarea.etiquetas) if tarea.etiquetas else {},
+            'checklist': [{
+                'id': item.id,
+                'texto': item.texto,
+                'completado': item.completado
+            } for item in tarea.checklist],
+            'comentarios': [{
+                'id': c.id,
+                'autor': c.autor.nombre,
+                'cuerpo': c.cuerpo,
+                'fecha': c.fecha_creacion.strftime('%d/%m/%Y %H:%M')
+            } for c in tarea.comentarios],
+            'adjuntos': [{
+                'id': a.id,
+                'nombre': a.nombre_archivo,
+                'ruta': url_for('static', filename=f'uploads/kanban/{a.ruta}'),
+                'fecha': a.fecha_subida.strftime('%d/%m/%Y')
+            } for a in tarea.adjuntos],
+            'miembros': [{'id': m.user_id, 'nombre': m.user.nombre, 'cargo': m.cargo} for m in tarea.proyecto.equipo.miembros if m.activo and m.user] if tarea.proyecto.equipo else []
+        }
+    })
+
+@main_bp.route('/api/kanban/tarea/<int:tarea_id>/color', methods=['POST'])
+@login_required
+def update_task_color(tarea_id):
+    tarea = Tarea.query.get_or_404(tarea_id)
+    if current_user.rol != 'admin' and not any(m.equipo_id == tarea.proyecto.equipo_id for m in current_user.membresias_equipo if m.activo):
+        return jsonify({'success': False, 'message': 'Sin permisos'}), 403
+        
+    data = request.get_json()
+    tarea.color = data.get('color', 'default')
+    db.session.commit()
+    return jsonify({'success': True})
+
+@main_bp.route('/api/kanban/tarea/<int:tarea_id>/checklist', methods=['POST'])
+@login_required
+def add_checklist_item(tarea_id):
+    tarea = Tarea.query.get_or_404(tarea_id)
+    if current_user.rol != 'admin' and not any(m.equipo_id == tarea.proyecto.equipo_id for m in current_user.membresias_equipo if m.activo):
+        return jsonify({'success': False, 'message': 'Sin permisos'}), 403
+        
+    data = request.get_json()
+    item = ChecklistItem(tarea_id=tarea_id, texto=data.get('texto'))
+    db.session.add(item)
+    db.session.commit()
+    return jsonify({'success': True, 'item': {'id': item.id, 'texto': item.texto, 'completado': item.completado}})
+
+@main_bp.route('/api/kanban/checklist/<int:item_id>/toggle', methods=['POST'])
+@login_required
+def toggle_checklist_item(item_id):
+    item = ChecklistItem.query.get_or_404(item_id)
+    tarea = item.tarea
+    if current_user.rol != 'admin' and not any(m.equipo_id == tarea.proyecto.equipo_id for m in current_user.membresias_equipo if m.activo):
+        return jsonify({'success': False, 'message': 'Sin permisos'}), 403
+        
+    item.completado = not item.completado
+    db.session.commit()
+    return jsonify({'success': True, 'completado': item.completado})
+
+@main_bp.route('/api/kanban/checklist/<int:item_id>', methods=['DELETE'])
+@login_required
+def delete_checklist_item(item_id):
+    item = ChecklistItem.query.get_or_404(item_id)
+    tarea = item.tarea
+    if current_user.rol != 'admin' and not any(m.equipo_id == tarea.proyecto.equipo_id for m in current_user.membresias_equipo if m.activo):
+        return jsonify({'success': False, 'message': 'Sin permisos'}), 403
+        
+    db.session.delete(item)
+    db.session.commit()
+    return jsonify({'success': True})
+
+@main_bp.route('/api/kanban/tarea/<int:tarea_id>/comentar', methods=['POST'])
+@login_required
+def add_comment(tarea_id):
+    tarea = Tarea.query.get_or_404(tarea_id)
+    if current_user.rol != 'admin' and not any(m.equipo_id == tarea.proyecto.equipo_id for m in current_user.membresias_equipo if m.activo):
+        return jsonify({'success': False, 'message': 'Sin permisos'}), 403
+        
+    data = request.get_json()
+    comentario = Comentario(tarea_id=tarea_id, autor_id=current_user.id, cuerpo=data.get('cuerpo'))
+    db.session.add(comentario)
+    db.session.commit()
+    return jsonify({
+        'success': True, 
+        'comentario': {
+            'autor': current_user.nombre, 
+            'cuerpo': comentario.cuerpo, 
+            'fecha': comentario.fecha_creacion.strftime('%d/%m/%Y %H:%M')
+        }
+    })
+
+@main_bp.route('/api/kanban/tarea/<int:tarea_id>/adjuntar', methods=['POST'])
+@login_required
+def add_attachment(tarea_id):
+    tarea = Tarea.query.get_or_404(tarea_id)
+    if current_user.rol != 'admin' and not any(m.equipo_id == tarea.proyecto.equipo_id for m in current_user.membresias_equipo if m.activo):
+        return jsonify({'success': False, 'message': 'Sin permisos'}), 403
+        
+    if 'archivo' not in request.files:
+        return jsonify({'success': False, 'message': 'No hay archivo'}), 400
+        
+    file = request.files['archivo']
+    if file.filename == '':
+        return jsonify({'success': False, 'message': 'Nombre vacío'}), 400
+        
+    if file:
+        filename = secure_filename(file.filename)
+        # Generar nombre único para evitar colisiones
+        unique_filename = f"{uuid.uuid4().hex}_{filename}"
+        upload_path = os.path.join(current_app.root_path, 'static', 'uploads', 'kanban')
+        
+        if not os.path.exists(upload_path):
+            os.makedirs(upload_path)
+            
+        file.save(os.path.join(upload_path, unique_filename))
+        
+        adjunto = Adjunto(
+            tarea_id=tarea_id, 
+            nombre_archivo=filename, 
+            ruta=unique_filename,
+            tipo_mimetype=file.mimetype
+        )
+        db.session.add(adjunto)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True, 
+            'adjunto': {
+                'id': adjunto.id, 
+                'nombre': adjunto.nombre_archivo, 
+                'ruta': url_for('static', filename=f'uploads/kanban/{unique_filename}'),
+                'fecha': adjunto.fecha_subida.strftime('%d/%m/%Y')
+            }
+        })
+
+@main_bp.route('/api/kanban/tarea/<int:tarea_id>/edit', methods=['POST'])
+@login_required
+def edit_task_details(tarea_id):
+    tarea = Tarea.query.get_or_404(tarea_id)
+    if current_user.rol != 'admin' and not any(m.equipo_id == tarea.proyecto.equipo_id for m in current_user.membresias_equipo if m.activo):
+        return jsonify({'success': False, 'message': 'Sin permisos'}), 403
+        
+    data = request.get_json()
+    if 'titulo' in data and data.get('titulo').strip():
+        tarea.titulo = data.get('titulo')
+    if 'descripcion' in data:
+        tarea.descripcion = data.get('descripcion')
+    if 'asignado_id' in data:
+        val = data.get('asignado_id')
+        tarea.asignado_id = int(val) if val else None
+        
+    if 'prioridad' in data:
+        tarea.prioridad = data.get('prioridad')
+    if 'fecha_limite' in data:
+        val = data.get('fecha_limite')
+        try:
+            from datetime import datetime
+            tarea.fecha_limite = datetime.strptime(val, '%Y-%m-%d') if val else None
+        except: pass
+    if 'etiquetas' in data:
+        tarea.etiquetas = json.dumps(data.get('etiquetas'))
+        
+    db.session.commit()
+    return jsonify({'success': True})
+
+@main_bp.route('/api/kanban/adjunto/<int:adjunto_id>', methods=['DELETE'])
+@login_required
+def delete_attachment(adjunto_id):
+    adjunto = Adjunto.query.get_or_404(adjunto_id)
+    tarea = adjunto.tarea
+    if current_user.rol != 'admin' and not any(m.equipo_id == tarea.proyecto.equipo_id for m in current_user.membresias_equipo if m.activo):
+        return jsonify({'success': False, 'message': 'Sin permisos'}), 403
+        
+    try:
+        file_path = os.path.join(current_app.root_path, 'static', 'uploads', 'kanban', adjunto.ruta)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            
+        db.session.delete(adjunto)
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@main_bp.route('/api/kanban/tarea/<int:tarea_id>', methods=['DELETE'])
+@login_required
+def delete_kanban_task(tarea_id):
+    tarea = Tarea.query.get_or_404(tarea_id)
+    if current_user.rol != 'admin' and not any(m.equipo_id == tarea.proyecto.equipo_id for m in current_user.membresias_equipo if m.activo):
+        return jsonify({'success': False, 'message': 'Sin permisos'}), 403
+        
+    try:
+        for adjunto in tarea.adjuntos:
+            file_path = os.path.join(current_app.root_path, 'static', 'uploads', 'kanban', adjunto.ruta)
+            if os.path.exists(file_path):
+                try: os.remove(file_path)
+                except: pass
+                
+        db.session.delete(tarea)
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@main_bp.route('/api/kanban/tarea/nueva', methods=['POST'])
+@login_required
+def create_task_direct(proyecto_id=None):
+    # El proyecto_id viene en el body
+    data = request.get_json()
+    p_id = data.get('proyecto_id')
+    proyecto = Proyecto.query.get_or_404(p_id)
+    
+    # Solo admins pueden crear tareas (según requerimiento original)
+    if current_user.rol != 'admin':
+        return jsonify({'success': False, 'message': 'Solo administradores pueden crear tareas'}), 403
+        
+    # Si no se envía columna_id, usar la primera del proyecto
+    c_id = data.get('columna_id')
+    if not c_id:
+        primera_col = Columna.query.filter_by(proyecto_id=p_id).order_by(Columna.orden).first()
+        if primera_col:
+            c_id = primera_col.id
+            
+    nueva_tarea = Tarea(
+        titulo=data.get('titulo'),
+        descripcion=data.get('descripcion'),
+        proyecto_id=p_id,
+        columna_id=c_id,
+        prioridad=data.get('prioridad', 'media'),
+        color=data.get('color', 'default'),
+        asignado_id=data.get('asignado_id') if data.get('asignado_id') else None
+    )
+    
+    if data.get('fecha_limite'):
+        try:
+            from datetime import datetime
+            nueva_tarea.fecha_limite = datetime.strptime(data.get('fecha_limite'), '%Y-%m-%d')
+        except:
+            pass
+
+    db.session.add(nueva_tarea)
+    
+    # Guardar etiquetas si las hay
+    if data.get('etiquetas'):
+        import json
+        nueva_tarea.etiquetas = json.dumps(data.get('etiquetas'))
+    db.session.flush() # Para obtener el ID
+    
+    # Agregar ítems de checklist inicial si los hay
+    items_iniciales = data.get('checklist', [])
+    for txt in items_iniciales:
+        if txt.strip():
+            item = ChecklistItem(tarea_id=nueva_tarea.id, texto=txt)
+            db.session.add(item)
+
+    # Guardar comentario inicial si lo hay
+    comentario_texto = data.get('comentario_inicial', '').strip()
+    if comentario_texto:
+        comentario = Comentario(
+            tarea_id=nueva_tarea.id,
+            autor_id=current_user.id,
+            cuerpo=comentario_texto
+        )
+        db.session.add(comentario)
+            
+    db.session.commit()
+    
+    return jsonify({'success': True, 'tarea_id': nueva_tarea.id})
+
+# --- APIs de Columnas (Kanban Dinámico) ---
+
+@main_bp.route('/api/kanban/columna/nueva', methods=['POST'])
+@login_required
+def create_column():
+    if current_user.rol != 'admin':
+        return jsonify({'success': False, 'message': 'Solo administradores'}), 403
+        
+    data = request.get_json()
+    proyecto_id = data.get('proyecto_id')
+    titulo = data.get('titulo', 'Nueva Columna')
+    
+    # Obtener el último orden
+    ultimo_orden = db.session.query(db.func.max(Columna.orden)).filter(Columna.proyecto_id == proyecto_id).scalar() or 0
+    
+    nueva_col = Columna(
+        titulo=titulo,
+        orden=ultimo_orden + 1,
+        proyecto_id=proyecto_id
+    )
+    db.session.add(nueva_col)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'columna_id': nueva_col.id, 'titulo': nueva_col.titulo})
+
+@main_bp.route('/api/kanban/columna/reordenar', methods=['POST'])
+@login_required
+def reorder_columns():
+    if current_user.rol != 'admin':
+        return jsonify({'success': False, 'message': 'Solo administradores'}), 403
+        
+    data = request.get_json()
+    # data debe ser una lista de {id: x, orden: y}
+    ordenes = data.get('ordenes', [])
+    
+    for item in ordenes:
+        col = Columna.query.get(item['id'])
+        if col:
+            col.orden = item['orden']
+            
+    db.session.commit()
+    return jsonify({'success': True})
+
+@main_bp.route('/api/kanban/columna/<int:columna_id>/edit', methods=['POST'])
+@login_required
+def edit_column_title(columna_id):
+    col = Columna.query.get_or_404(columna_id)
+    if current_user.rol != 'admin':
+        return jsonify({'success': False, 'message': 'Solo administradores'}), 403
+    data = request.get_json()
+    if 'titulo' in data and data['titulo'].strip():
+        col.titulo = data['titulo'].strip()
+        db.session.commit()
+    return jsonify({'success': True})
+
+@main_bp.route('/api/kanban/columna/<int:columna_id>', methods=['DELETE'])
+@login_required
+def delete_column(columna_id):
+    if current_user.rol != 'admin':
+        return jsonify({'success': False, 'message': 'Solo administradores'}), 403
+        
+    col = Columna.query.get_or_404(columna_id)
+    proyecto_id = col.proyecto_id
+    
+    # Verificar si quedan más columnas
+    otras_cols = Columna.query.filter(Columna.proyecto_id == proyecto_id, Columna.id != columna_id).all()
+    if not otras_cols:
+        return jsonify({'success': False, 'message': 'No se puede eliminar la última columna'}), 400
+        
+    # Mover tareas a la primera columna disponible
+    primera_disponible = otras_cols[0]
+    for tarea in col.tareas:
+        tarea.columna_id = primera_disponible.id
+        
+    db.session.delete(col)
+    db.session.commit()
+    return jsonify({'success': True})
 
 @main_bp.route('/wro')
 def wro():
@@ -417,3 +852,18 @@ def registro():
             flash('Ya existe una cuenta con este correo electrónico.', 'error')
             
     return render_template('registro.html', form=form)
+
+@main_bp.route('/api/admin/proyecto/<int:proyecto_id>/users', methods=['GET'])
+@login_required
+def api_proyecto_users(proyecto_id):
+    if current_user.rol != 'admin':
+        return jsonify({'success': False}), 403
+    from app.models.proyecto import Proyecto
+    from app.models.miembro_equipo import MiembroEquipo
+    p = Proyecto.query.get_or_404(proyecto_id)
+    if not p.equipo_id:
+        return jsonify({'success': True, 'users': {}})
+    
+    miembros = MiembroEquipo.query.filter_by(equipo_id=p.equipo_id, activo=True).all()
+    user_data = {str(m.user_id): m.cargo for m in miembros if m.user_id}
+    return jsonify({'success': True, 'users': user_data})

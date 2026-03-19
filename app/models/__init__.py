@@ -8,3 +8,8 @@ from .configuracion import Configuracion
 from .proyecto import Proyecto
 from .miembro_equipo import MiembroEquipo
 from .equipo import Equipo
+from .tarea import Tarea
+from .checklist_item import ChecklistItem
+from .comentario import Comentario
+from .adjunto import Adjunto
+from .columna import Columna

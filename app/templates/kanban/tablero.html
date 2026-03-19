@@ -1,0 +1,1121 @@
+{% extends "base.html" %}
+
+{% block title %}Tablero Kanban: {{ proyecto.titulo }} - Club de Robótica{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --card-default: rgba(255, 255, 255, 0.05);
+        --card-blue: rgba(59, 130, 246, 0.15);
+        --card-green: rgba(34, 197, 94, 0.15);
+        --card-yellow: rgba(234, 179, 8, 0.15);
+        --card-red: rgba(239, 68, 68, 0.15);
+        --card-purple: rgba(168, 85, 247, 0.15);
+    }
+    .kanban-column {
+        min-height: 70vh;
+        transition: background-color 0.3s ease;
+    }
+    .kanban-column.drag-over {
+        background-color: rgba(99, 102, 241, 0.05);
+        border-color: rgba(99, 102, 241, 0.3);
+    }
+    .sortable-ghost {
+        opacity: 0.4;
+        transform: scale(0.95);
+    }
+    .task-card {
+        cursor: pointer;
+        border-left-width: 4px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .task-card:active {
+        cursor: grabbing;
+    }
+    
+    /* Task card color variations */
+    .task-card[data-color="blue"] { border-left-color: #3b82f6; background-color: var(--card-blue); }
+    .task-card[data-color="green"] { border-left-color: #22c55e; background-color: var(--card-green); }
+    .task-card[data-color="yellow"] { border-left-color: #eab308; background-color: var(--card-yellow); }
+    .task-card[data-color="red"] { border-left-color: #ef4444; background-color: var(--card-red); }
+    .task-card[data-color="purple"] { border-left-color: #a855f7; background-color: var(--card-purple); }
+    .task-card[data-color="default"] { border-left-color: rgba(255, 255, 255, 0.1); }
+
+    /* Panel Lateral (Slide-over) — izquierda */
+    #task-detail-panel, #new-task-panel {
+        z-index: 120;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #task-detail-panel.active, #new-task-panel:not(.translate-x-full) {
+        transform: translateX(0) !important;
+    }
+
+    /* Custom Checkbox LotOS */
+    .lotos-checkbox {
+        appearance: none;
+        width: 1.25rem;
+        height: 1.25rem;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+        background: transparent;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.2s;
+    }
+    .lotos-checkbox:checked {
+        background: var(--brand-500);
+        border-color: var(--brand-500);
+    }
+    .lotos-checkbox:checked::after {
+        content: '✓';
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        color: white;
+    }
+
+    .color-swatch {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: transform 0.2s;
+    }
+    .color-swatch:hover { transform: scale(1.2); }
+    .color-swatch.active { border-color: white; transform: scale(1.1); }
+
+    /* Etiquetas/Tags Estilos */
+    .tag-editor-square {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid transparent;
+        position: relative;
+    }
+    .tag-editor-square:hover { transform: translateY(-2px); }
+    .tag-editor-square.editing,
+    .tag-editor-square.has-content { width: auto; min-width: 32px; padding: 0 8px; }
+    .tag-editor-square.editing { border-color: white; box-shadow: 0 0 0 2px rgba(255,255,255,0.2); }
+    
+    .tag-input {
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 10px;
+        font-weight: bold;
+        text-transform: uppercase;
+        width: 0;
+        padding: 0;
+        transition: all 0.2s ease;
+        pointer-events: none;
+        outline: none;
+    }
+    .tag-editor-square.editing .tag-input {
+        width: 80px;
+        padding: 0 4px;
+        pointer-events: auto;
+    }
+    .tag-editor-square.has-content .tag-input {
+        width: auto;
+        min-width: 20px;
+        max-width: 120px;
+        padding: 0 4px;
+        pointer-events: auto;
+    }
+    .tag-input:focus { outline: none; box-shadow: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+{% macro render_task_card(tarea) %}
+<div class="task-card lotos-card p-4 hover:border-white/20 transition-all border border-white/10 group" 
+     data-id="{{ tarea.id }}" 
+     data-color="{{ tarea.color or 'default' }}"
+     onclick="openTaskDetail({{ tarea.id }})">
+    
+    <div class="flex justify-between items-start mb-3">
+        <!-- Asignado (AHORA ARRIBA) -->
+        <div class="flex items-center gap-2">
+            {% if tarea.asignado %}
+                {% set pn = tarea.asignado.nombre.split() %}
+                <div class="h-7 px-3 rounded-md bg-brand-600/50 flex items-center justify-center text-[11px] font-bold text-white border border-brand-400/30 whitespace-nowrap" title="{{ tarea.asignado.nombre }}">
+                    {{ pn[0] }}{% if pn|length > 1 %} {{ pn[1][0] }}.{% endif %}
+                </div>
+{% else %}
+                <div class="h-7 px-3 rounded-md bg-white/5 flex items-center justify-center text-[11px] text-white/20 border border-white/10" title="Sin asignar">
+                    NO ASIGNADO
+                </div>
+{% endif %}
+            <span class="text-[9px] font-mono text-white/20 uppercase tracking-tighter">#{{ tarea.id }}</span>
+        </div>
+
+        {% if current_user.rol == 'admin' %}
+        <button onclick="event.stopPropagation(); deleteKanbanTask({{ tarea.id }})" class="opacity-0 group-hover:opacity-100 p-1 text-red-500 hover:text-red-400 hover:bg-red-500/10 transition-all rounded" title="Eliminar tarea">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        {% endif %}
+    </div>
+
+    <!-- Título (AHORA EN EL CENTRO) -->
+    <h4 class="text-sm font-bold text-white mb-4 line-clamp-2 leading-tight group-hover:text-brand-400 transition-colors">{{ tarea.titulo }}</h4>
+    
+    <div class="flex flex-col gap-3 mt-auto pt-3 border-t border-white/5">
+        <!-- Etiquetas y Prioridad (AHORA ABAJO) -->
+        <div class="flex flex-wrap items-center justify-between gap-2">
+            <div id="labels-container-{{ tarea.id }}" class="flex flex-wrap gap-1">
+                {% if tarea.etiquetas %}
+                    {% set tags = safe_json(tarea.etiquetas, {}) %}
+                    {% for color, name in tags.items() %}
+                        {% if name %}
+                            <span class="px-1.5 py-0.5 rounded-sm text-[8px] font-bold uppercase tracking-wider text-white/90" 
+                                  style="background-color: {{ get_tag_color(color) }};" 
+                                  title="{{ name }}">
+                                {{ name[:15] }}{% if name|length > 15 %}...{% endif %}
+                            </span>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div id="priority-dot-{{ tarea.id }}" class="flex-shrink-0">
+                {% if tarea.prioridad == 'alta' %}
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.8)]" title="Prioridad Alta"></span>
+                {% elif tarea.prioridad == 'media' %}
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand-400 shadow-[0_0_6px_rgba(99,102,241,0.6)]" title="Prioridad Media"></span>
+                {% else %}
+                    <span class="w-1.5 h-1.5 rounded-full bg-accent-400 shadow-[0_0_6px_rgba(20,184,166,0.5)]" title="Prioridad Baja"></span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="flex items-center justify-between text-[9px] font-mono text-white/30">
+            {% if tarea.checklist|length > 0 %}
+                <span class="flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    {{ tarea.checklist|selectattr('completado', 'equalto', true)|list|length }}/{{ tarea.checklist|length }}
+                </span>
+            {% else %}
+                <span></span>
+            {% endif %}
+            
+            {% if tarea.fecha_limite %}
+                <span class="flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    {{ tarea.fecha_limite.strftime('%d %b') }}
+                </span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 mt-10">
+    <!-- Breadcrumbs & Header -->
+    <div class="mb-8" data-aos="fade-down">
+        <nav class="flex mb-4 text-xs font-mono uppercase tracking-widest text-white/30">
+            <a href="{{ url_for('main.miembros_index') }}" class="hover:text-brand-400 transition-colors">Zona Miembros</a>
+            <span class="mx-2">/</span>
+            <span class="text-white/60">{{ proyecto.titulo }}</span>
+        </nav>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-3xl font-display font-bold text-white uppercase tracking-tight">
+                    Tablero <span class="text-brand-400">Kanban</span>
+                </h1>
+                <p class="text-gray-400 mt-1">Gestión técnica del proyecto: {{ proyecto.titulo }}</p>
+            </div>
+            <div class="flex gap-2">
+                <span class="lotos-badge lotos-badge-primary">ID: {{ proyecto.id }}</span>
+                {% if current_user.rol == 'admin' %}
+                <button onclick="openNewTaskModal()" class="lotos-btn-primary py-2 px-4 text-xs flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Nueva Tarea
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Kanban Board Container (Flexible & Scrollable) -->
+    <div id="kanban-board" class="flex overflow-x-auto gap-6 pb-12 pt-4 px-2 custom-scrollbar select-none" style="min-height: 70vh;">
+        {% for columna in proyecto.columnas %}
+        <div class="flex flex-col gap-4 flex-shrink-0 w-80 group/col kanban-column-wrapper" data-columna-id="{{ columna.id }}">
+            <div class="flex items-start justify-between p-3 bg-white/[0.03] border border-white/10 rounded-xl cursor-grab active:cursor-grabbing column-handle transition-colors hover:bg-white/[0.05]" ondblclick="editColumnTitle({{ columna.id }}, this)">
+                <div class="flex items-start gap-2 flex-grow pr-2 min-w-0">
+                    <span class="text-xs font-bold uppercase tracking-widest text-brand-400 whitespace-pre-wrap break-words leading-tight flex-grow min-w-0 mt-0.5" style="pointer-events: none;">{{ columna.titulo }}</span>
+                    {% if current_user.rol == 'admin' %}
+                    <button onclick="event.stopPropagation(); deleteColumn({{ columna.id }})" class="opacity-0 group-hover/col:opacity-100 p-0.5 text-red-500 hover:text-red-400 transition-all text-[12px] flex-shrink-0 relative z-10" title="Eliminar columna">✕</button>
+                    {% endif %}
+                </div>
+                <span class="lotos-badge lotos-badge-neutral text-[10px] flex-shrink-0 mt-0.5" id="count-{{ columna.id }}">{{ columna.tareas|length }}</span>
+            </div>
+            <div id="columna-{{ columna.id }}" 
+                 class="kanban-column flex flex-col gap-3 p-3 rounded-2xl border border-white/5 bg-white/[0.015] hover:bg-white/[0.03] transition-colors h-full" 
+                 data-columna-id="{{ columna.id }}">
+                {% for tarea in columna.tareas %}
+                    {{ render_task_card(tarea) }}
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+
+        {% if current_user.rol == 'admin' %}
+        <!-- Add Column Button -->
+        <div class="flex-shrink-0 w-80 h-[200px] flex flex-col items-center justify-center border-2 border-dashed border-white/10 rounded-2xl hover:border-brand-500/50 hover:bg-brand-500/5 transition-all cursor-pointer group" onclick="createNewColumn()">
+            <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-brand-500 group-hover:text-white transition-all text-white/30 mb-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            </div>
+            <span class="text-sm font-bold text-white/40 group-hover:text-white transition-colors">Añadir Columna</span>
+        </div>
+        {% endif %}
+    </div>
+</section>
+</section>
+
+<!-- Overlays & Modals -->
+<div id="slide-over-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[115] opacity-0 pointer-events-none transition-opacity duration-300" onclick="closeAllPanels()"></div>
+
+<div id="task-detail-panel" class="fixed inset-y-0 left-0 w-full max-w-lg bg-dark-950/95 backdrop-blur-xl border-r border-white/10 shadow-2xl -translate-x-full flex flex-col overflow-hidden">
+    <!-- El contenido se carga dinámicamente vía JS -->
+    <div id="detail-loader" class="flex items-center justify-center h-full">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
+    </div>
+    <div id="detail-content" class="hidden h-full flex flex-col">
+        <!-- JS inyectará aquí -->
+    </div>
+</div>
+
+<!-- Modal Nueva Tarea -->
+<!-- Panel Lateral de Nueva Tarea (Slide-over Derecha) -->
+<div id="new-task-panel" class="fixed inset-y-0 right-0 w-full max-w-lg z-[120] translate-x-full transition-transform duration-300 ease-out flex flex-col bg-dark-950/95 backdrop-blur-xl border-l border-white/10 shadow-2xl overflow-hidden">
+    <div class="p-6 border-b border-white/10 flex justify-between items-center bg-white/[0.02]">
+        <div>
+            <h3 class="text-xl font-bold text-white">Nueva Tarea</h3>
+            <p class="text-[10px] text-white/30 uppercase tracking-widest font-mono mt-1">Creación de registro técnico</p>
+        </div>
+        <button onclick="closeNewTaskModal()" class="text-white/40 hover:text-white transition-colors p-2 text-xl">✕</button>
+    </div>
+    
+    <form id="new-task-form" class="flex-grow flex flex-col overflow-hidden">
+        <div class="flex-grow p-6 space-y-8 overflow-y-auto custom-scrollbar">
+            <!-- Título y Descripción -->
+            <div class="space-y-4">
+                <div>
+                    <label class="lotos-label mb-2">Título de la Tarea</label>
+                    <input type="text" name="titulo" class="lotos-input w-full py-3" required placeholder="Ej: Diseñar placa de control">
+                </div>
+                <div>
+                    <label class="lotos-label mb-2">Descripción Detallada</label>
+                    <textarea name="descripcion" class="lotos-input w-full h-24 py-3 resize-none" placeholder="Detalla los requisitos técnicos..."></textarea>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label class="lotos-label mb-2">Proyecto Asignado</label>
+                    <select name="proyecto_id" class="lotos-input w-full bg-dark-900 py-2 opacity-60 cursor-not-allowed" readonly>
+                        <option value="{{ proyecto.id }}" selected>{{ proyecto.titulo }}</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="lotos-label mb-2">Estado / Columna</label>
+                    <select name="columna_id" class="lotos-input w-full bg-dark-900 py-2">
+                        {% for col in proyecto.columnas %}
+                        <option value="{{ col.id }}">{{ col.titulo }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label class="lotos-label mb-2">Prioridad</label>
+                    <select name="prioridad" class="lotos-input w-full bg-dark-900 py-2">
+                        <option value="baja">Baja</option>
+                        <option value="media" selected>Media</option>
+                        <option value="alta">Alta</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="lotos-label mb-2">Fecha Límite</label>
+                    <input type="date" name="fecha_limite" class="lotos-input w-full bg-dark-900 py-2">
+                </div>
+            </div>
+
+            <div>
+                <label class="lotos-label mb-2">Responsable Técnico</label>
+                <select name="asignado_id" class="lotos-input w-full bg-dark-900 py-2 border-brand-500/20 focus:border-brand-500">
+                    <option value="">Sin asignar / Tarea libre</option>
+                    {% for u in usuarios_equipo %}
+                    <option value="{{ u.id }}">{{ u.nombre }} ({{ u.cargo }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Etiquetas Críticas (USANDO JINJA PARA EVITAR CÓDIGO A LA VISTA) -->
+            <div>
+                <label class="lotos-label mb-3">Etiquetas de Clasificación (opcional)</label>
+                <div class="flex flex-wrap gap-2" id="new-task-tags">
+                    {% for color in ['blue', 'green', 'yellow', 'red', 'purple', 'teal'] %}
+                        <div class="tag-editor-square" 
+                             style="background-color: {{ get_tag_color(color) }}44; color: {{ get_tag_color(color) }}" 
+                             onclick="focusTagEditNew('{{ color }}')" 
+                             id="new-tag-sq-{{ color }}">
+                            <input type="text" id="new-tag-input-{{ color }}" class="tag-input" 
+                                   placeholder="+" onblur="this.parentElement.classList.toggle('has-content', !!this.value)">
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Color de Tarjeta -->
+            <div>
+                <label class="lotos-label mb-3">Fondo Visual de la Tarjeta</label>
+                <div class="flex items-center gap-3" id="new-task-color-picker">
+                    {% for color, hex in [('default','rgba(255,255,255,0.15)'),('blue','#3b82f6'),('green','#22c55e'),('yellow','#eab308'),('red','#ef4444'),('purple','#a855f7')] %}
+                    <div class="color-swatch {% if color == 'default' %}active{% endif %}" 
+                         style="background-color: {{ hex }}" 
+                         data-color="{{ color }}"
+                         onclick="selectNewTaskColor('{{ color }}', this)"
+                         title="{{ color }}"></div>
+                    {% endfor %}
+                </div>
+                <input type="hidden" name="color" id="new-task-color-value" value="default">
+            </div>
+
+            <!-- Checklist Inicial -->
+            <div>
+                <label class="lotos-label mb-3">Checklist de Pasos Iniciales</label>
+                <div id="new-task-checklist" class="space-y-3">
+                    <div class="flex items-center gap-3 group/ci bg-white/[0.02] p-2 rounded-lg border border-white/5">
+                        <span class="w-4 h-4 rounded border-2 border-white/20 flex-shrink-0"></span>
+                        <input type="text" class="bg-transparent border-none focus:ring-0 flex-grow text-sm py-1 text-white/70" placeholder="Ej: Investigar componentes">
+                        <button type="button" onclick="removeChecklistItem(this)" class="text-red-500 opacity-0 group-hover/ci:opacity-100 transition-opacity px-2">✕</button>
+                    </div>
+                </div>
+                <button type="button" onclick="addNewTaskChecklistItem()" class="mt-3 text-[10px] text-brand-400 hover:text-brand-300 font-bold uppercase tracking-widest">+ Añadir punto de control</button>
+            </div>
+
+            <!-- Comentario -->
+            <div>
+                <label class="lotos-label mb-2">Contexto o Nota Inicial</label>
+                <textarea id="new-task-comment" class="lotos-input w-full h-24 py-3 text-sm resize-none" placeholder="Contexto adicional para el equipo..."></textarea>
+            </div>
+        </div>
+
+        <div class="p-6 border-t border-white/10 bg-white/[0.02] flex gap-3">
+            <button type="button" onclick="closeNewTaskModal()" class="lotos-btn-neutral flex-grow h-12 font-bold uppercase tracking-widest text-xs">Descartar</button>
+            <button type="submit" class="lotos-btn-primary flex-grow h-12 font-bold uppercase tracking-widest text-xs shadow-lg shadow-brand-500/20">Registrar Tarea</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script>
+    let currentTaskId = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // 1. Sortable para las Tareas (Mover entre columnas)
+        const taskColumns = document.querySelectorAll('.kanban-column');
+        taskColumns.forEach(column => {
+            new Sortable(column, {
+                group: 'tasks',
+                animation: 250,
+                ghostClass: 'sortable-ghost',
+                onEnd: async function (evt) {
+                    const tareaId = evt.item.getAttribute('data-id');
+                    const nuevaColumnaId = evt.to.getAttribute('data-columna-id');
+                    await updateTaskStatus(tareaId, nuevaColumnaId);
+                    updateCounters();
+                }
+            });
+        });
+
+        // 2. Sortable para las Columnas (Reordenar tablero)
+        {% if current_user.rol == 'admin' %}
+        new Sortable(document.getElementById('kanban-board'), {
+            animation: 250,
+            handle: '.column-handle',
+            draggable: '.kanban-column-wrapper',
+            onEnd: async function () {
+                const ordenes = Array.from(document.querySelectorAll('.kanban-column-wrapper')).map((el, index) => ({
+                    id: el.getAttribute('data-columna-id'),
+                    orden: index
+                }));
+                await reorderColumns(ordenes);
+            }
+        });
+        {% endif %}
+
+        // 3. Grab-to-Scroll (Desplazamiento horizontal por arrastre)
+        const board = document.getElementById('kanban-board');
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        board.addEventListener('mousedown', (e) => {
+            // No activar si el clic fue sobre una tarjeta, botón, input o el manejador de columnas
+            if (e.target.closest('.task-card') || 
+                e.target.closest('.column-handle') || 
+                e.target.closest('button') || 
+                e.target.closest('input') || 
+                e.target.closest('select') || 
+                e.target.closest('textarea')) return;
+
+            isDown = true;
+            board.style.cursor = 'grabbing';
+            startX = e.pageX - board.offsetLeft;
+            scrollLeft = board.scrollLeft;
+        });
+
+        // Resetear estado del ratón a nivel global para mayor robustez
+        window.addEventListener('mouseup', () => {
+            isDown = false;
+            if (board) board.style.cursor = 'default';
+        });
+
+        board.addEventListener('mouseleave', () => {
+            isDown = false;
+            board.style.cursor = 'default';
+        });
+
+        board.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - board.offsetLeft;
+            const walk = (x - startX) * 1.5; // Ajuste de velocidad
+            board.scrollLeft = scrollLeft - walk;
+        });
+    });
+
+    async function updateTaskStatus(tareaId, nuevaColumnaId) {
+        try {
+            const resp = await fetch('/api/kanban/update_status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tarea_id: tareaId, columna_id: nuevaColumnaId })
+            });
+            const res = await resp.json();
+            if (!res.success) location.reload();
+        } catch (e) { console.error(e); }
+    }
+
+    async function reorderColumns(ordenes) {
+        try {
+            await fetch('/api/kanban/columna/reordenar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ordenes: ordenes })
+            });
+        } catch (e) { console.error(e); }
+    }
+
+    function updateCounters() {
+        document.querySelectorAll('.kanban-column').forEach(col => {
+            const colId = col.getAttribute('data-columna-id');
+            const count = col.querySelectorAll('.task-card').length;
+            const counterEl = document.getElementById(`count-${colId}`);
+            if (counterEl) counterEl.textContent = count;
+        });
+    }
+
+    // --- Gestión de Columnas ---
+    async function createNewColumn() {
+        const titulo = prompt("Nombre de la nueva columna:");
+        if (!titulo) return;
+
+        try {
+            const r = await fetch('/api/kanban/columna/nueva', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ proyecto_id: {{ proyecto.id }}, titulo: titulo })
+            });
+            if ((await r.json()).success) location.reload();
+        } catch(e) { console.error(e); }
+    }
+
+    async function deleteColumn(colId) {
+        if (!confirm("¿Estás seguro de eliminar esta columna? Las tareas se moverán a la primera columna disponible.")) return;
+
+        try {
+            const r = await fetch(`/api/kanban/columna/${colId}`, {
+                method: 'DELETE'
+            });
+            if ((await r.json()).success) location.reload();
+            else alert("Error al eliminar la columna.");
+        } catch(e) { console.error(e); }
+    }
+
+    // --- Funciones del Panel Lateral ---
+    async function openTaskDetail(id) {
+        currentTaskId = id;
+        const panel = document.getElementById('task-detail-panel');
+        const overlay = document.getElementById('slide-over-overlay');
+        const loader = document.getElementById('detail-loader');
+        const content = document.getElementById('detail-content');
+
+        panel.classList.add('active');
+        overlay.classList.add('active');
+        loader.classList.remove('hidden');
+        content.classList.add('hidden');
+
+        try {
+            const resp = await fetch(`/api/kanban/tarea/${id}`);
+            const data = await resp.json();
+            if (data.success) renderTaskDetail(data.tarea);
+        } catch (e) { console.error(e); }
+    }
+
+    function closeTaskDetail() {
+        document.getElementById('task-detail-panel').classList.remove('active');
+        document.getElementById('slide-over-overlay').classList.remove('active');
+        currentTaskId = null;
+    }
+
+    function renderTaskDetail(t) {
+        const content = document.getElementById('detail-content');
+        const loader = document.getElementById('detail-loader');
+        const tags = t.etiquetas || {};
+        const tagColors = ['blue', 'green', 'yellow', 'red', 'purple', 'teal'];
+        
+        let tagsHtml = tagColors.map(c => {
+            const val = tags[c] || '';
+            return `
+                <div id="tag-sq-${c}" class="tag-editor-square ${val ? 'has-content' : ''}" 
+                     style="background-color: ${getColorValue(c)}44; color: ${getColorValue(c)}"
+                     onclick="focusTagEdit('${c}')">
+                    <input type="text" id="tag-input-${c}" class="tag-input" 
+                           placeholder="+" value="${val}"
+                           onblur="saveTagValue('${t.id}', '${c}')" 
+                           onkeyup="if(event.key==='Enter') this.blur()">
+                </div>
+            `;
+        }).join('');
+
+        let colorHtml = ['default', 'blue', 'green', 'yellow', 'red', 'purple'].map(c => 
+            `<div class="color-swatch ${t.color === c ? 'active' : ''}" style="background-color: ${getColorValue(c)}" onclick="changeTaskColor(${t.id}, '${c}')"></div>`
+        ).join('');
+
+        content.innerHTML = `
+            <div class="p-6 border-b border-white/10 flex justify-between items-start">
+                <div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="text-[10px] font-mono text-white/30 tracking-[0.3em]">TAREA_${t.id}</span>
+                        <span class="text-[9px] font-mono text-white/20">Creada: ${t.fecha_creacion}</span>
+                    </div>
+                    <input type="text" id="detail-title-input" class="w-full bg-transparent border-none text-2xl font-bold text-white leading-tight focus:ring-1 focus:ring-brand-500/50 rounded p-1 -ml-1" value="${t.titulo}" onblur="saveTaskChanges(${t.id})">
+                </div>
+                <button onclick="closeTaskDetail()" class="text-white/40 hover:text-white transition-colors p-2 text-xl">✕</button>
+            </div>
+            
+            <div class="flex-grow p-6 space-y-8 overflow-y-auto custom-scrollbar">
+                <!-- Status & Metadata -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[9px] uppercase tracking-widest text-white/30 font-bold">Estado</span>
+                        <select id="detail-column-input" onchange="saveTaskChanges(${t.id})" class="bg-transparent border-none text-[11px] text-white font-bold p-0 focus:ring-0 cursor-pointer">
+                            ${(t.columnas_proyecto || []).map(c => `
+                                <option value="${c.id}" class="bg-dark-900" ${c.id == t.columna_id ? 'selected' : ''}>
+                                    ${c.titulo.toUpperCase()}
+                                </option>
+                            `).join('')}
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[9px] uppercase tracking-widest text-white/30 font-bold">Prioridad</span>
+                        <select id="detail-priority-input" onchange="saveTaskChanges(${t.id})" class="bg-transparent border-none text-[11px] text-white font-bold p-0 focus:ring-0 cursor-pointer">
+                            <option value="baja" class="bg-dark-900" ${t.prioridad === 'baja' ? 'selected' : ''}>BAJA</option>
+                            <option value="media" class="bg-dark-900" ${t.prioridad === 'media' ? 'selected' : ''}>MEDIA</option>
+                            <option value="alta" class="bg-dark-900" ${t.prioridad === 'alta' ? 'selected' : ''}>ALTA</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[9px] uppercase tracking-widest text-white/30 font-bold">Vencimiento</span>
+                        <input type="date" id="detail-deadline-input" value="${t.fecha_limite || ''}" onchange="saveTaskChanges(${t.id})" class="bg-transparent border-none text-[11px] text-white font-bold p-0 focus:ring-0 cursor-pointer">
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[9px] uppercase tracking-widest text-white/30 font-bold">Responsable</span>
+                        <select onchange="saveTaskChanges(${t.id})" id="detail-assignee-input" class="bg-transparent border-none text-[11px] text-brand-400 font-bold p-0 focus:ring-0 focus:text-white transition-colors cursor-pointer">
+                            <option value="" class="bg-dark-900">Sin asignar</option>
+                            ${(t.miembros || []).map(m => `
+                                <option value="${m.id}" class="bg-dark-900" ${m.id == t.asignado_id ? 'selected' : ''}>
+                                    ${m.nombre} (${m.cargo})
+                                </option>
+                            `).join('')}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Etiquetas & Color -->
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[9px] uppercase tracking-widest text-white/30 font-bold">Etiquetas</span>
+                        <div class="flex flex-wrap gap-2">${tagsHtml}</div>
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[9px] uppercase tracking-widest text-white/30 font-bold">Fondo de Tarjeta</span>
+                        <div class="flex gap-2">${colorHtml}</div>
+                    </div>
+                </div>
+
+                <!-- Descripción -->
+                <section>
+                    <h3 class="lotos-label mb-2 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+                            Descripción
+                        </div>
+                        <span id="desc-save-status" class="text-[9px] font-mono text-brand-400 opacity-0 transition-opacity">Guardado ✓</span>
+                    </h3>
+                    <textarea id="detail-desc-input" 
+                              class="w-full text-sm text-white/70 leading-relaxed bg-white/[0.03] p-4 rounded-xl border border-white/5 shadow-inner focus:border-brand-500/30 focus:ring-0 resize-none h-32 custom-scrollbar transition-all"
+                              onblur="saveTaskChanges(${t.id})"
+                              placeholder="Escribe una descripción técnica...">${t.descripcion || ''}</textarea>
+                </section>
+
+                <!-- Checklist -->
+                <section>
+                    <h3 class="lotos-label mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/></svg>
+                        Checklist
+                    </h3>
+                    <div id="detail-checklist" class="space-y-2">
+                        ${renderChecklist(t.checklist)}
+                    </div>
+                    <div class="mt-4 flex gap-2">
+                        <input type="text" id="new-check-input" class="lotos-input flex-grow py-1.5 text-sm" placeholder="Añadir punto...">
+                        <button onclick="addCheckItem(${t.id})" class="lotos-btn-primary px-4 py-1.5 text-xs font-bold">Añadir</button>
+                    </div>
+                </section>
+
+                <!-- Adjuntos -->
+                <section>
+                    <h3 class="lotos-label mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.414a4 4 0 00-5.656-5.656l-6.415 6.414a6 6 0 108.486 8.486L20.5 13"/></svg>
+                        Archivos Adjuntos
+                    </h3>
+                    <div id="detail-adjuntos" class="grid grid-cols-1 gap-2">
+                        ${renderAdjuntos(t.adjuntos)}
+                    </div>
+                    <form id="upload-form" class="mt-4">
+                        <label class="lotos-btn-neutral w-full cursor-pointer py-2 text-xs flex justify-center gap-2 border-dashed">
+                            <span>+ Subir nuevo archivo</span>
+                            <input type="file" id="file-input" class="hidden" onchange="uploadFile(${t.id})">
+                        </label>
+                    </form>
+                </section>
+
+                <!-- Comentarios -->
+                <section class="pb-10">
+                    <h3 class="lotos-label mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
+                        Comentarios
+                    </h3>
+                    <div id="detail-comments" class="space-y-4 mb-6">
+                        ${renderComments(t.comentarios)}
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <textarea id="comment-input" class="lotos-input w-full h-20 py-2 text-sm" placeholder="Escribe un comentario..."></textarea>
+                        <button onclick="postComment(${t.id})" class="lotos-btn-primary py-2 text-xs font-bold self-end px-6">Enviar</button>
+                    </div>
+                </section>
+            </div>
+        `;
+
+        loader.classList.add('hidden');
+        content.classList.remove('hidden');
+    }
+
+    function getColorValue(c) {
+        switch(c) {
+            case 'blue': return '#3b82f6';
+            case 'green': return '#22c55e';
+            case 'yellow': return '#eab308';
+            case 'red': return '#ef4444';
+            case 'purple': return '#a855f7';
+            case 'teal': return '#14b8a6';
+            default: return 'rgba(255,255,255,0.1)';
+        }
+    }
+
+    function focusTagEdit(color) {
+        const sq = document.getElementById(`tag-sq-${color}`);
+        const input = document.getElementById(`tag-input-${color}`);
+        sq.classList.add('editing');
+        input.focus();
+    }
+
+    function saveTagValue(taskId, color) {
+        const sq = document.getElementById(`tag-sq-${color}`);
+        const input = document.getElementById(`tag-input-${color}`);
+        sq.classList.remove('editing');
+        if (input.value) sq.classList.add('has-content');
+        else sq.classList.remove('has-content');
+        saveTaskChanges(taskId);
+    }
+
+    function focusTagEditNew(color) {
+        const sq = document.getElementById(`new-tag-sq-${color}`);
+        const input = document.getElementById(`new-tag-input-${color}`);
+        sq.classList.add('editing');
+        input.focus();
+        input.onblur = () => {
+            sq.classList.remove('editing');
+            sq.classList.toggle('has-content', !!input.value);
+        };
+    }
+
+    async function saveTaskChanges(id) {
+        const titulo = document.getElementById('detail-title-input').value;
+        const descripcion = document.getElementById('detail-desc-input').value;
+        const asignado_id = document.getElementById('detail-assignee-input').value;
+        const prioridad = document.getElementById('detail-priority-input').value;
+        const fecha_limite = document.getElementById('detail-deadline-input').value;
+        const columna_id = document.getElementById('detail-column-input').value;
+        
+        // Recolectar etiquetas
+        const etiquetas = {};
+        ['blue', 'green', 'yellow', 'red', 'purple', 'teal'].forEach(c => {
+            const val = document.getElementById(`tag-input-${c}`).value;
+            if (val) etiquetas[c] = val;
+        });
+
+        const statusLabel = document.getElementById('desc-save-status');
+
+        try {
+            const resp = await fetch(`/api/kanban/tarea/${id}/edit`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    titulo, descripcion, asignado_id, 
+                    prioridad, fecha_limite, etiquetas 
+                })
+            });
+            const res = await resp.json();
+            if (res.success) {
+                // Actualizar la tarjeta en el fondo
+                const cardTitle = document.querySelector(`.task-card[data-id="${id}"] h4`);
+                const cardDesc = document.querySelector(`.task-card[data-id="${id}"] p`);
+                if (cardTitle) cardTitle.textContent = titulo;
+                if (cardDesc) cardDesc.textContent = descripcion;
+
+                // Actualizar etiquetas en la tarjeta
+                const labelsContainer = document.getElementById(`labels-container-${id}`);
+                if (labelsContainer) {
+                    labelsContainer.innerHTML = Object.entries(etiquetas).map(([color, name]) => {
+                        if (!name) return '';
+                        return `<span class="px-1.5 py-0.5 rounded-sm text-[8px] font-bold uppercase tracking-wider text-white/90" 
+                                      style="background-color: ${getColorValue(color)};" 
+                                      title="${name}">
+                                    ${name.length > 15 ? name.substring(0, 15) + '...' : name}
+                                </span>`;
+                    }).join('');
+                }
+
+                // Actualizar punto de prioridad
+                const priorityDot = document.getElementById(`priority-dot-${id}`);
+                if (priorityDot) {
+                    let dotHtml = '';
+                    if (prioridad === 'alta') dotHtml = '<span class="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]" title="Prioridad Alta"></span>';
+                    else if (prioridad === 'media') dotHtml = '<span class="w-2 h-2 rounded-full bg-brand-400 shadow-[0_0_8px_rgba(99,102,241,0.6)]" title="Prioridad Media"></span>';
+                    else dotHtml = '<span class="w-2 h-2 rounded-full bg-accent-400 shadow-[0_0_8px_rgba(20,184,166,0.5)]" title="Prioridad Baja"></span>';
+                    priorityDot.innerHTML = dotHtml;
+                }
+
+                // Mostrar status temporal
+                if (statusLabel) {
+                    statusLabel.classList.remove('opacity-0');
+                    setTimeout(() => statusLabel.classList.add('opacity-0'), 2000);
+                }
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    async function changeTaskColor(id, color) {
+        try {
+            const resp = await fetch(`/api/kanban/tarea/${id}/color`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ color })
+            });
+            if ((await resp.json()).success) {
+                document.querySelector(`.task-card[data-id="${id}"]`).setAttribute('data-color', color);
+                openTaskDetail(id); // Recargar panel
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    // --- Checklist Handlers ---
+    function renderChecklist(items) {
+        if (!items || items.length === 0) return '<p class="text-xs text-white/20 italic p-2">No hay tareas pendientes.</p>';
+        return items.map(item => `
+            <div class="flex items-start gap-3 bg-white/[0.02] p-2 rounded-lg border border-white/5 hover:border-white/10 transition-all group/item min-w-0">
+                <input type="checkbox" class="lotos-checkbox mt-0.5 flex-shrink-0" ${item.completado ? 'checked' : ''} onclick="toggleCheck(${item.id})">
+                <div class="flex-grow min-w-0">
+                    <span class="text-sm ${item.completado ? 'line-through text-white/20' : 'text-white/70'} block break-words whitespace-pre-wrap">${item.texto}</span>
+                </div>
+                <button onclick="deleteCheck(${item.id})" class="opacity-0 group-hover/item:opacity-100 p-1 text-red-500 hover:text-red-400 transition-all flex-shrink-0 text-xs">✕</button>
+            </div>
+        `).join('');
+    }
+
+    async function toggleCheck(itemId) {
+        const r = await fetch(`/api/kanban/checklist/${itemId}/toggle`, { method: 'POST' });
+        if ((await r.json()).success) openTaskDetail(currentTaskId);
+    }
+
+    async function deleteCheck(itemId) {
+        const r = await fetch(`/api/kanban/checklist/${itemId}`, { method: 'DELETE' });
+        if ((await r.json()).success) openTaskDetail(currentTaskId);
+    }
+
+    async function addCheckItem(taskId) {
+        const input = document.getElementById('new-check-input');
+        if (!input.value.trim()) return;
+        const r = await fetch(`/api/kanban/tarea/${taskId}/checklist`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ texto: input.value })
+        });
+        if ((await r.json()).success) openTaskDetail(taskId);
+    }
+
+    // --- Comentarios Handlers ---
+    function renderComments(comments) {
+        if (!comments || comments.length === 0) return '<p class="text-xs text-white/20 italic text-center py-4">Sin comentarios.</p>';
+        return comments.map(c => `
+            <div class="bg-white/[0.03] p-4 rounded-xl border border-white/5">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-xs font-bold text-brand-400">${c.autor}</span>
+                    <span class="text-[9px] font-mono text-white/20">${c.fecha}</span>
+                </div>
+                <p class="text-sm text-white/70 leading-relaxed break-words whitespace-pre-wrap">${c.cuerpo}</p>
+            </div>
+        `).join('');
+    }
+
+    async function postComment(taskId) {
+        const input = document.getElementById('comment-input');
+        if (!input.value.trim()) return;
+        const r = await fetch(`/api/kanban/tarea/${taskId}/comentar`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cuerpo: input.value })
+        });
+        if ((await r.json()).success) openTaskDetail(taskId);
+    }
+
+    // --- Adjuntos Handlers ---
+    function renderAdjuntos(adjuntos) {
+        if (!adjuntos || adjuntos.length === 0) return '<p class="text-[10px] text-white/20 italic">No hay archivos adjuntos.</p>';
+        return adjuntos.map(a => `
+            <div class="flex items-center gap-2 group/adj min-w-0 w-full">
+                <a href="${a.ruta}" target="_blank" class="flex-grow flex items-center gap-3 bg-dark-900 border border-white/5 p-3 rounded-lg hover:border-brand-500/30 transition-all group min-w-0">
+                    <div class="p-2 rounded-md bg-white/5 text-brand-400 group-hover:scale-110 transition-transform flex-shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0 overflow-hidden">
+                        <div class="text-xs font-bold text-white truncate" title="${a.nombre}">${a.nombre}</div>
+                        <div class="text-[9px] text-white/30 uppercase font-mono truncate">${a.fecha}</div>
+                    </div>
+                </a>
+                <button onclick="removeAttachment(${a.id})" class="flex-shrink-0 opacity-0 group-hover/adj:opacity-100 p-2 text-red-500 hover:text-red-400 transition-all" title="Eliminar archivo">✕</button>
+            </div>
+        `).join('');
+    }
+
+    async function uploadFile(taskId) {
+        const fileInput = document.getElementById('file-input');
+        if (!fileInput.files[0]) return;
+        
+        const formData = new FormData();
+        formData.append('archivo', fileInput.files[0]);
+
+        try {
+            const resp = await fetch(`/api/kanban/tarea/${taskId}/adjuntar`, {
+                method: 'POST',
+                body: formData
+            });
+            if ((await resp.json()).success) openTaskDetail(taskId);
+        } catch (e) { console.error(e); }
+    }
+
+    async function removeAttachment(adjuntoId) {
+        if (!confirm("¿Seguro de que quieres eliminar este archivo permanentemente?")) return;
+        try {
+            const resp = await fetch(`/api/kanban/adjunto/${adjuntoId}`, {
+                method: 'DELETE'
+            });
+            if ((await resp.json()).success) openTaskDetail(currentTaskId);
+        } catch (e) { console.error(e); }
+    }
+
+    // --- Nueva Tarea ---
+    function openNewTaskModal() {
+        document.getElementById('new-task-panel').classList.remove('translate-x-full');
+        document.getElementById('slide-over-overlay').classList.add('active');
+    }
+    
+    function closeNewTaskModal() {
+        document.getElementById('new-task-panel').classList.add('translate-x-full');
+        document.getElementById('slide-over-overlay').classList.remove('active');
+        document.getElementById('new-task-form').reset();
+        // Reset color picker
+        document.getElementById('new-task-color-value').value = 'default';
+        document.querySelectorAll('#new-task-color-picker .color-swatch').forEach((s, i) => {
+            s.classList.toggle('active', i === 0);
+        });
+        // Limpiar tags
+        document.querySelectorAll('#new-task-tags .tag-editor-square').forEach(sq => {
+            sq.classList.remove('has-content');
+            sq.querySelector('input').value = '';
+        });
+    }
+
+    function closeAllPanels() {
+        closeTaskDetail();
+        closeNewTaskModal();
+    }
+
+    function selectNewTaskColor(color, el) {
+        document.getElementById('new-task-color-value').value = color;
+        document.querySelectorAll('#new-task-color-picker .color-swatch').forEach(s => s.classList.remove('active'));
+        el.classList.add('active');
+    }
+    
+    function addNewTaskChecklistItem() {
+        const container = document.getElementById('new-task-checklist');
+        const wrapper = document.createElement('div');
+        wrapper.className = 'flex items-center gap-3 group/ci bg-white/[0.02] p-2 rounded-lg border border-white/5';
+        wrapper.innerHTML = `
+            <span class="w-4 h-4 rounded border-2 border-white/20 flex-shrink-0"></span>
+            <input type="text" class="bg-transparent border-none focus:ring-0 flex-grow text-sm py-1 text-white/70" placeholder="Ej: Nuevo paso...">
+            <button type="button" onclick="removeChecklistItem(this)" class="text-red-500 opacity-0 group-hover/ci:opacity-100 transition-opacity px-2">✕</button>
+        `;
+        container.appendChild(wrapper);
+        wrapper.querySelector('input').focus();
+    }
+
+    function removeChecklistItem(btn) {
+        btn.closest('.group\/ci').remove();
+    }
+
+    document.getElementById('new-task-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
+        data.proyecto_id = {{ proyecto.id }};
+        
+        // Colectar checklist (solo los inputs dentro de los wrappers)
+        data.checklist = Array.from(document.querySelectorAll('#new-task-checklist input[type="text"]'))
+                             .map(i => i.value.trim())
+                             .filter(v => v !== "");
+
+        const comentarioInput = document.getElementById('new-task-comment');
+        if (comentarioInput && comentarioInput.value.trim()) {
+            data.comentario_inicial = comentarioInput.value.trim();
+        }
+
+        // El campo fecha_limite ya viene en 'data' por el FormData(this)
+        // pero asegurémonos de que si está vacío se mande como null o cadena vacía
+        if (!data.fecha_limite) data.fecha_limite = "";
+
+        // Colectar etiquetas
+        data.etiquetas = {};
+        ['blue', 'green', 'yellow', 'red', 'purple', 'teal'].forEach(c => {
+            const val = document.getElementById(`new-tag-input-${c}`).value;
+            if (val) data.etiquetas[c] = val;
+        });
+
+        try {
+            const r = await fetch('/api/kanban/tarea/nueva', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if ((await r.json()).success) location.reload();
+        } catch(e) { console.error(e); }
+    });
+
+    async function deleteKanbanTask(taskId) {
+        if (!confirm("¿Seguro de que quieres eliminar esta tarea permanentemente? (Se borrarán sus adjuntos, comentarios y checklist)")) return;
+        try {
+            const resp = await fetch(`/api/kanban/tarea/${taskId}`, { method: 'DELETE' });
+            if ((await resp.json()).success) location.reload();
+        } catch(e) { console.error(e); }
+    }
+
+    async function editColumnTitle(colId, headerEl) {
+        if ("{{ current_user.rol }}" !== "admin") return;
+        
+        const span = headerEl.querySelector('span');
+        if (!span || span.classList.contains('hidden')) return;
+        
+        const currentTitle = span.textContent.trim();
+        const baseClass = span.className.replace('text-brand-400', 'text-white');
+        span.classList.add('hidden');
+        
+        const input = document.createElement('textarea');
+        input.rows = 1;
+        input.value = currentTitle;
+        input.className = baseClass + " bg-dark-900 focus:outline-none focus:ring-1 focus:ring-white/20 relative z-20 resize-none overflow-hidden m-0 w-full border-transparent px-0 py-0";
+        input.classList.remove('hidden'); // Evitar que se oculte a sí mismo
+        input.style.pointerEvents = "auto"; // Restaurar puntero a texto normal
+        
+        const autoResize = () => {
+            input.style.height = 'auto';
+            input.style.height = input.scrollHeight + 'px';
+        };
+        input.oninput = autoResize;
+        
+        input.onclick = (e) => e.stopPropagation();
+        input.ondblclick = (e) => e.stopPropagation();
+        input.onmousedown = (e) => e.stopPropagation();
+        
+        async function save() {
+            const newTitle = input.value.trim();
+            if (newTitle && newTitle !== currentTitle) {
+                try {
+                    const r = await fetch(`/api/kanban/columna/${colId}/edit`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ titulo: newTitle })
+                    });
+                    if ((await r.json()).success) {
+                        span.textContent = newTitle;
+                    }
+                } catch(e) { console.error(e); }
+            }
+            input.remove();
+            span.classList.remove('hidden');
+        }
+        
+        input.onblur = save;
+        input.onkeydown = (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) { 
+                e.preventDefault(); 
+                input.blur(); 
+            } else if (e.key === 'Escape') { 
+                input.value = currentTitle; 
+                input.blur(); 
+            }
+        };
+        
+        headerEl.querySelector('.flex-grow').insertBefore(input, span);
+        autoResize();
+        input.focus();
+        input.select();
+    }
+</script>
+{% endblock %}

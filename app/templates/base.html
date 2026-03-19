@@ -8,11 +8,7 @@
     <!-- Meta Descriptions -->
     <meta name="description" content="Bienvenido al Club de Robótica. Descubre nuestros proyectos, talleres y únete a nuestra comunidad apasionada por la tecnología.">
 
-    <!-- Tailwind CSS (Compilado) -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dist/tailwind.css') }}">
-
-    {# Fallback CDN para desarrollo local si no tienes Node/NPM instalado #}
-    {% if config.DEBUG %}
+    <!-- Tailwind CSS (CDN Fallback/Primary) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -40,7 +36,6 @@
             }
         }
     </script>
-    {% endif %}
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

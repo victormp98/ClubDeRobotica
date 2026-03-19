@@ -62,4 +62,4 @@ class User(UserMixin, db.Model):
         return db.session.get(User, id)
 
     def __repr__(self):
-        return f'<User {self.nombre}>'
+        return self.nombre

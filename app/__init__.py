@@ -41,7 +41,12 @@ def create_app(config_class=Config):
     from app.models.proyecto import Proyecto
     from app.models.equipo import Equipo
     from app.models.miembro_equipo import MiembroEquipo
-    from app.admin_views import UserAdmin, MyAdminIndexView, NoticiaAdmin, AlbumAdmin, FotoAdmin, HorarioAdmin, PageAdmin, ConfiguracionAdmin, ProyectoAdmin, EquipoAdmin, MiembroEquipoAdmin, WROConfigAdmin
+    from app.models.tarea import Tarea
+    from app.models.columna import Columna
+    from app.models.checklist_item import ChecklistItem
+    from app.models.comentario import Comentario
+    from app.models.adjunto import Adjunto
+    from app.admin_views import UserAdmin, MyAdminIndexView, NoticiaAdmin, AlbumAdmin, FotoAdmin, HorarioAdmin, PageAdmin, ConfiguracionAdmin, ProyectoAdmin, EquipoAdmin, MiembroEquipoAdmin, WROConfigAdmin, TareaAdmin, ColumnaAdmin
     
     # Initialize Flask-Admin here (to avoid circular imports with models)
     from flask_admin import Admin
@@ -58,6 +63,7 @@ def create_app(config_class=Config):
     admin.add_view(PageAdmin(Page, db.session, name='Páginas Estáticas', category='Contenido', endpoint='pages'))
     admin.add_view(EquipoAdmin(Equipo, db.session, name='Equipos', category='Contenido', endpoint='equipos'))
     admin.add_view(MiembroEquipoAdmin(MiembroEquipo, db.session, name='Miembros de Equipo', category='Contenido', endpoint='miembros_equipo'))
+    admin.add_view(TareaAdmin(Tarea, db.session, name='Gestión de Tareas', category='Contenido', endpoint='tareas_admin'))
     
     admin.add_view(ConfiguracionAdmin(Configuracion, db.session, name='Configuración Global', category='Ajustes', endpoint='configuraciones'))
     admin.add_view(WROConfigAdmin(Configuracion, db.session, name='🏆 Gestión Certamen', endpoint='wro_config'))
@@ -84,5 +90,29 @@ def create_app(config_class=Config):
     # Auto-seed admin on startup
     with app.app_context():
         auto_seed_admin(app)
+
+    @app.context_processor
+    def utility_processor():
+        import json
+        def safe_json(val, default=None):
+            try:
+                if not val: return default or {}
+                return json.loads(val) if isinstance(val, str) else val
+            except:
+                return default or {}
+        
+        def get_tag_color(name):
+            colors = {
+                'blue': '#3b82f6',
+                'green': '#22c55e',
+                'yellow': '#eab308',
+                'red': '#ef4444',
+                'purple': '#a855f7',
+                'teal': '#14b8a6',
+                'default': 'rgba(255,255,255,0.2)'
+            }
+            return colors.get(name, colors['default'])
+            
+        return dict(safe_json=safe_json, get_tag_color=get_tag_color)
 
     return app

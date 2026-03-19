@@ -18,6 +18,9 @@ class Proyecto(db.Model):
     
     # NUEVOS: Álbumes asociados al proyecto (v2)
     albumes = db.relationship('Album', back_populates='proyecto', lazy=True)
+    
+    # Kanban: Columnas del tablero
+    columnas = db.relationship('Columna', backref='proyecto', lazy=True, order_by="Columna.orden", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'<Proyecto {self.titulo}>'

@@ -14,6 +14,9 @@ from app.models.user import User
 from app.models.noticia import Noticia
 from app.models.album import Album
 from app.models.foto import Foto
+from app.models.tarea import Tarea
+from app.models.checklist_item import ChecklistItem
+from app.models.comentario import Comentario
 from app.extensions import mail, db
 import threading
 import traceback
@@ -592,4 +595,85 @@ class MiembroEquipoAdmin(SecureModelView):
             max_size=(800, 800, False), 
             thumbnail_size=(150, 150, True),
         )
+    }
+
+class TareaAdmin(SecureModelView):
+    extra_js = ['/static/js/admin_tarea_dynamic.js']
+    
+    column_list = ('id', 'titulo', 'proyecto', 'columna_obj', 'prioridad', 'color', 'fecha_limite', 'asignado')
+    
+    form_columns = [
+        'titulo', 'descripcion', 'proyecto', 'columna_obj', 'asignado', 'prioridad', 'etiquetas', 'color', 'fecha_limite'
+    ]
+    column_filters = ('columna_obj.titulo', 'prioridad', 'proyecto.titulo', 'asignado.nombre')
+    column_searchable_list = ('titulo', 'descripcion')
+    can_view_details = True
+
+    column_labels = {
+        'titulo': 'Título',
+        'descripcion': 'Descripción',
+        'columna_obj': 'Estado/Columna',
+        'prioridad': 'Prioridad',
+        'color': 'Color',
+        'fecha_limite': 'Fecha Límite',
+        'proyecto': 'Proyecto',
+        'asignado': 'Responsable'
+    }
+    
+    form_overrides = {
+        'prioridad': SelectField,
+        'color': SelectField
+    }
+    
+    inline_models = [ChecklistItem, Comentario]
+
+    form_args = {
+        'columna_obj': { # Changed from 'estado' to 'columna_obj'
+            'validators': [DataRequired(message="Debe seleccionar una columna para la tarea.")]
+        },
+        'prioridad': {
+            'choices': [
+                ('baja', 'Baja'),
+                ('media', 'Media'),
+                ('alta', 'Alta')
+            ]
+        },
+        'color': {
+            'choices': [
+                ('default', 'Sin color (Default)'),
+                ('blue', 'Azul'),
+                ('green', 'Verde'),
+                ('yellow', 'Amarillo'),
+                ('red', 'Rojo'),
+                ('purple', 'Morado')
+            ]
+        },
+        'asignado': {
+            'allow_blank': True,
+            'blank_text': 'Sin asignar / Pendiente (Libre)'
+        },
+        'descripcion': {
+            'description': 'Descripción técnica de la tarea.'
+        }
+    }
+
+    form_widget_args = {
+        'descripcion': {
+            'rows': 5,
+            'class': 'form-control'
+        }
+    }
+
+class ColumnaAdmin(SecureModelView):
+    column_list = ('id', 'titulo', 'orden', 'proyecto')
+    form_columns = ('titulo', 'orden', 'proyecto')
+    column_labels = {
+        'titulo': 'Título de la Columna',
+        'orden': 'Posición (0-N)',
+        'proyecto': 'Proyecto'
+    }
+    form_args = {
+        'orden': {
+            'description': 'Determina el orden de izquierda a derecha en el Kanban.'
+        }
     }
