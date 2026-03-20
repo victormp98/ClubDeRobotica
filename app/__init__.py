@@ -46,7 +46,16 @@ def create_app(config_class=Config):
     from app.models.checklist_item import ChecklistItem
     from app.models.comentario import Comentario
     from app.models.adjunto import Adjunto
-    from app.admin_views import UserAdmin, MyAdminIndexView, NoticiaAdmin, AlbumAdmin, FotoAdmin, HorarioAdmin, PageAdmin, ConfiguracionAdmin, ProyectoAdmin, EquipoAdmin, MiembroEquipoAdmin, TorneoConfigAdmin, TareaAdmin, ColumnaAdmin
+    from app.models.torneo import CategoriaTorneo, FechaTorneo, RecuadroTorneo, RequisitoTorneo, ProyectoTorneo
+    from app.admin_views import (
+        UserAdmin, MyAdminIndexView, NoticiaAdmin, AlbumAdmin, FotoAdmin, 
+        HorarioAdmin, PageAdmin, ConfiguracionAdmin, ProyectoAdmin, EquipoAdmin, 
+        MiembroEquipoAdmin, TareaAdmin, ColumnaAdmin, CategoriaTorneoAdmin, 
+        FechaTorneoAdmin, RecuadroTorneoAdmin, RequisitoTorneoAdmin, ProyectoTorneoAdmin,
+        TorneoTextosEncabezadoAdmin, TorneoTextosRelojAdmin, TorneoTextosInfoAdmin,
+        TorneoTextosCategoriasAdmin, TorneoTextosFechasAdmin, TorneoTextosRequisitosAdmin,
+        TorneoTextosProyectosAdmin, TorneoTextosCierreAdmin
+    )
     
     # Initialize Flask-Admin here (to avoid circular imports with models)
     from flask_admin import Admin
@@ -66,7 +75,27 @@ def create_app(config_class=Config):
     admin.add_view(TareaAdmin(Tarea, db.session, name='Gestión de Tareas', category='Contenido', endpoint='tareas_admin'))
     
     admin.add_view(ConfiguracionAdmin(Configuracion, db.session, name='Configuración Global', category='Ajustes', endpoint='configuraciones'))
-    admin.add_view(TorneoConfigAdmin(Configuracion, db.session, name='🏆 Gestión Certamen', endpoint='torneo_config'))
+    
+    # Torneo Menu - Ordering logically
+    admin.add_view(TorneoTextosEncabezadoAdmin(Configuracion, db.session, name='1. Textos Encabezado', category='Torneo', endpoint='torneo_txt_encabezado'))
+    admin.add_view(TorneoTextosRelojAdmin(Configuracion, db.session, name='2. Textos Reloj', category='Torneo', endpoint='torneo_txt_reloj'))
+    admin.add_view(TorneoTextosInfoAdmin(Configuracion, db.session, name='3. Textos Información', category='Torneo', endpoint='torneo_txt_info'))
+    
+    admin.add_view(CategoriaTorneoAdmin(CategoriaTorneo, db.session, name='4. Categorías (Variables)', category='Torneo', endpoint='torneo_categorias'))
+    admin.add_view(TorneoTextosCategoriasAdmin(Configuracion, db.session, name='4.1 Textos Categorías', category='Torneo', endpoint='torneo_txt_cat'))
+    
+    admin.add_view(FechaTorneoAdmin(FechaTorneo, db.session, name='5. Fechas Clave (Variables)', category='Torneo', endpoint='torneo_fechas'))
+    admin.add_view(TorneoTextosFechasAdmin(Configuracion, db.session, name='5.1 Textos Fechas', category='Torneo', endpoint='torneo_txt_fechas'))
+    
+    admin.add_view(RecuadroTorneoAdmin(RecuadroTorneo, db.session, name='6. Estadísticas (Variables)', category='Torneo', endpoint='torneo_recuadros'))
+    
+    admin.add_view(RequisitoTorneoAdmin(RequisitoTorneo, db.session, name='7. Requisitos (Variables)', category='Torneo', endpoint='torneo_requisitos'))
+    admin.add_view(TorneoTextosRequisitosAdmin(Configuracion, db.session, name='7.1 Textos Requisitos', category='Torneo', endpoint='torneo_txt_req'))
+    
+    admin.add_view(ProyectoTorneoAdmin(ProyectoTorneo, db.session, name='8. Proyectos (Variables)', category='Torneo', endpoint='torneo_proyectos'))
+    admin.add_view(TorneoTextosProyectosAdmin(Configuracion, db.session, name='8.1 Textos Proyectos', category='Torneo', endpoint='torneo_txt_proy'))
+    
+    admin.add_view(TorneoTextosCierreAdmin(Configuracion, db.session, name='9. Textos Cierre / CTA', category='Torneo', endpoint='torneo_txt_cierre'))
 
     # Botones de navegación salida (MenuLink)
     admin.add_link(MenuLink(name='Volver al Sitio', url='/', icon_type='fa', icon_value='fa-home'))

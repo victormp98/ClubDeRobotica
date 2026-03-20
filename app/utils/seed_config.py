@@ -28,14 +28,7 @@ DEFAULT_CONFIGS = {
     'TORNEO_CTA_TITULO': ('¿Listo para<br/><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-indigo-400">competir?</span>', 'Cabecera final que invita a inscribirse (bottom page).'),
     'TORNEO_CTA_DESC': ('Únete al Club de Robótica, aprende a construir y programar robots, y representa al club en WRO México 2026.', 'Descripción del bloque final para conseguir miembros.'),
     'TORNEO_CTA_BTN1_LABEL': ('Registrarme ahora', 'Llamada principal a la acción al final del Torneo.'),
-    'TORNEO_CTA_BTN2_LABEL': ('Ver portal del club →', 'Enlace secundario hacia Inicio al final del Torneo.'),
-
-    # == JSON ARRAYS (Estructuras predeterminadas vacías o mínimas) ==
-    'TORNEO_FECHAS': ('[]', 'Lista JSON que construye los cuadros de fecha del torneo.'),
-    'TORNEO_RECUADROS': ('[]', 'Lista JSON que modela los recuadros numéricos (ej. +12 Equipos).'),
-    'TORNEO_CATEGORIAS': ('[]', 'Lista JSON que dibuja las distintas competencias y reglas.'),
-    'TORNEO_REQUISITOS': ('[]', 'Estructura JSON con palomitas booleanas para listar reglas del roster.'),
-    'TORNEO_PROYECTOS': ('[]', 'Arreglo JSON renderizando la vitrina de proyectos WRO.')
+    'TORNEO_CTA_BTN2_LABEL': ('Ver portal del club →', 'Enlace secundario hacia Inicio al final del Torneo.')
 }
 
 def auto_seed_config(app):

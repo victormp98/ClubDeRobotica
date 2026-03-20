@@ -351,7 +351,9 @@ class PageAdmin(SecureModelView):
     }
 
 class ConfiguracionAdmin(SecureModelView):
-    column_list = ('llave', 'valor', 'descripcion')
+    can_create = False
+    can_delete = False
+    column_list = ['llave', 'valor', 'descripcion']
     form_columns = ('llave', 'valor', 'descripcion', 'valor_imagen')
     column_labels = {
         'llave': 'Identificador Único (Key)',
@@ -418,29 +420,61 @@ class ConfiguracionAdmin(SecureModelView):
             if filename:
                 model.valor = filename
 
-class TorneoConfigAdmin(SecureModelView):
+class BaseTorneoConfigAdmin(SecureModelView):
+    can_create = False
+    can_delete = False
     column_list = ['llave', 'valor', 'descripcion']
     column_searchable_list = ['llave', 'descripcion']
     
     column_labels = {
-        'llave': 'Identificador (WRO)',
+        'llave': 'Identificador',
         'valor': 'Contenido / Dato',
         'descripcion': 'Propósito'
     }
 
     form_widget_args = {
         'valor': {
-            'rows': 8,
+            'rows': 4,
             'class': 'form-control',
             'style': 'font-family: monospace; font-size: 13px;'
         }
     }
+    
+    torneo_keys = []
 
     def get_query(self):
-        return self.session.query(self.model).filter(self.model.llave.like('TORNEO_%'))
+        return self.session.query(self.model).filter(self.model.llave.in_(self.torneo_keys))
 
     def get_count_query(self):
-        return self.session.query(db.func.count('*')).filter(self.model.llave.like('TORNEO_%'))
+        return self.session.query(db.func.count('*')).filter(self.model.llave.in_(self.torneo_keys))
+
+class TorneoTextosEncabezadoAdmin(BaseTorneoConfigAdmin):
+    torneo_keys = [
+        'TORNEO_TITULO', 'TORNEO_SUBTITULO', 'TORNEO_SLOGAN', 
+        'TORNEO_HERO_DESC', 
+        'TORNEO_HERO_BTN1_LABEL', 'TORNEO_HERO_BTN2_LABEL'
+    ]
+
+class TorneoTextosRelojAdmin(BaseTorneoConfigAdmin):
+    torneo_keys = ['TORNEO_COUNTDOWN_LABEL', 'TORNEO_FECHA_COUNTDOWN']
+
+class TorneoTextosInfoAdmin(BaseTorneoConfigAdmin):
+    torneo_keys = ['TORNEO_INFO_TITULO', 'TORNEO_INFO_DESC']
+
+class TorneoTextosCategoriasAdmin(BaseTorneoConfigAdmin):
+    torneo_keys = ['TORNEO_SECTION_CAT_TITULO', 'TORNEO_SECTION_CAT_SUB']
+
+class TorneoTextosFechasAdmin(BaseTorneoConfigAdmin):
+    torneo_keys = ['TORNEO_SECTION_FECHAS_TITULO', 'TORNEO_SECTION_FECHAS_SUB']
+
+class TorneoTextosRequisitosAdmin(BaseTorneoConfigAdmin):
+    torneo_keys = ['TORNEO_SECTION_REQ_TITULO', 'TORNEO_SECTION_REQ_SUB']
+
+class TorneoTextosProyectosAdmin(BaseTorneoConfigAdmin):
+    torneo_keys = ['TORNEO_SECTION_PROY_TITULO', 'TORNEO_SECTION_PROY_SUB']
+
+class TorneoTextosCierreAdmin(BaseTorneoConfigAdmin):
+    torneo_keys = ['TORNEO_CTA_TITULO', 'TORNEO_CTA_DESC', 'TORNEO_CTA_BTN1_LABEL', 'TORNEO_CTA_BTN2_LABEL']
 
 class ProyectoAdmin(SecureModelView):
     column_list = ('titulo', 'equipo', 'miniatura_preview', 'categoria', 'fecha_creacion', 'activo')
@@ -676,4 +710,109 @@ class ColumnaAdmin(SecureModelView):
         'orden': {
             'description': 'Determina el orden de izquierda a derecha en el Kanban.'
         }
+    }
+
+# ==========================================
+# GESTIÓN DE TORNEO (CERTAMEN) - EN CRUD
+# ==========================================
+
+class CategoriaTorneoAdmin(SecureModelView):
+    column_list = ('orden', 'nombre', 'edades', 'miniatura_preview')
+    form_columns = ('orden', 'nombre', 'edades', 'mision', 'imagen_path')
+    column_searchable_list = ('nombre', 'mision')
+    column_labels = {
+        'nombre': 'Categoría / Competencia',
+        'edades': 'Rango de Edades',
+        'mision': 'Misión o Descripción',
+        'imagen_path': 'Fotografía de Portada',
+        'orden': 'Orden'
+    }
+    def _list_thumbnail(view, context, model, name):
+        if not model.imagen_path:
+            return ''
+        url = url_for('static', filename=os.path.join('uploads/torneo_categorias/', model.imagen_path).replace('\\', '/'))
+        return Markup(f'<img src="{url}" style="width: 100px; height: auto; border-radius: 4px;">')
+    column_formatters = {'miniatura_preview': _list_thumbnail}
+    
+    base_path_cats = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads', 'torneo_categorias')
+    os.makedirs(base_path_cats, exist_ok=True)
+    
+    form_extra_fields = {
+        'imagen_path': form.ImageUploadField(
+            'Subir Imagen (Se redimensionará y guardará)',
+            base_path=base_path_cats,
+            url_relative_path='uploads/torneo_categorias/',
+            namegen=prefix_name,
+            allowed_extensions=['jpg', 'jpeg', 'png', 'webp'],
+            max_size=(800, 800, False),
+            thumbnail_size=(150, 150, True)
+        )
+    }
+
+class FechaTorneoAdmin(SecureModelView):
+    column_list = ('orden', 'fecha', 'nombre', 'estado_etiqueta', 'estado_clase')
+    form_columns = ('orden', 'fecha', 'nombre', 'descripcion', 'estado_clase', 'estado_etiqueta')
+    column_labels = {
+        'fecha': 'Periodo (Ej. May - Jun 2026)',
+        'nombre': 'Nombre del Hito',
+        'descripcion': 'Descripción Corta',
+        'estado_etiqueta': 'Texto del Badge (Ej. ✓ Abierto)',
+        'estado_clase': 'Color del Badge'
+    }
+    form_overrides = {'estado_clase': SelectField}
+    form_args = {
+        'estado_clase': {
+            'choices': [
+                ('f-open', 'Verde (Abierto)'), 
+                ('f-coming', 'Azul (Próximamente)'), 
+                ('f-future', 'Morado (Futuro)'), 
+                ('f-meta', 'Naranja (Meta)')
+            ],
+            'default': 'f-future'
+        }
+    }
+
+class RecuadroTorneoAdmin(SecureModelView):
+    column_list = ('orden', 'icono', 'etiqueta', 'valor')
+    form_columns = ('orden', 'icono', 'etiqueta', 'valor')
+    column_labels = {
+        'icono': 'Clase FontAwesome (Ej. fa-users)',
+        'etiqueta': 'Subtítulo (Ej. MIEMBROS)',
+        'valor': 'Dato Principal (Ej. +120)'
+    }
+
+class RequisitoTorneoAdmin(SecureModelView):
+    column_list = ('orden', 'texto')
+    form_columns = ('orden', 'texto')
+    column_labels = {'texto': 'Descripción del requisito'}
+
+class ProyectoTorneoAdmin(SecureModelView):
+    column_list = ('orden', 'titulo', 'categoria', 'miniatura_preview')
+    form_columns = ('orden', 'titulo', 'categoria', 'descripcion', 'imagen_path')
+    column_labels = {
+        'titulo': 'Nombre del Proyecto',
+        'categoria': 'Categoría Relacionada',
+        'descripcion': 'Descripción Corta',
+        'imagen_path': 'Fotografía del Proyecto'
+    }
+    def _list_thumbnail(view, context, model, name):
+        if not model.imagen_path:
+            return ''
+        url = url_for('static', filename=os.path.join('uploads/torneo_proyectos/', model.imagen_path).replace('\\', '/'))
+        return Markup(f'<img src="{url}" style="width: 100px; height: auto; border-radius: 4px;">')
+    column_formatters = {'miniatura_preview': _list_thumbnail}
+    
+    base_path_proys = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads', 'torneo_proyectos')
+    os.makedirs(base_path_proys, exist_ok=True)
+    
+    form_extra_fields = {
+        'imagen_path': form.ImageUploadField(
+            'Subir Portada Proyecto',
+            base_path=base_path_proys,
+            url_relative_path='uploads/torneo_proyectos/',
+            namegen=prefix_name,
+            allowed_extensions=['jpg', 'jpeg', 'png', 'webp'],
+            max_size=(800, 800, False),
+            thumbnail_size=(150, 150, True)
+        )
     }

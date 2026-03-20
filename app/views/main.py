@@ -853,18 +853,21 @@ def wro():
         except:
             return default
 
-    fechas_json = safe_json(configs.get('TORNEO_FECHAS'), [])
-    recuadros_json = safe_json(configs.get('TORNEO_RECUADROS'), [])
-    categorias_json = safe_json(configs.get('TORNEO_CATEGORIAS'), [])
-    requisitos_json = safe_json(configs.get('TORNEO_REQUISITOS'), [])
-    proyectos_json = safe_json(configs.get('TORNEO_PROYECTOS'), [])
+    from app.models.torneo import CategoriaTorneo, FechaTorneo, RecuadroTorneo, RequisitoTorneo, ProyectoTorneo
+    
+    fechas_db = FechaTorneo.query.order_by(FechaTorneo.orden).all()
+    recuadros_db = RecuadroTorneo.query.order_by(RecuadroTorneo.orden).all()
+    categorias_db = CategoriaTorneo.query.order_by(CategoriaTorneo.orden).all()
+    requisitos_db = RequisitoTorneo.query.order_by(RequisitoTorneo.orden).all()
+    proyectos_db = ProyectoTorneo.query.order_by(ProyectoTorneo.orden).all()
 
     return render_template('wro.html', 
-                           config_torneo=configs, lotos_config=configs, fechas_torneo=fechas_json,
-                           recuadros_torneo=recuadros_json,
-                           categorias_torneo=categorias_json,
-                           requisitos_torneo=requisitos_json,
-                           proyectos_torneo=proyectos_json)
+                           config_torneo=configs, lotos_config=configs, 
+                           fechas_torneo=fechas_db,
+                           recuadros_torneo=recuadros_db,
+                           categorias_torneo=categorias_db,
+                           requisitos_torneo=requisitos_db,
+                           proyectos_torneo=proyectos_db)
 
 @main_bp.route('/admin/logout')
 @login_required
