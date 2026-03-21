@@ -314,17 +314,9 @@ def login():
 
 @main_bp.route('/reset_password_request', methods=['GET', 'POST'])
 def reset_password_request():
-    if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
-    form = ResetPasswordRequestForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        if user:
-            send_password_reset_email(user, current_app._get_current_object())
-        # Siempre mostramos el mismo mensaje para no revelar si un email existe o no
-        flash('Verifica tu correo electrónico para las instrucciones de cómo restablecer tu contraseña', 'info')
-        return redirect(url_for('main.login'))
-    return render_template('reset_password_request.html', form=form)
+    # Deshabilitado temporalmente: La recuperación de contraseña es manual via Admin
+    flash('La recuperación de contraseña por correo está deshabilitada temporalmente. Por favor contacta al administrador.', 'info')
+    return redirect(url_for('main.login'))
 
 @main_bp.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
@@ -893,8 +885,8 @@ def registro():
             db.session.add(user)
             db.session.commit()
             
-            # Enviar notificación falsa/dummy en hilo en background enviando el app contexto real
-            enviar_notificacion_admin(user, current_app._get_current_object())
+            # Deshabilitado por ahora: Enviar notificación falsa/dummy en hilo en background enviando el app contexto real
+            # enviar_notificacion_admin(user, current_app._get_current_object())
             
             flash('¡Registro exitoso! Tu cuenta está pendiente de aprobación por un administrador.', 'success')
             return redirect(url_for('main.index'))

@@ -156,9 +156,9 @@ class UserAdmin(SecureModelView):
                     )
                     msg.body = f"Hola {user.nombre},\n\nTu solicitud de ingreso ha sido aprobada por un administrador del Club de Robótica.\n\nYa eres oficialmente un miembro activo. ¡Bienvenido al equipo!\n\nSaludos."
                     
-                    # Mandar correo en hilo de fondo
-                    thread = threading.Thread(target=send_async_email, args=(app, msg))
-                    thread.start()
+                    # Deshabilitado: Mandar correo en hilo de fondo
+                    # thread = threading.Thread(target=send_async_email, args=(app, msg))
+                    # thread.start()
 
             self.session.commit()
             if count > 0:
