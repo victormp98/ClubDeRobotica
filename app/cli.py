@@ -50,6 +50,8 @@ def auto_seed_admin(app):
     # Usamos el logger de la app para la salida
     run_seed_logic(app, app.logger.info, app.logger.error)
     auto_seed_config(app)
+    from app.utils.seed_torneo import auto_seed_torneo
+    auto_seed_torneo(app)
 
 def register_commands(app):
     """Registra los comandos personalizados en la aplicación Flask."""
