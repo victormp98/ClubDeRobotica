@@ -24,6 +24,17 @@ from app.models.adjunto import Adjunto
 from functools import wraps
 from app.extensions import db, mail
 from flask_login import login_user, logout_user, current_user, login_required
+from flask_socketio import join_room
+from app.extensions import socketio
+
+# Socket.IO Event Handlers
+@socketio.on('join')
+def on_join(data):
+    room = data.get('room')
+    if room: join_room(room)
+
+def notify_kanban(proyecto_id, event, data):
+    socketio.emit(event, data, room=f"proyecto_{proyecto_id}")
 
 def miembro_required(f):
     @wraps(f)
@@ -421,31 +432,6 @@ def kanban_tablero(proyecto_id):
                            proyecto=proyecto, 
                            usuarios_equipo=usuarios_equipo)
 
-@main_bp.route('/api/kanban/proyecto/<int:proyecto_id>/sync', methods=['GET'])
-@login_required
-@miembro_required
-def kanban_sync(proyecto_id):
-    proyecto = Proyecto.query.get_or_404(proyecto_id)
-    
-    if current_user.rol != 'admin':
-        es_miembro = any(m.equipo_id == proyecto.equipo_id for m in current_user.membresias_equipo if m.activo)
-        if not es_miembro:
-            return jsonify({'success': False, 'message': 'Sin permisos'}), 403
-
-    tareas_data = []
-    tareas = Tarea.query.filter_by(proyecto_id=proyecto_id).all()
-    for t in tareas:
-        tareas_data.append({
-            'id': t.id,
-            'columna_id': t.columna_id,
-            'titulo': t.titulo
-        })
-
-    return jsonify({
-        'success': True,
-        'tareas': tareas_data
-    })
-
 @main_bp.route('/api/kanban/update_status', methods=['POST'])
 @login_required
 def update_task_status():
@@ -463,6 +449,7 @@ def update_task_status():
             
     tarea.columna_id = nueva_columna_id
     db.session.commit()
+    notify_kanban(tarea.proyecto_id, 'task_moved', {'tarea_id': tarea.id, 'columna_id': nueva_columna_id})
     return jsonify({'success': True})
 
 @main_bp.route('/api/kanban/tarea/<int:tarea_id>', methods=['GET'])
@@ -523,6 +510,7 @@ def update_task_color(tarea_id):
     data = request.get_json()
     tarea.color = data.get('color', 'default')
     db.session.commit()
+    notify_kanban(tarea.proyecto_id, 'task_updated', {'tarea_id': tarea.id, 'color': tarea.color})
     return jsonify({'success': True})
 
 @main_bp.route('/api/kanban/tarea/<int:tarea_id>/checklist', methods=['POST'])
@@ -658,6 +646,7 @@ def edit_task_details(tarea_id):
         tarea.etiquetas = json.dumps(data.get('etiquetas'))
         
     db.session.commit()
+    notify_kanban(tarea.proyecto_id, 'task_updated', {'tarea_id': tarea.id, 'titulo': tarea.titulo})
     return jsonify({'success': True})
 
 @main_bp.route('/api/kanban/adjunto/<int:adjunto_id>', methods=['DELETE'])
@@ -694,7 +683,9 @@ def delete_kanban_task(tarea_id):
                 except: pass
                 
         db.session.delete(tarea)
+        p_id = tarea.proyecto_id
         db.session.commit()
+        notify_kanban(p_id, 'task_deleted', {'tarea_id': tarea_id})
         return jsonify({'success': True})
     except Exception as e:
         db.session.rollback()

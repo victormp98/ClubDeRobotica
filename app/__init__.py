@@ -21,9 +21,10 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     
-    from .extensions import mail, login_manager
+    from .extensions import mail, login_manager, socketio
     mail.init_app(app)
     login_manager.init_app(app)
+    socketio.init_app(app, cors_allowed_origins="*")
 
     # Register blueprints here
     from app.views.main import main_bp

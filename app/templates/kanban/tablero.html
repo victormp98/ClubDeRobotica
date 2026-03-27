@@ -426,6 +426,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script>
     let currentTaskId = null;
@@ -514,57 +515,59 @@
         });
     });
 
-    // --- DOM Reconciler Polling ---
-    let isPollingPaused = false;
+    // --- Socket.IO Integration (WebSockets) ---
+    const socket = io();
     
-    document.addEventListener('mousedown', (e) => { 
-        if(e.target.closest('.task-card') || e.target.closest('.column-handle')) isPollingPaused = true; 
-    });
-    document.addEventListener('mouseup', () => { 
-        setTimeout(() => isPollingPaused = false, 500); 
+    // Unirse a la sala del proyecto actual
+    socket.on('connect', () => {
+        socket.emit('join', { room: 'proyecto_{{ proyecto.id }}' });
     });
 
-    setInterval(async () => {
-        const detailOpen = document.getElementById('task-detail-panel').classList.contains('active');
-        const newOpen = document.getElementById('new-task-panel').classList.contains('active');
-        if (isPollingPaused || detailOpen || newOpen) return;
-
-        try {
-            const res = await fetch(`/api/kanban/proyecto/{{ proyecto.id }}/sync`);
-            const data = await res.json();
-            if (data.success) reconcileBoard(data.tareas);
-        } catch(e) { }
-    }, 4000);
-
-    function reconcileBoard(serverTasks) {
-        const domCards = document.querySelectorAll('.task-card');
-        if (domCards.length !== serverTasks.length) {
-            // Tarea creada o borrada por otro cliente. Recarga dura para re-dibujar la base.
-            location.reload();
-            return;
+    socket.on('task_moved', (data) => {
+        // data: { tarea_id, columna_id }
+        const card = document.querySelector(`.task-card[data-id="${data.tarea_id}"]`);
+        const targetCol = document.querySelector(`.kanban-column[data-columna-id="${data.columna_id}"]`);
+        
+        // Evitar que mueva la propia tarjeta si yo soy el que la está arrastrando (Sortable)
+        // Sortable añade la clase sortable-ghost a la tarjeta en movimiento.
+        if (card && targetCol && !card.classList.contains('sortable-ghost')) {
+            targetCol.insertBefore(card, targetCol.firstChild);
+            updateCounters();
         }
+    });
 
-        serverTasks.forEach(st => {
-            const card = document.querySelector(`.task-card[data-id="${st.id}"]`);
-            if (card) {
-                const colWrapper = card.closest('.kanban-column');
-                if (colWrapper) {
-                    const currentColId = colWrapper.getAttribute('data-columna-id');
-                    if (currentColId != st.columna_id) {
-                        const targetCol = document.querySelector(`.kanban-column[data-columna-id="${st.columna_id}"]`);
-                        if (targetCol) {
-                            targetCol.insertBefore(card, targetCol.firstChild);
-                            updateCounters();
-                        }
-                    }
-                }
+    socket.on('task_updated', (data) => {
+        // data: { tarea_id, titulo, color }
+        const card = document.querySelector(`.task-card[data-id="${data.tarea_id}"]`);
+        if (card) {
+            if (data.titulo) {
                 const titleEl = card.querySelector('h4');
-                if (titleEl && titleEl.textContent !== st.titulo) {
-                    titleEl.textContent = st.titulo;
+                if (titleEl) titleEl.textContent = data.titulo;
+            }
+            if (data.color && card.firstElementChild) {
+                // Actualizar la barriga de color (muy útil para tags visuales en Kanban)
+                const banner = card.querySelector('.bg-' + card.getAttribute('data-color') + '-500');
+                if(banner) {
+                    banner.className = `h-1.5 w-full bg-${data.color}-500`;
+                    card.setAttribute('data-color', data.color);
                 }
             }
-        });
-    }
+        }
+    });
+
+    socket.on('task_deleted', (data) => {
+        const card = document.querySelector(`.task-card[data-id="${data.tarea_id}"]`);
+        if (card) {
+            card.remove();
+            updateCounters();
+        }
+    });
+
+    socket.on('task_added', () => {
+        // Recarga suave para regenerar el HTML Jinja de la tarjeta 
+        // Se podría inyectar el HTML directo, pero reload previene errores de estado inicial.
+        setTimeout(() => location.reload(), 500);
+    });
 
     async function updateTaskStatus(tareaId, nuevaColumnaId) {
         try {
