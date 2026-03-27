@@ -3,6 +3,7 @@ from flask.cli import with_appcontext
 from flask import current_app
 from app.models.user import User
 from app.utils.seed_config import auto_seed_config
+from app.extensions import db
 
 def get_admin_credentials(app):
     """Obtiene las credenciales del admin desde la configuración."""

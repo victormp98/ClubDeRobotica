@@ -24,5 +24,5 @@ class Config:
     DEFAULT_RESET_PASSWORD = os.environ.get('DEFAULT_RESET_PASSWORD')
 
     # AD-01: Configuración para Inicializador de Administrador (seed_admin.py)
-    INITIAL_ADMIN_EMAIL = os.environ.get('INITIAL_ADMIN_EMAIL')
-    INITIAL_ADMIN_PASSWORD = os.environ.get('INITIAL_ADMIN_PASSWORD')
+    INITIAL_ADMIN_EMAIL = os.environ.get('INITIAL_ADMIN_EMAIL', 'admin@clubrobotica.unach.mx')
+    INITIAL_ADMIN_PASSWORD = os.environ.get('INITIAL_ADMIN_PASSWORD', 'admin123')
