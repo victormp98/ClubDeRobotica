@@ -525,6 +525,11 @@ def add_checklist_item(tarea_id):
     db.session.add(item)
     db.session.commit()
     notify_kanban(tarea.proyecto_id, 'task_detail_updated', {'tarea_id': tarea_id})
+    notify_kanban(tarea.proyecto_id, 'task_checklist_updated', {
+        'tarea_id': tarea_id,
+        'completados': sum(1 for i in tarea.checklist if i.completado),
+        'total': len(tarea.checklist)
+    })
     return jsonify({'success': True, 'item': {'id': item.id, 'texto': item.texto, 'completado': item.completado}})
 
 @main_bp.route('/api/kanban/checklist/<int:item_id>/toggle', methods=['POST'])
@@ -538,6 +543,11 @@ def toggle_checklist_item(item_id):
     item.completado = not item.completado
     db.session.commit()
     notify_kanban(tarea.proyecto_id, 'task_detail_updated', {'tarea_id': tarea.id})
+    notify_kanban(tarea.proyecto_id, 'task_checklist_updated', {
+        'tarea_id': tarea.id,
+        'completados': sum(1 for i in tarea.checklist if i.completado),
+        'total': len(tarea.checklist)
+    })
     return jsonify({'success': True, 'completado': item.completado})
 
 @main_bp.route('/api/kanban/checklist/<int:item_id>', methods=['DELETE'])
@@ -551,6 +561,11 @@ def delete_checklist_item(item_id):
     db.session.delete(item)
     db.session.commit()
     notify_kanban(tarea.proyecto_id, 'task_detail_updated', {'tarea_id': tarea.id})
+    notify_kanban(tarea.proyecto_id, 'task_checklist_updated', {
+        'tarea_id': tarea.id,
+        'completados': sum(1 for i in tarea.checklist if i.completado),
+        'total': len(tarea.checklist)
+    })
     return jsonify({'success': True})
 
 @main_bp.route('/api/kanban/tarea/<int:tarea_id>/comentar', methods=['POST'])
@@ -651,7 +666,15 @@ def edit_task_details(tarea_id):
         tarea.etiquetas = json.dumps(data.get('etiquetas'))
         
     db.session.commit()
-    notify_kanban(tarea.proyecto_id, 'task_updated', {'tarea_id': tarea.id, 'titulo': tarea.titulo})
+    notify_kanban(tarea.proyecto_id, 'task_updated', {
+        'tarea_id': tarea.id, 
+        'titulo': tarea.titulo,
+        'prioridad': tarea.prioridad,
+        'color': tarea.color,
+        'asignado_nombre': tarea.asignado.nombre if tarea.asignado else None,
+        'etiquetas': json.loads(tarea.etiquetas) if tarea.etiquetas else {},
+        'fecha_limite': tarea.fecha_limite.strftime('%d %b') if tarea.fecha_limite else None
+    })
     return jsonify({'success': True})
 
 @main_bp.route('/api/kanban/adjunto/<int:adjunto_id>', methods=['DELETE'])

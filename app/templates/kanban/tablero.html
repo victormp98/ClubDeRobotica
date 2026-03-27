@@ -203,21 +203,19 @@
         </div>
 
         <div class="flex items-center justify-between text-[9px] font-mono text-white/30">
-            {% if tarea.checklist|length > 0 %}
-                <span class="flex items-center gap-1">
+            <span id="checklist-count-{{ tarea.id }}" class="flex items-center gap-1">
+                {% if tarea.checklist|length > 0 %}
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                     {{ tarea.checklist|selectattr('completado', 'equalto', true)|list|length }}/{{ tarea.checklist|length }}
-                </span>
-            {% else %}
-                <span></span>
-            {% endif %}
+                {% endif %}
+            </span>
             
-            {% if tarea.fecha_limite %}
-                <span class="flex items-center gap-1">
+            <span id="deadline-container-{{ tarea.id }}" class="flex items-center gap-1">
+                {% if tarea.fecha_limite %}
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     {{ tarea.fecha_limite.strftime('%d %b') }}
-                </span>
-            {% endif %}
+                {% endif %}
+            </span>
         </div>
     </div>
 </div>
@@ -537,20 +535,77 @@
     });
 
     socket.on('task_updated', (data) => {
-        // data: { tarea_id, titulo, color }
         const card = document.querySelector(`.task-card[data-id="${data.tarea_id}"]`);
         if (card) {
+            // Título
             if (data.titulo) {
                 const titleEl = card.querySelector('h4');
                 if (titleEl) titleEl.textContent = data.titulo;
             }
-            if (data.color && card.firstElementChild) {
-                // Actualizar la barriga de color (muy útil para tags visuales en Kanban)
-                const banner = card.querySelector('.bg-' + card.getAttribute('data-color') + '-500');
-                if(banner) {
-                    banner.className = `h-1.5 w-full bg-${data.color}-500`;
-                    card.setAttribute('data-color', data.color);
+            // Color
+            if (data.color) {
+                card.setAttribute('data-color', data.color);
+            }
+            // Prioridad
+            if (data.prioridad) {
+                const priorityDot = document.getElementById(`priority-dot-${data.tarea_id}`);
+                if (priorityDot) {
+                    let dotHtml = '';
+                    if (data.prioridad === 'alta') dotHtml = '<span class="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.8)]"></span><span class="text-[8px] font-bold text-red-500 uppercase tracking-wider">Alta</span>';
+                    else if (data.prioridad === 'media') dotHtml = '<span class="w-1.5 h-1.5 rounded-full bg-brand-400 shadow-[0_0_6px_rgba(99,102,241,0.6)]"></span><span class="text-[8px] font-bold text-brand-400 uppercase tracking-wider">Media</span>';
+                    else dotHtml = '<span class="w-1.5 h-1.5 rounded-full bg-accent-400 shadow-[0_0_6px_rgba(20,184,166,0.5)]"></span><span class="text-[8px] font-bold text-accent-400 uppercase tracking-wider">Baja</span>';
+                    priorityDot.innerHTML = dotHtml;
                 }
+            }
+            // Etiquetas
+            if (data.etiquetas !== undefined) {
+                const labelsContainer = document.getElementById(`labels-container-${data.tarea_id}`);
+                if (labelsContainer) {
+                    labelsContainer.innerHTML = Object.entries(data.etiquetas).map(([color, name]) => {
+                        if (!name) return '';
+                        return `<span class="px-1.5 py-0.5 rounded-sm text-[8px] font-bold uppercase tracking-wider text-white/90" 
+                                      style="background-color: ${getColorValue(color)};" 
+                                      title="${name}">
+                                    ${name.length > 15 ? name.substring(0, 15) + '...' : name}
+                                </span>`;
+                    }).join('');
+                }
+            }
+            // Asignado
+            if (data.asignado_nombre !== undefined) {
+                const assigneeContainer = document.getElementById(`assignee-container-${data.tarea_id}`);
+                if (assigneeContainer) {
+                    if (data.asignado_nombre) {
+                        const fullName = data.asignado_nombre.split('(')[0].trim();
+                        const parts = fullName.split(' ');
+                        const shortName = parts[0] + (parts.length > 1 ? ' ' + parts[1][0] + '.' : '');
+                        assigneeContainer.innerHTML = `<div class="h-7 px-3 rounded-md bg-brand-600/50 flex items-center justify-center text-[11px] font-bold text-white border border-brand-400/30 whitespace-nowrap" title="${fullName}">${shortName}</div>`;
+                    } else {
+                        assigneeContainer.innerHTML = `<div class="h-7 px-3 rounded-md bg-white/5 flex items-center justify-center text-[11px] text-white/20 border border-white/10" title="Sin asignar">NO ASIGNADO</div>`;
+                    }
+                }
+            }
+            // Fecha Límite
+            if (data.fecha_limite !== undefined) {
+                const deadlineContainer = document.getElementById(`deadline-container-${data.tarea_id}`);
+                if (deadlineContainer) {
+                    if (data.fecha_limite) {
+                        deadlineContainer.innerHTML = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> ${data.fecha_limite}`;
+                    } else {
+                        deadlineContainer.innerHTML = '';
+                    }
+                }
+            }
+        }
+    });
+
+    socket.on('task_checklist_updated', (data) => {
+        const span = document.getElementById(`checklist-count-${data.tarea_id}`);
+        if (span) {
+            if (data.total > 0) {
+                span.innerHTML = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> ${data.completados}/${data.total}`;
+            } else {
+                span.innerHTML = '';
             }
         }
     });
