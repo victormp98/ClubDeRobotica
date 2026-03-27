@@ -18,3 +18,7 @@ test_admin.html
 # Node / Tailwind
 node_modules/
 app/static/css/dist/
+
+# Empaquetado PyInstaller
+build/
+dist/
