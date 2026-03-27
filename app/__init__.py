@@ -119,6 +119,7 @@ def create_app(config_class=Config):
 
     # Auto-seed admin on startup
     with app.app_context():
+        db.create_all()  # Asegura que las tablas existan antes de sembrar datos
         auto_seed_admin(app)
 
     @app.context_processor
