@@ -514,6 +514,58 @@
         });
     });
 
+    // --- DOM Reconciler Polling ---
+    let isPollingPaused = false;
+    
+    document.addEventListener('mousedown', (e) => { 
+        if(e.target.closest('.task-card') || e.target.closest('.column-handle')) isPollingPaused = true; 
+    });
+    document.addEventListener('mouseup', () => { 
+        setTimeout(() => isPollingPaused = false, 500); 
+    });
+
+    setInterval(async () => {
+        const detailOpen = document.getElementById('task-detail-panel').classList.contains('active');
+        const newOpen = document.getElementById('new-task-panel').classList.contains('active');
+        if (isPollingPaused || detailOpen || newOpen) return;
+
+        try {
+            const res = await fetch(`/api/kanban/proyecto/{{ proyecto.id }}/sync`);
+            const data = await res.json();
+            if (data.success) reconcileBoard(data.tareas);
+        } catch(e) { }
+    }, 4000);
+
+    function reconcileBoard(serverTasks) {
+        const domCards = document.querySelectorAll('.task-card');
+        if (domCards.length !== serverTasks.length) {
+            // Tarea creada o borrada por otro cliente. Recarga dura para re-dibujar la base.
+            location.reload();
+            return;
+        }
+
+        serverTasks.forEach(st => {
+            const card = document.querySelector(`.task-card[data-id="${st.id}"]`);
+            if (card) {
+                const colWrapper = card.closest('.kanban-column');
+                if (colWrapper) {
+                    const currentColId = colWrapper.getAttribute('data-columna-id');
+                    if (currentColId != st.columna_id) {
+                        const targetCol = document.querySelector(`.kanban-column[data-columna-id="${st.columna_id}"]`);
+                        if (targetCol) {
+                            targetCol.insertBefore(card, targetCol.firstChild);
+                            updateCounters();
+                        }
+                    }
+                }
+                const titleEl = card.querySelector('h4');
+                if (titleEl && titleEl.textContent !== st.titulo) {
+                    titleEl.textContent = st.titulo;
+                }
+            }
+        });
+    }
+
     async function updateTaskStatus(tareaId, nuevaColumnaId) {
         try {
             const resp = await fetch('/api/kanban/update_status', {

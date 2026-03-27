@@ -421,6 +421,31 @@ def kanban_tablero(proyecto_id):
                            proyecto=proyecto, 
                            usuarios_equipo=usuarios_equipo)
 
+@main_bp.route('/api/kanban/proyecto/<int:proyecto_id>/sync', methods=['GET'])
+@login_required
+@miembro_required
+def kanban_sync(proyecto_id):
+    proyecto = Proyecto.query.get_or_404(proyecto_id)
+    
+    if current_user.rol != 'admin':
+        es_miembro = any(m.equipo_id == proyecto.equipo_id for m in current_user.membresias_equipo if m.activo)
+        if not es_miembro:
+            return jsonify({'success': False, 'message': 'Sin permisos'}), 403
+
+    tareas_data = []
+    tareas = Tarea.query.filter_by(proyecto_id=proyecto_id).all()
+    for t in tareas:
+        tareas_data.append({
+            'id': t.id,
+            'columna_id': t.columna_id,
+            'titulo': t.titulo
+        })
+
+    return jsonify({
+        'success': True,
+        'tareas': tareas_data
+    })
+
 @main_bp.route('/api/kanban/update_status', methods=['POST'])
 @login_required
 def update_task_status():
