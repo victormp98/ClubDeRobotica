@@ -2,6 +2,10 @@ from app.extensions import db
 from app.models.configuracion import Configuracion
 
 DEFAULT_CONFIGS = {
+    # == VARIABLES GLOBALES ==
+    'drive_virtual_url': ('#', 'Link al Google Drive que ven los miembros en la sección exclusiva.'),
+    'IMAGEN_EQUIPO_HOME': ('equipo_placeholder.jpg', 'Foto  - Equipo - Club de robótica'),
+
     # == INDEX TORNEO CARD ==
     'INDEX_TORNEO_BADGE': ('METAS DEL CLUB', 'Etiqueta flotante superior de la tarjeta Torneo (Inicio).'),
     'INDEX_TORNEO_TITULO': ('Camino a la World Robot Olympiad (WRO)', 'Título principal promocional en la página de Inicio.'),
