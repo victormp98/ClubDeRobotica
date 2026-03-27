@@ -571,6 +571,10 @@ def add_attachment(tarea_id):
     if file.filename == '':
         return jsonify({'success': False, 'message': 'Nombre vacío'}), 400
         
+    ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'gif', 'docx', 'doc', 'xls', 'xlsx', 'zip', 'rar', 'txt', 'csv'}
+    if '.' not in file.filename or file.filename.rsplit('.', 1)[1].lower() not in ALLOWED_EXTENSIONS:
+        return jsonify({'success': False, 'message': 'Extensión de archivo no permitida'}), 400
+        
     if file:
         filename = secure_filename(file.filename)
         # Generar nombre único para evitar colisiones

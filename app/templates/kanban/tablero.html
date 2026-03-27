@@ -606,6 +606,16 @@
         currentTaskId = null;
     }
 
+    function escapeHtml(unsafe) {
+        if (!unsafe) return '';
+        return String(unsafe)
+             .replace(/&/g, "&amp;")
+             .replace(/</g, "&lt;")
+             .replace(/>/g, "&gt;")
+             .replace(/"/g, "&quot;")
+             .replace(/'/g, "&#039;");
+    }
+
     function renderTaskDetail(t) {
         const content = document.getElementById('detail-content');
         const loader = document.getElementById('detail-loader');
@@ -637,7 +647,7 @@
                         <span class="text-[10px] font-mono text-white/30 tracking-[0.3em]">TAREA_${t.id}</span>
                         <span class="text-[9px] font-mono text-white/20">Creada: ${t.fecha_creacion}</span>
                     </div>
-                    <input type="text" id="detail-title-input" class="w-full bg-transparent border-none text-2xl font-bold text-white leading-tight focus:ring-1 focus:ring-brand-500/50 rounded p-1 -ml-1" value="${t.titulo}" onblur="saveTaskChanges(${t.id})">
+                    <input type="text" id="detail-title-input" class="w-full bg-transparent border-none text-2xl font-bold text-white leading-tight focus:ring-1 focus:ring-brand-500/50 rounded p-1 -ml-1" value="${escapeHtml(t.titulo)}" onblur="saveTaskChanges(${t.id})">
                 </div>
                 <button onclick="closeTaskDetail()" class="text-white/40 hover:text-white transition-colors p-2 text-xl">✕</button>
             </div>
@@ -704,7 +714,7 @@
                     <textarea id="detail-desc-input" 
                               class="w-full text-sm text-white/70 leading-relaxed bg-white/[0.03] p-4 rounded-xl border border-white/5 shadow-inner focus:border-brand-500/30 focus:ring-0 resize-none h-32 custom-scrollbar transition-all"
                               onblur="saveTaskChanges(${t.id})"
-                              placeholder="Escribe una descripción técnica...">${t.descripcion || ''}</textarea>
+                              placeholder="Escribe una descripción técnica...">${escapeHtml(t.descripcion)}</textarea>
                 </section>
 
                 <!-- Checklist -->
@@ -930,7 +940,7 @@
             <div class="flex items-start gap-3 bg-white/[0.02] p-2 rounded-lg border border-white/5 hover:border-white/10 transition-all group/item min-w-0">
                 <input type="checkbox" class="lotos-checkbox mt-0.5 flex-shrink-0" ${item.completado ? 'checked' : ''} onclick="toggleCheck(${item.id})">
                 <div class="flex-grow min-w-0">
-                    <span class="text-sm ${item.completado ? 'line-through text-white/20' : 'text-white/70'} block break-words whitespace-pre-wrap">${item.texto}</span>
+                    <span class="text-sm ${item.completado ? 'line-through text-white/20' : 'text-white/70'} block break-words whitespace-pre-wrap">${escapeHtml(item.texto)}</span>
                 </div>
                 <button onclick="deleteCheck(${item.id})" class="opacity-0 group-hover/item:opacity-100 p-1 text-red-500 hover:text-red-400 transition-all flex-shrink-0 text-xs">✕</button>
             </div>
@@ -964,10 +974,10 @@
         return comments.map(c => `
             <div class="bg-white/[0.03] p-4 rounded-xl border border-white/5">
                 <div class="flex justify-between items-center mb-2">
-                    <span class="text-xs font-bold text-brand-400">${c.autor}</span>
+                    <span class="text-xs font-bold text-brand-400">${escapeHtml(c.autor)}</span>
                     <span class="text-[9px] font-mono text-white/20">${c.fecha}</span>
                 </div>
-                <p class="text-sm text-white/70 leading-relaxed break-words whitespace-pre-wrap">${c.cuerpo}</p>
+                <p class="text-sm text-white/70 leading-relaxed break-words whitespace-pre-wrap">${escapeHtml(c.cuerpo)}</p>
             </div>
         `).join('');
     }
@@ -993,7 +1003,7 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     </div>
                     <div class="flex-1 min-w-0 overflow-hidden">
-                        <div class="text-xs font-bold text-white truncate" title="${a.nombre}">${a.nombre}</div>
+                        <div class="text-xs font-bold text-white truncate" title="${escapeHtml(a.nombre)}">${escapeHtml(a.nombre)}</div>
                         <div class="text-[9px] text-white/30 uppercase font-mono truncate">${a.fecha}</div>
                     </div>
                 </a>
