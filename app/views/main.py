@@ -524,6 +524,7 @@ def add_checklist_item(tarea_id):
     item = ChecklistItem(tarea_id=tarea_id, texto=data.get('texto'))
     db.session.add(item)
     db.session.commit()
+    notify_kanban(tarea.proyecto_id, 'task_detail_updated', {'tarea_id': tarea_id})
     return jsonify({'success': True, 'item': {'id': item.id, 'texto': item.texto, 'completado': item.completado}})
 
 @main_bp.route('/api/kanban/checklist/<int:item_id>/toggle', methods=['POST'])
@@ -536,6 +537,7 @@ def toggle_checklist_item(item_id):
         
     item.completado = not item.completado
     db.session.commit()
+    notify_kanban(tarea.proyecto_id, 'task_detail_updated', {'tarea_id': tarea.id})
     return jsonify({'success': True, 'completado': item.completado})
 
 @main_bp.route('/api/kanban/checklist/<int:item_id>', methods=['DELETE'])
@@ -548,6 +550,7 @@ def delete_checklist_item(item_id):
         
     db.session.delete(item)
     db.session.commit()
+    notify_kanban(tarea.proyecto_id, 'task_detail_updated', {'tarea_id': tarea.id})
     return jsonify({'success': True})
 
 @main_bp.route('/api/kanban/tarea/<int:tarea_id>/comentar', methods=['POST'])
@@ -561,6 +564,7 @@ def add_comment(tarea_id):
     comentario = Comentario(tarea_id=tarea_id, autor_id=current_user.id, cuerpo=data.get('cuerpo'))
     db.session.add(comentario)
     db.session.commit()
+    notify_kanban(tarea.proyecto_id, 'task_detail_updated', {'tarea_id': tarea_id})
     return jsonify({
         'success': True, 
         'comentario': {
@@ -607,6 +611,7 @@ def add_attachment(tarea_id):
         )
         db.session.add(adjunto)
         db.session.commit()
+        notify_kanban(tarea.proyecto_id, 'task_detail_updated', {'tarea_id': tarea_id})
         
         return jsonify({
             'success': True, 
@@ -664,6 +669,7 @@ def delete_attachment(adjunto_id):
             
         db.session.delete(adjunto)
         db.session.commit()
+        notify_kanban(tarea.proyecto_id, 'task_detail_updated', {'tarea_id': tarea.id})
         return jsonify({'success': True})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
@@ -778,6 +784,7 @@ def create_column():
     )
     db.session.add(nueva_col)
     db.session.commit()
+    notify_kanban(proyecto_id, 'board_structure_changed', {})
     
     return jsonify({'success': True, 'columna_id': nueva_col.id, 'titulo': nueva_col.titulo})
 
@@ -795,8 +802,11 @@ def reorder_columns():
         col = Columna.query.get(item['id'])
         if col:
             col.orden = item['orden']
+            proyecto_id = col.proyecto_id
             
     db.session.commit()
+    if ordenes and 'proyecto_id' in locals():
+        notify_kanban(proyecto_id, 'board_structure_changed', {})
     return jsonify({'success': True})
 
 @main_bp.route('/api/kanban/columna/<int:columna_id>/edit', methods=['POST'])
@@ -809,6 +819,7 @@ def edit_column_title(columna_id):
     if 'titulo' in data and data['titulo'].strip():
         col.titulo = data['titulo'].strip()
         db.session.commit()
+        notify_kanban(col.proyecto_id, 'board_structure_changed', {})
     return jsonify({'success': True})
 
 @main_bp.route('/api/kanban/columna/<int:columna_id>', methods=['DELETE'])
@@ -832,6 +843,7 @@ def delete_column(columna_id):
         
     db.session.delete(col)
     db.session.commit()
+    notify_kanban(proyecto_id, 'board_structure_changed', {})
     return jsonify({'success': True})
 
 @main_bp.route('/wro')

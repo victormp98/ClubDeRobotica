@@ -564,8 +564,19 @@
     });
 
     socket.on('task_added', () => {
-        // Recarga suave para regenerar el HTML Jinja de la tarjeta 
-        // Se podría inyectar el HTML directo, pero reload previene errores de estado inicial.
+        setTimeout(() => location.reload(), 500);
+    });
+
+    socket.on('task_detail_updated', (data) => {
+        const panel = document.getElementById('task-detail-panel');
+        if (panel && panel.classList.contains('active') && currentTaskId == data.tarea_id) {
+            // Recargar silenciosamente la tarjeta para obtener comentarios y checklists vivos
+            fetchTaskDetails(currentTaskId);
+        }
+    });
+
+    socket.on('board_structure_changed', () => {
+        // Recarga suave para sincronizar creaciones o borrados de columnas globalmente
         setTimeout(() => location.reload(), 500);
     });
 
