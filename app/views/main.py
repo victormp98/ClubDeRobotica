@@ -363,7 +363,7 @@ def update_certamen_config():
             if config:
                 config.valor = str(valor)
             else:
-                config = Configuracion(clave=clave, valor=str(valor), descripcion=f"Config dynamically created: {clave}")
+                config = Configuracion(llave=clave, valor=str(valor), descripcion=f"Config dynamically created: {clave}")
                 db.session.add(config)
             keys_updated.append(clave)
             
