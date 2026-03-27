@@ -1,1 +1,1 @@
-web: flask db upgrade && gunicorn -w 4 -b 0.0.0.0:5000 run:app
+web: flask db upgrade && gunicorn --worker-class eventlet -w 1 -b 0.0.0.0:5000 run:app

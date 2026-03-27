@@ -33,4 +33,4 @@ ENV PORT=5000
 EXPOSE 5000
 
 # Start command
-CMD ["sh", "-c", "flask db upgrade && gunicorn -w 4 -b 0.0.0.0:${PORT} run:app"]
+CMD ["sh", "-c", "flask db upgrade && gunicorn --worker-class eventlet -w 1 -b 0.0.0.0:${PORT} run:app"]
