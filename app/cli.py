@@ -3,6 +3,7 @@ from flask.cli import with_appcontext
 from flask import current_app
 from app.models.user import User
 from app.utils.seed_config import auto_seed_config
+from app.utils.seed_pages import auto_seed_pages
 from app.extensions import db
 
 def get_admin_credentials(app):
@@ -50,6 +51,7 @@ def auto_seed_admin(app):
     # Usamos el logger de la app para la salida
     run_seed_logic(app, app.logger.info, app.logger.error)
     auto_seed_config(app)
+    auto_seed_pages(app)
     from app.utils.seed_torneo import auto_seed_torneo
     auto_seed_torneo(app)
 
