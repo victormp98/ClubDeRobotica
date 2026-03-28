@@ -7,9 +7,11 @@ block_cipher = None
 # Dependencias críticas ocultas de Eventlet y SocketIO que PyInstaller ignora por defecto
 hidden_imports = [
     'engineio.async_drivers.eventlet',
+    'engineio.async_eventlet',
     'eventlet.hubs.epolls',
     'eventlet.hubs.kqueue',
     'eventlet.hubs.selects',
+    'eventlet.hubs.poll',
     'dns',
     'dns.dnssec',
     'dns.e164',
@@ -61,7 +63,7 @@ exe = EXE(
     [],
     exclude_binaries=True,
     name='ClubRobotica_Comando',
-    debug=False,
+    debug=True,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
