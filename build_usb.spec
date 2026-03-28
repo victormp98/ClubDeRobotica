@@ -80,11 +80,16 @@ extra_hidden_imports = [
 hidden_imports = dns_imports + eventlet_imports + engineeio_imports + socketio_imports + extra_hidden_imports
 
 # Datos adjuntos: Las carpetas de plantillas y archivos estáticos de Flask
+flask_admin_data = collect_data_files('flask_admin')
+flask_wtf_data = collect_data_files('flask_wtf')
+wtforms_data = collect_data_files('wtforms')
+
 added_files = [
     ('app/templates', 'app/templates'),
     ('app/static', 'app/static'),
     ('migrations', 'migrations')
-]
+] + flask_admin_data + flask_wtf_data + wtforms_data
+
 
 a = Analysis(
     ['run_offline.py'],
