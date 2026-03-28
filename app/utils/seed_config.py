@@ -17,19 +17,31 @@ DEFAULT_CONFIGS = {
     
     # == CERTAMEN / TORNEO (Textos estáticos) ==
     'TORNEO_FECHA_COUNTDOWN': ('2026-08-01T00:00:00', 'Fecha meta oficial para el contador (YYYY-MM-DDTHH:MM:SS)'),
-    'TORNEO_HERO_TITULO': ('WRO México <span class="bg-clip-text text-transparent bg-gradient-to-r from-brand-400 to-indigo-400">2026</span>', 'Cabecera masiva principal de la Landing del Torneo.'),
+    'TORNEO_COUNTDOWN_LABEL': ('Tiempo para la fase regional', 'Etiqueta pequeña arriba del reloj.'),
+    
+    'TORNEO_TITULO': ('Certamen 2026', 'Texto pequeño en cápsula (badge) del Hero de Torneo.'),
+    'TORNEO_SUBTITULO': ('WRO · México · 2026', 'Subtítulo tracking mono en el Hero de Torneo.'),
+    'TORNEO_SLOGAN': ('Certamen de', 'Slogan gigante de la palabra base en el Hero.'),
     'TORNEO_HERO_DESC': ('Participa en la competencia de robótica más grande del mundo. Construye, programa y compite superando retos tecnológicos que transformarán tu visión del futuro.', 'Párrafo de introducción en el Top del Torneo.'),
-    'TORNEO_HERO_BTN1_LABEL': ('Descubrir Categorías', 'Texto del botón primario en el hero del Torneo.'),
-    'TORNEO_HERO_BTN2_LABEL': ('Ver Reglas Generales', 'Texto del botón secundario en el hero del Torneo.'),
+    'TORNEO_HERO_BTN1_LABEL': ('Registrarme al club', 'Texto del botón primario en el hero del Torneo.'),
+    'TORNEO_HERO_BTN2_LABEL': ('Conocer WRO →', 'Texto del botón secundario en el hero del Torneo.'),
     
-    'TORNEO_SECTION_CAT_SUB': ('Explora todas las disciplinas oficiales donde puedes unirte y competir con tu equipo.', 'Subtítulo para sección Competencias Internacionales (Categorías)'),
-    'TORNEO_SECTION_FECHAS_SUB': ('Mantente atento a los hitos clave para el registro y competencia regional.', 'Subtítulo para cronograma del torneo.'),
-    'TORNEO_SECTION_REQ_TITULO': ('Requisitos de Participación', 'Título para los requisitos del torneo WRO.'),
-    'TORNEO_SECTION_REQ_SUB': ('Lo que necesitas para unirte a nuestros equipos oficiales.', 'Subtítulo para la sección de requisitos.'),
-    'TORNEO_SECTION_PROY_TITULO': ('Proyectos Destacados (WRO)', 'Título para la galería/lista de proyectos semilla del WRO.'),
-    'TORNEO_SECTION_PROY_SUB': ('Proyectos anteriores desarrollados para la competencia.', 'Subtítulo para sección proyectos WRO.'),
+    'TORNEO_INFO_TITULO': ('World Robot Olympiad 2026', 'Cabecera de la sección de información general.'),
+    'TORNEO_INFO_DESC': ('La WRO es la competencia de robótica más grande del mundo. México participa en fases regionales con acceso a la final nacional.', 'Párrafo sobre la WRO.'),
     
-    'TORNEO_CTA_TITULO': ('¿Listo para<br/><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-indigo-400">competir?</span>', 'Cabecera final que invita a inscribirse (bottom page).'),
+    'TORNEO_SECTION_CAT_TITULO': ('Categorías WRO', 'Título principal de la sección de categorías.'),
+    'TORNEO_SECTION_CAT_SUB': ('Competencias', 'Subtítulo para sección Competencias Internacionales (Categorías)'),
+    
+    'TORNEO_SECTION_FECHAS_TITULO': ('Fechas Clave', 'Título para el roadmap de fechas clave.'),
+    'TORNEO_SECTION_FECHAS_SUB': ('Calendario 2026', 'Subtítulo para cronograma del torneo.'),
+    
+    'TORNEO_SECTION_REQ_TITULO': ('Requisitos y Beneficios', 'Título para los requisitos del torneo WRO.'),
+    'TORNEO_SECTION_REQ_SUB': ('Para participar', 'Subtítulo para la sección de requisitos.'),
+    
+    'TORNEO_SECTION_PROY_TITULO': ('Proyectos del Club', 'Título para la galería/lista de proyectos semilla del WRO.'),
+    'TORNEO_SECTION_PROY_SUB': ('Lo que construirás', 'Subtítulo para sección proyectos WRO.'),
+    
+    'TORNEO_CTA_TITULO': ('¿Listo para competir?', 'Cabecera final que invita a inscribirse (bottom page).'),
     'TORNEO_CTA_DESC': ('Únete al Club de Robótica, aprende a construir y programar robots, y representa al club en WRO México 2026.', 'Descripción del bloque final para conseguir miembros.'),
     'TORNEO_CTA_BTN1_LABEL': ('Registrarme ahora', 'Llamada principal a la acción al final del Torneo.'),
     'TORNEO_CTA_BTN2_LABEL': ('Ver portal del club →', 'Enlace secundario hacia Inicio al final del Torneo.')
