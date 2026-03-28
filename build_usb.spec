@@ -1,18 +1,38 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 import os
+from PyInstaller.utils.hooks import collect_submodules, collect_data_files
 
 block_cipher = None
 
-# Dependencias críticas ocultas de Eventlet y SocketIO que PyInstaller ignora por defecto
-hidden_imports = [
-    'engineio.async_drivers.eventlet',
-    'engineio.async_eventlet',
+# --- Recolección automática de submódulos dinámicos ---
+# dnspython 2.x y eventlet cargan muchos módulos dinámicamente.
+# collect_submodules garantiza que TODOS los submódulos se incluyan.
+dns_imports = collect_submodules('dns')
+eventlet_imports = collect_submodules('eventlet')
+engineeio_imports = collect_submodules('engineio')
+socketio_imports = collect_submodules('socketio')
+
+# Dependencias críticas ocultas adicionales que PyInstaller ignora por defecto
+extra_hidden_imports = [
+    # Eventlet hubs (cargados dinámicamente según el OS)
     'eventlet.hubs.epolls',
     'eventlet.hubs.kqueue',
     'eventlet.hubs.selects',
     'eventlet.hubs.poll',
-    'dns',
+    'eventlet.hubs.hub',
+    'eventlet.hubs.asyncio',
+    # Submódulos de dns específicos para dnspython 2.x
+    'dns.rdtypes',
+    'dns.rdtypes.ANY',
+    'dns.rdtypes.IN',
+    'dns.rdtypes.ANY.SOA',
+    'dns.rdtypes.ANY.MX',
+    'dns.rdtypes.ANY.NS',
+    'dns.rdtypes.ANY.CNAME',
+    'dns.rdtypes.ANY.TXT',
+    'dns.rdtypes.IN.A',
+    'dns.rdtypes.IN.AAAA',
     'dns.dnssec',
     'dns.e164',
     'dns.hash',
@@ -24,12 +44,40 @@ hidden_imports = [
     'dns.asyncbackend',
     'dns.asyncquery',
     'dns.asyncresolver',
+    'dns.resolver',
+    'dns.query',
+    'dns.message',
+    'dns.name',
+    'dns.rdata',
+    'dns.rdataclass',
+    'dns.rdataset',
+    'dns.rdatatype',
+    'dns.tokenizer',
+    'dns.exception',
+    'dns.flags',
+    'dns.inet',
+    'dns.ipv4',
+    'dns.ipv6',
+    'dns.opcode',
+    'dns.entropy',
+    'dns.set',
+    'dns.ttl',
+    # Flask y SQLAlchemy
     'flask_socketio',
     'sqlalchemy.sql.default_comparator',
     'sqlalchemy.dialects.sqlite',
+    'sqlalchemy.dialects.sqlite.pysqlite',
+    'sqlalchemy.orm',
     'flask_sqlalchemy',
-    'pymysql'
+    'pymysql',
+    # Encodings requeridos por Windows
+    'encodings',
+    'encodings.utf_8',
+    'encodings.ascii',
+    'encodings.latin_1',
 ]
+
+hidden_imports = dns_imports + eventlet_imports + engineeio_imports + socketio_imports + extra_hidden_imports
 
 # Datos adjuntos: Las carpetas de plantillas y archivos estáticos de Flask
 added_files = [
@@ -44,10 +92,19 @@ a = Analysis(
     binaries=[],
     datas=added_files,
     hiddenimports=hidden_imports,
-    hookspath=[],
+    hookspath=['hooks'],
     hooksconfig={},
-    runtime_hooks=[],
-    excludes=[],
+    runtime_hooks=['runtime_hooks/rthook_dns_fix.py'],
+    excludes=[
+        # Excluir módulos que no usamos para reducir tamaño
+        'tkinter',
+        'matplotlib',
+        'numpy',
+        'pandas',
+        'scipy',
+        'test',
+        'unittest',
+    ],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
