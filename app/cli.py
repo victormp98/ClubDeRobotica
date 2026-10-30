@@ -8,14 +8,17 @@ from app.extensions import db
 
 def get_admin_credentials(app):
     """Obtiene las credenciales del admin desde la configuración."""
-    email = app.config.get('INITIAL_ADMIN_EMAIL', 'admin@club.com')
-    password = app.config.get('INITIAL_ADMIN_PASSWORD', 'admin123')
+    email = app.config.get('INITIAL_ADMIN_EMAIL')
+    password = app.config.get('INITIAL_ADMIN_PASSWORD')
     return email, password
 
 def run_seed_logic(app, log_info, log_error):
     """Lógica compartida para crear el administrador."""
     try:
         email, password = get_admin_credentials(app)
+        if not email or not password:
+            log_info('Inicialización de administrador omitida: configura INITIAL_ADMIN_EMAIL y INITIAL_ADMIN_PASSWORD.')
+            return
         log_info(f"[*] Verificando existencia de administrador: {email}")
         
         user = User.query.filter_by(email=email).first()

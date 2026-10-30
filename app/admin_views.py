@@ -170,24 +170,6 @@ class UserAdmin(SecureModelView):
                 flash(f'Hubo un error aprobando usuarios: {str(ex)}', 'error')
             self.session.rollback()
 
-    @action('reset_password', 'Resetear Contraseña', '¿Estás seguro de que quieres sobreescribir la contraseña de los alumnos seleccionados al valor por defecto configurado en .env?')
-    def action_reset_password(self, ids):
-        try:
-            query = User.query.filter(User.id.in_(ids))
-            count = 0
-            # CR-02: La contraseña por defecto se lee de la configuración / .env (DEFAULT_RESET_PASSWORD)
-            # ya NO está hardcodeada en el código fuente
-            default_password = current_app.config.get('DEFAULT_RESET_PASSWORD', 'robotica2026')
-            for user in query.all():
-                user.set_password(default_password)
-                count += 1
-            self.session.commit()
-            flash(f'Contraseña reseteada al valor de DEFAULT_RESET_PASSWORD para {count} usuarios exitosamente.', 'success')
-        except Exception as ex:
-            if not self.handle_view_exception(ex):
-                flash(f'Hubo un fatal error reseteando contraseñas: {str(ex)}', 'error')
-            self.session.rollback()
-
     # (Opcional) Logica POST-Edicion
     def on_model_change(self, form, model, is_created):
         pass

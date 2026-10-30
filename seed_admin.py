@@ -16,9 +16,11 @@ from app.models.user import User
 def seed_admin():
     app = create_app()
     with app.app_context():
-        # Leer configuración (usa defaults locales o variables de entorno en producción)
+        # Configuración privada requerida para la creación de la cuenta inicial.
         email = app.config.get('INITIAL_ADMIN_EMAIL')
         password = app.config.get('INITIAL_ADMIN_PASSWORD')
+        if not email or not password:
+            raise RuntimeError('Configura INITIAL_ADMIN_EMAIL y INITIAL_ADMIN_PASSWORD antes de crear el administrador.')
         
         print(f"[*] Verificando existencia de administrador: {email}")
         
