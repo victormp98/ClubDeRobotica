@@ -53,3 +53,10 @@ Para este proyecto utilizamos SQLAlchemy ORM.
 * **album_id**: Foreign Key hacia `Album`
 * **fecha_subida**: Timestamp UTC 
 * **activo**: Borrado lógico (bool)
+
+
+## Seguridad de cuentas administrativas
+
+El inicializador `seed_admin.py` requiere establecer `INITIAL_ADMIN_EMAIL` y `INITIAL_ADMIN_PASSWORD` mediante variables de entorno privadas antes de crear el primer administrador. El código ya no proporciona una contraseña administrativa predeterminada.
+
+Se ha retirado la acción de restablecimiento masivo que asignaba la misma contraseña a varios usuarios. Para recuperar el acceso, utiliza los mecanismos de recuperación individual con token y verifica su configuración de correo. Cambia cualquier contraseña antigua de demostración utilizada en entornos accesibles.
