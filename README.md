@@ -19,6 +19,8 @@ Aplicación web para gestionar miembros, proyectos, actividades y contenido del 
 
 `SECRET_KEY` es obligatorio para sesiones, CSRF y tokens de recuperación. Define `DATABASE_URL` para seleccionar la base de datos. Las variables de correo (`MAIL_SERVER`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD` y `MAIL_DEFAULT_SENDER`) habilitan notificaciones y recuperación de acceso.
 
+Define `SOCKETIO_ALLOWED_ORIGINS` con una lista de orígenes HTTP(S) separados por comas para permitir una interfaz web en un dominio distinto. Sin esta variable, Flask-SocketIO aplica su validación de mismo origen.
+
 El proceso de creación de la cuenta inicial toma `INITIAL_ADMIN_EMAIL` y `INITIAL_ADMIN_PASSWORD` del entorno. Si faltan, omite la creación de esa cuenta. Usa una contraseña exclusiva para cada instalación.
 
 ## Ejecución local
@@ -47,7 +49,7 @@ flask seed-admin
 
 ## Recuperación de cuentas
 
-La recuperación individual utiliza un token firmado con expiración y la dirección de correo del usuario. Configura SMTP antes de habilitar este flujo. No asignes una contraseña compartida a un grupo de cuentas.
+La recuperación individual utiliza un token firmado con expiración y la dirección de correo del usuario. Configura SMTP antes de habilitar este flujo. Los cuerpos de correo y los tokens de recuperación no deben escribirse en registros de error. No asignes una contraseña compartida a un grupo de cuentas.
 
 ## Datos locales
 
