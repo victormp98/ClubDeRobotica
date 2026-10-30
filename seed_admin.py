@@ -19,6 +19,8 @@ def seed_admin():
         # Leer configuración (usa defaults locales o variables de entorno en producción)
         email = app.config.get('INITIAL_ADMIN_EMAIL')
         password = app.config.get('INITIAL_ADMIN_PASSWORD')
+        if not email or not password:
+            raise RuntimeError('Configura INITIAL_ADMIN_EMAIL y INITIAL_ADMIN_PASSWORD antes de crear el administrador.')
         
         print(f"[*] Verificando existencia de administrador: {email}")
         
