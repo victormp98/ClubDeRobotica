@@ -24,7 +24,11 @@ def create_app(config_class=Config):
     from .extensions import mail, login_manager, socketio
     mail.init_app(app)
     login_manager.init_app(app)
-    socketio.init_app(app, cors_allowed_origins="*")
+    allowed_origins = [origin.strip() for origin in os.environ.get('SOCKETIO_ALLOWED_ORIGINS', '').split(',') if origin.strip()]
+    if allowed_origins:
+        socketio.init_app(app, cors_allowed_origins=allowed_origins)
+    else:
+        socketio.init_app(app)
 
     # Register blueprints here
     from app.views.main import main_bp
