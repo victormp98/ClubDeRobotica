@@ -65,12 +65,10 @@ def send_async_email(app, msg):
     with app.app_context():
         try:
             mail.send(msg)
-            print(f"[MAIL_SUCCESS] Correo enviado a {msg.recipients}")
-        except Exception as e:
-            # Capturamos el error silenciosamente (para que no afecte el registro)
-            print(f"\n[ATENCIÓN DEV] No se pudo enviar el correo a {msg.recipients} porque el servidor SMTP no está configurado.")
-            print(f"[LINK A TUS CORREOS LOCALES]: \n{msg.body}\n")
-            # print(traceback.format_exc(), file=sys.stderr)
+        except Exception:
+            # Los correos de recuperación contienen tokens; registrar solo la excepción.
+            app.logger.exception('No fue posible enviar un mensaje SMTP.')
+
 
 def enviar_notificacion_admin(user, app):
     """Envia correo al admin en un hilo separado para no bloquear la request."""
