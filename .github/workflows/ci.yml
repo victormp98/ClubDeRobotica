@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "security/**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: sqlite:////tmp/clubrobotica-ci.sqlite3
+      SECRET_KEY: ci-session-secret-not-for-deployment
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Check Python syntax
+        run: python -m compileall -q app seed_admin.py run.py
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Flask application startup
+        run: |
+          python -c "from app import create_app; app = create_app(); assert app is not None; print('Flask app initialized')"
